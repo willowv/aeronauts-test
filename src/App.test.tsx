@@ -1,9 +1,8 @@
-import React from 'react';
-import { render } from '@testing-library/react';
-import App from './App';
+import { SimulateCombat } from './combatBalance'
 
-test('renders learn react link', () => {
-  const { getByText } = render(<App />);
-  const linkElement = getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+test('4 Players, Similar Numbers, Medium Difficulty', () => {
+  console.log(SimulateCombat(
+    { cNormal: 0, cDangerous: 2, cTough: 0, cScary: 0 },
+    { cNormal: 0, cDangerous: 2, cTough: 0, cScary: 0 },
+    4, 2, true));
 });
