@@ -3,48 +3,43 @@ import Combatant from './combatant'
 const playerHealth = 15;
 
 export class Player extends Combatant {
-    // ability scores
-    per: number;
-    int: number;
-    coord: number;
-    agi: number;
-    conv: number;
-
+    abilityScores : { [ability : string] : number };
     focus: number;
 
     constructor(actions: number, picac : number[], focus: number) {
         super(playerHealth, actions);
-        this.per = picac[0];
-        this.int = picac[1];
-        this.coord = picac[2];
-        this.agi = picac[3];
-        this.conv = picac[4];
+        this.abilityScores = {
+            'per' : picac[0],
+            'int' : picac[1],
+            'coord' : picac[2],
+            'agi' : picac[3],
+            'conv' : picac[4]
+        }
         this.focus = focus;
     }
 
     act(rgplayer : Combatant[], rgenemyPrimary : Combatant[], rgenemySecondary : Combatant[]) : void {
-        /*if(rgenemyPrimary.length == 0)
-            return 0;
+        // Select target - for now, choose the lowest health enemy in Primary
+        let rgenemyPrimarySorted = [...rgenemyPrimary].sort((a, b) => a.health - b.health);
         
-        let iPlayerTarget = 0;
-        let iPlayerTargetSecondary = -1;
-        let actPlayerRemaining = actPlayerOutput;
-        while(actPlayerRemaining > 0)
+        let target = 0;
+        for(let action = 0; action < this.actions; action++)
         {
-            if(rgenemyPrimary.length == 0)
-            return actPlayerOutput - actPlayerRemaining;
-            
-            iPlayerTarget = iPlayerTarget % (rgenemyPrimary.length + rgenemySecondary.length);
-            iPlayerTargetSecondary = iPlayerTarget - rgenemyPrimary.length;
-            if(iPlayerTargetSecondary >= 0)
-            DamageAndKill(rgenemySecondary, iPlayerTargetSecondary);
-            else
-            DamageAndKill(rgenemyPrimary, iPlayerTarget);
-            
-            actPlayerRemaining--;
-            iPlayerTarget = (iPlayerTarget + 1) % cPlayerTargets;
-        }*/
-        console.log("Player took an action.");
+            let enemy = rgenemyPrimarySorted[target];
+            let checkResult = this.actionCheck('coord', enemy);
+            if(checkResult >= 15)
+                enemy.takeDamage(5);
+
+            else if (checkResult >= 10)
+                enemy.takeDamage(3);
+
+            if(enemy.isDead())
+                target++;
+        }
+    }
+
+    defend(ability: string, attacker: Combatant) : number {
+        return this.defenseCheck(ability, attacker);
     }
 
     takeDamage(damage: number) {
@@ -56,6 +51,39 @@ export class Player extends Combatant {
 
         this.health -= damage;
     }
+
+    actionCheck(ability : string, enemy : Combatant) : number {
+        let modifier = this.abilityScores[ability];
+        if(this.focus > 0) {
+            modifier++;
+            this.focus--;
+        }
+        let boost = this.actionBoost() - enemy.defenseBoost();
+        return rollDice(modifier, boost);
+    }
+
+    defenseCheck(ability : string, enemy : Combatant) : number {
+        let modifier = this.abilityScores[ability];
+        if(this.focus > 0) {
+            modifier++;
+            this.focus--;
+        }
+        let boost = this.defenseBoost() - enemy.actionBoost();
+        return rollDice(modifier, boost);
+    }
+}
+
+export function rollDice(modifier : number, boost : number) : number {
+    let d6 = 3 + Math.abs(boost);
+    let rolls = Array(d6);
+    for(let i = 0; i < d6; i++) {
+        rolls[i] = Math.floor(Math.random() * 6 + 1);
+    }
+    let rollsSorted = rolls.sort();
+    if(boost > 0) {
+        rollsSorted = rollsSorted.reverse(); // get highest three if boost is positive
+    }
+    return rollsSorted[0] + rollsSorted[1] + rollsSorted[2] + modifier;
 }
 
 export interface PlayerSet {

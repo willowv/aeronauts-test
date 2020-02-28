@@ -6,7 +6,23 @@ export class Enemy extends Combatant{
     }
 
     act(rgplayer : Combatant[], rgenemyPrimary : Combatant[], rgenemySecondary : Combatant[]) : void {
-        console.log("Enemy took an action.");
+        // choose the player with the highest health for now
+        let rgplayerSorted = [...rgplayer].sort((a, b) => b.health - a.health);
+
+        let target = 0;
+        for(let action = 0; action < this.actions; action++)
+        {
+            let player = rgplayerSorted[target];
+            let checkResult = player.defend('agi', this);
+            if(checkResult < 10)
+                player.takeDamage(5);
+
+            else if (checkResult < 15)
+                player.takeDamage(2);
+
+            if(player.isDead())
+                target++;
+        }
     }
 }
 
