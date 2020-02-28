@@ -1,26 +1,12 @@
-export class Enemy {
-    health: number;
-    actions: number;
+import Combatant from './combatant'
 
+export class Enemy extends Combatant{
     constructor(health: number, actions: number) {
-        this.health = health;
-        this.actions = actions;
+        super(health, actions);
     }
 
-    takeDamage(damage: number) {
-        this.health -= damage;
-        if(this.health < 0 )
-            return -this.health;
-
-        return 0;
-    }
-
-    dealDamage() {
-        return this.actions;
-    }
-
-    isDead() {
-        return this.health <= 0;
+    act(rgplayer : Combatant[], rgenemyPrimary : Combatant[], rgenemySecondary : Combatant[]) : void {
+        console.log("Enemy took an action.");
     }
 }
 
