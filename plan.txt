@@ -4,10 +4,11 @@ Incremental steps toward a full simulator
 -- create a player class for tracking player health, ability scores, tokens, and focus (x)
 -- add tokens to enemy class (x)
 -- add support for having players make attack/defense checks (x)
--- tests!
--- update simulator to run multiple times and output statistics
---- did players win; players average health/focus, lowest health/focus; unspent tokens of each type
+-- update simulator to run multiple times and output statistics (x)
 
 - Support for weapons/special actions with limited AI (healing/shielding vs. attacking)
+-- weapons/actions have thresholds, effects, possible additional costs (actions, focus, free attacks, etc), key ability score, possibly multiple targets => probably same signature as the act method
+-- players and enemies have them, may have more than one, and need logic to choose between them
+
 - Support airship combat
 - Support for maps/movement (abstract this somehow for now)
