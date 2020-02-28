@@ -5,14 +5,19 @@ export class Enemy extends Combatant{
         super(health, actions);
     }
 
-    act(rgplayer : Combatant[], rgenemyPrimary : Combatant[], rgenemySecondary : Combatant[]) : void {
-        // choose the player with the highest health for now
-        let rgplayerSorted = [...rgplayer].sort((a, b) => b.health - a.health);
+    act(rgplayer : Combatant[], rgenemyPrimary : Combatant[], rgenemySecondary : Combatant[]) : number {
+        // Temporary AI
+        let rgplayerTarget = rgplayer
+            .filter((player) => !player.isDead()) // filter out dead players
+            .sort((a, b) => b.health - a.health); // target player with the highest health
+
+        if(rgplayerTarget.length === 0)
+            return 0; // no players to target
 
         let target = 0;
         for(let action = 0; action < this.actions; action++)
         {
-            let player = rgplayerSorted[target];
+            let player = rgplayerTarget[target];
             let checkResult = player.defend('agi', this);
             if(checkResult < 10)
                 player.takeDamage(5);
@@ -21,8 +26,13 @@ export class Enemy extends Combatant{
                 player.takeDamage(2);
 
             if(player.isDead())
+            {
                 target++;
+                if(target >= rgplayerTarget.length)
+                    return action + 1; // no enemy to target
+            }
         }
+        return this.actions;
     }
 }
 

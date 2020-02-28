@@ -32,33 +32,33 @@ export function SimulateCombat(
   let cRound = 0;
   while(!isPrimaryDefeated && !arePlayersDefeated && cRound < cRoundLimit)
   {
-    isPrimaryDefeated = true;
-    rgenemyPrimary.forEach((enemy : Enemy) => {
-      if(!enemy.isDead()) {
-        isPrimaryDefeated = false;
-        enemy.act(rgplayer, rgenemyPrimary, rgenemySecondary);
-        actEnemy += enemy.actions;
-        actTotal += enemy.actions;
-      }
-    });
-
-    rgenemySecondary.forEach((enemy : Enemy) => {
-      if(!enemy.isDead()) {
-        enemy.act(rgplayer, rgenemyPrimary, rgenemySecondary);
-        actEnemy += enemy.actions;
-        actTotal += enemy.actions;
-      }
-    });
-
     arePlayersDefeated = true;
     rgplayer.forEach((player : Player) => {
       if(!player.isDead()) {
         arePlayersDefeated = false;
-        player.act(rgplayer, rgenemyPrimary, rgenemySecondary);
-        actTotal += player.actions;
+        actTotal += player.act(rgplayer, rgenemyPrimary, rgenemySecondary);
       }
     });
+    if(arePlayersDefeated) break;
 
+    isPrimaryDefeated = true;
+    rgenemyPrimary.forEach((enemy : Enemy) => {
+      if(!enemy.isDead()) {
+        isPrimaryDefeated = false;
+        let actions = enemy.act(rgplayer, rgenemyPrimary, rgenemySecondary);
+        actEnemy += actions;
+        actTotal += actions;
+      }
+    });
+    if(isPrimaryDefeated) break;
+
+    rgenemySecondary.forEach((enemy : Enemy) => {
+      if(!enemy.isDead()) {
+        let actions = enemy.act(rgplayer, rgenemyPrimary, rgenemySecondary);
+        actEnemy += actions;
+        actTotal += actions;
+      }
+    });
     cRound++;
   }
   

@@ -13,7 +13,7 @@ export class Combatant {
         this.actions = actions;
     }
 
-    act(rgplayer : Combatant[], rgenemyPrimary : Combatant[], rgenemySecondary : Combatant[]) : void { }
+    act(rgplayer : Combatant[], rgenemyPrimary : Combatant[], rgenemySecondary : Combatant[]) : number { return this.actions; }
 
     defend(ability : string, attacker : Combatant) : number { return 0; }
 
@@ -29,11 +29,11 @@ export class Combatant {
         let boost = 0;
         if(this.adv > 0) {
             boost++;
-            this.exp--;
+            this.adv--;
         }
         if(this.disadv > 0) {
             boost--;
-            this.def--;
+            this.disadv--;
         }
         return boost;
     }

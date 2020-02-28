@@ -18,14 +18,19 @@ export class Player extends Combatant {
         this.focus = focus;
     }
 
-    act(rgplayer : Combatant[], rgenemyPrimary : Combatant[], rgenemySecondary : Combatant[]) : void {
-        // Select target - for now, choose the lowest health enemy in Primary
-        let rgenemyPrimarySorted = [...rgenemyPrimary].sort((a, b) => a.health - b.health);
+    act(rgplayer : Combatant[], rgenemyPrimary : Combatant[], rgenemySecondary : Combatant[]) : number {
+        // Temporary AI
+        let rgenemyTarget = rgenemyPrimary
+            .filter((enemy) => !enemy.isDead()) // only target living enemies
+            .sort((a, b) => a.health - b.health); // attack lowest health enemy
+        
+        if(rgenemyTarget.length === 0)
+            return 0; // No enemy to target
         
         let target = 0;
         for(let action = 0; action < this.actions; action++)
         {
-            let enemy = rgenemyPrimarySorted[target];
+            let enemy = rgenemyTarget[target];
             let checkResult = this.actionCheck('coord', enemy);
             if(checkResult >= 15)
                 enemy.takeDamage(5);
@@ -34,8 +39,13 @@ export class Player extends Combatant {
                 enemy.takeDamage(3);
 
             if(enemy.isDead())
+            {
                 target++;
+                if(target >= rgenemyTarget.length)
+                    return action + 1; // No enemy to target
+            }
         }
+        return this.actions;
     }
 
     defend(ability: string, attacker: Combatant) : number {
