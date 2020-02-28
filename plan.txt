@@ -1,8 +1,9 @@
 Incremental steps toward a full simulator
 
 - Use real, seeded rolls with focus, tokens, and health/damage (but only use damage for now)
--- create a player class for tracking player health, ability scores, tokens, and focus
--- add tokens to enemy class
+-- create a player class for tracking player health, ability scores, tokens, and focus (x)
+-- add tokens to enemy class (x)
+-- add support for having players make attack/defense checks
 -- update simulator logic to deal damage to players instead of simply recording action count
 -- update simulator logic to have players roll for damage instead of simply deducting action count
 
