@@ -1,6 +1,6 @@
-import Combatant from './combatant'
-import { Enemy, EnemySet, rgEnemyFromEnemySet } from './enemy'
-import { Player, PlayerSet, rgplayerFromPlayerSet } from './player'
+import Combatant from './combatants/combatant'
+import { Enemy, EnemySet, rgEnemyFromEnemySet } from './combatants/enemy'
+import { Player, PlayerSet, rgplayerFromPlayerSet } from './combatants/player'
 
 const cRoundLimit = 10;
 
