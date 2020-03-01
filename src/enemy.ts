@@ -43,25 +43,25 @@ export interface EnemySet {
     cScary : number;
 }
 
-const enemyNormal = () => new Enemy(4, 1);
-const enemyDangerous = () => new Enemy(8, 2);
-const enemyTough = () => new Enemy(12, 2);
-const enemyScary = () => new Enemy(16, 4);
+const enemyNormal = (baseActions : number) => new Enemy(4, Math.ceil(baseActions/2));
+const enemyDangerous = (baseActions : number) => new Enemy(8, Math.ceil(baseActions));
+const enemyTough = (baseActions : number) => new Enemy(12, Math.ceil(baseActions));
+const enemyScary = (baseActions : number) => new Enemy(16, Math.ceil(baseActions*2));
 
-function rgEnemyByType(cenemy : number, fnEnemy : () => Enemy)
+function rgEnemyByType(cenemy : number, fnEnemy : (baseActions : number) => Enemy, baseActions : number)
 {
   let rgenemy = [];
   for(let i = 0; i < cenemy; i++)
-    rgenemy.push(fnEnemy());
+    rgenemy.push(fnEnemy(baseActions));
   
   return rgenemy;
 }
 
-export function rgEnemyFromEnemySet(enemySet : EnemySet) {
+export function rgEnemyFromEnemySet(enemySet : EnemySet, baseActions : number) {
     let rgenemy : Enemy[] = [];
-    rgenemy = rgenemy.concat(rgEnemyByType(enemySet.cNormal, enemyNormal));
-    rgenemy = rgenemy.concat(rgEnemyByType(enemySet.cDangerous, enemyDangerous));
-    rgenemy = rgenemy.concat(rgEnemyByType(enemySet.cTough, enemyTough));
-    rgenemy = rgenemy.concat(rgEnemyByType(enemySet.cScary, enemyScary));
+    rgenemy = rgenemy.concat(rgEnemyByType(enemySet.cNormal, enemyNormal, baseActions));
+    rgenemy = rgenemy.concat(rgEnemyByType(enemySet.cDangerous, enemyDangerous, baseActions));
+    rgenemy = rgenemy.concat(rgEnemyByType(enemySet.cTough, enemyTough, baseActions));
+    rgenemy = rgenemy.concat(rgEnemyByType(enemySet.cScary, enemyScary, baseActions));
     return rgenemy;
 }

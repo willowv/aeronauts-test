@@ -2,7 +2,6 @@ import Combatant from './combatant'
 import { Enemy, EnemySet, rgEnemyFromEnemySet } from './enemy'
 import { Player, PlayerSet, rgplayerFromPlayerSet } from './player'
 
-const playerActions = 2;
 const cRoundLimit = 10;
 
 export interface CombatScenario {
@@ -10,6 +9,7 @@ export interface CombatScenario {
   enemySetSecondary : EnemySet,
   playerSet : PlayerSet,
   isAmbush : boolean,
+  isAirCombat : boolean,
   startingFocus : number
 }
 
@@ -33,12 +33,20 @@ export interface CombatStats {
 // Return number of total actions and number of threat actions
 export function SimulateCombat(scenario : CombatScenario) : CombatStats
 {
+  let baseActions = scenario.isAirCombat ? 1 : 2;
   let actTotal = 0;
   let actEnemy = 0;
-  let rgenemyPrimary = rgEnemyFromEnemySet(scenario.enemySetPrimary);
-  let rgenemySecondary = rgEnemyFromEnemySet(scenario.enemySetSecondary);
-  let rgplayer = rgplayerFromPlayerSet(scenario.playerSet, playerActions, scenario.startingFocus);
-  
+  let rgenemyPrimary = rgEnemyFromEnemySet(scenario.enemySetPrimary, baseActions);
+  let rgenemySecondary = rgEnemyFromEnemySet(scenario.enemySetSecondary, baseActions);
+  let rgplayer = rgplayerFromPlayerSet(scenario.playerSet, baseActions, scenario.startingFocus);
+  if(scenario.isAirCombat)
+  {
+    // Add two extra players (captain and engineer can double as the health for the other two for now)
+    // I guess we're assuming there's always a captain and an engineer
+    rgplayer.push(new Player(0, [0,0,0,1,0], 6));
+    rgplayer.push(new Player(0, [0,0,0,1,0], 6));
+  }
+
   // Combat
   if(scenario.isAmbush)
   {

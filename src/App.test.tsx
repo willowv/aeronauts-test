@@ -17,18 +17,19 @@ interface ScenarioReport{
 
 test('4 Players, Similar Numbers, Medium Difficulty', () => {
   let scenario : CombatScenario = {
-    enemySetPrimary : { cNormal: 0, cDangerous: 0, cTough: 2, cScary: 0 },
-    enemySetSecondary : { cNormal: 0, cDangerous: 2, cTough: 0, cScary: 0 },
+    enemySetPrimary : { cNormal: 0, cDangerous: 0, cTough: 6, cScary: 0 },
+    enemySetSecondary : { cNormal: 0, cDangerous: 0, cTough: 0, cScary: 0 },
     playerSet : {
       rgpicac: [
-        [2, 1, 1, 0, 0],
-        [0, 2, 1, 1, 0],
-        [0, 0, 2, 1, 1],
-        [1, 0, 0, 2, 1],
+        [1, -1, 2, 2, 0],
+        [2, 0, 1, 1, 0],
+        [1, 2, 2, 1, 1],
+        [1, 1, 2, 1, 2],
       ]
     },
+    isAirCombat : true,
     isAmbush : false,
-    startingFocus : 12
+    startingFocus : 9
   }
   let rgstats : CombatStats[] = [];
   for(let i = 0; i < cTrials; i++)
