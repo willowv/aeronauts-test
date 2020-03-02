@@ -1,52 +1,35 @@
-export class Combatant {
-    health: number;
+export abstract class Combatant {
+    health: {[component : string] : number};
     actions: number;
 
     // tokens
-    adv : number = 0;
-    disadv : number = 0;
-    def : number = 0;
-    exp : number = 0;
+    tokens : { [type : string] : number[] } = {
+        'action': [0,0],
+        'defense': [0,0]
+    }
 
-    constructor(health : number, actions : number) {
+    constructor(health : {[component : string] : number}, actions : number) {
         this.health = health;
         this.actions = actions;
     }
 
-    act(rgplayer : Combatant[], rgenemyPrimary : Combatant[], rgenemySecondary : Combatant[]) : number { return this.actions; }
+    abstract act(rgplayer : Combatant[], rgenemyPrimary : Combatant[], rgenemySecondary : Combatant[]) : number
 
-    defend(ability : string, attacker : Combatant) : number { return 0; }
+    abstract defend(ability : string, attacker : Combatant) : number
 
-    takeDamage(damage : number) : void {
-        this.health -= damage;
-    }
+    abstract takeDamage(damage : number, component : string) : void
 
-    isDead() {
-        return this.health <= 0;
-    }
+    abstract isDead() : boolean
 
-    actionBoost() {
+    getBoost(tokenType : string) {
         let boost = 0;
-        if(this.adv > 0) {
+        if(this.tokens[tokenType][0] > 0) {
             boost++;
-            this.adv--;
+            this.tokens[tokenType][0]--;
         }
-        if(this.disadv > 0) {
+        if(this.tokens[tokenType][1] > 0) {
             boost--;
-            this.disadv--;
-        }
-        return boost;
-    }
-
-    defenseBoost() {
-        let boost = 0;
-        if(this.def > 0) {
-            boost++;
-            this.def--;
-        }
-        if(this.exp > 0) {
-            boost--;
-            this.exp--;
+            this.tokens[tokenType][1]--;
         }
         return boost;
     }

@@ -1,4 +1,3 @@
-import Combatant from './combatants/combatant'
 import { Enemy, EnemySet, rgEnemyFromEnemySet } from './combatants/enemy'
 import { Player, PlayerSet, rgplayerFromPlayerSet } from './combatants/player'
 
@@ -8,7 +7,6 @@ export interface CombatScenario {
   enemySetPrimary : EnemySet,
   enemySetSecondary : EnemySet,
   playerSet : PlayerSet,
-  isAmbush : boolean,
   isAirCombat : boolean,
   startingFocus : number
 }
@@ -39,20 +37,6 @@ export function SimulateCombat(scenario : CombatScenario) : CombatStats
   let rgenemyPrimary = rgEnemyFromEnemySet(scenario.enemySetPrimary, baseActions);
   let rgenemySecondary = rgEnemyFromEnemySet(scenario.enemySetSecondary, baseActions);
   let rgplayer = rgplayerFromPlayerSet(scenario.playerSet, baseActions, scenario.startingFocus);
-  if(scenario.isAirCombat)
-  {
-    // Add two extra players (captain and engineer can double as the health for the other two for now)
-    // I guess we're assuming there's always a captain and an engineer
-    rgplayer.push(new Player(0, [0,0,0,1,0], 6));
-    rgplayer.push(new Player(0, [0,0,0,1,0], 6));
-  }
-
-  // Combat
-  if(scenario.isAmbush)
-  {
-    // 1 enemy action per player (how to decide what these are?)
-    actEnemy += rgplayer.length;
-  }
 
   let isPrimaryDefeated = false;
   let arePlayersDefeated = false;
@@ -110,28 +94,28 @@ function getCombatStats(
   let lowestPlayerHealth = 15;
   let lowestPlayerFocus = 12;
   rgplayer.forEach((player : Player) => {
-    lowestPlayerHealth = Math.min(lowestPlayerHealth, player.health);
+    lowestPlayerHealth = Math.min(lowestPlayerHealth, player.getHealth());
     lowestPlayerFocus = Math.min(lowestPlayerFocus, player.focus);
-    totalPlayerHealth += player.health;
+    totalPlayerHealth += player.getHealth();
     totalPlayerFocus += player.focus;
-    unspentAdv += player.adv;
-    unspentDisadv += player.disadv;
-    unspentDef += player.def;
-    unspentExp += player.exp;
+    unspentAdv += player.tokens['action'][0];
+    unspentDisadv += player.tokens['action'][1];
+    unspentDef += player.tokens['defense'][0];
+    unspentExp += player.tokens['defense'][1];
   });
 
   rgenemyPrimary.forEach((enemy : Enemy) => {
-    unspentAdv += enemy.adv;
-    unspentDisadv += enemy.disadv;
-    unspentDef += enemy.def;
-    unspentExp += enemy.exp;
+    unspentAdv += enemy.tokens['action'][0];
+    unspentDisadv += enemy.tokens['action'][1];
+    unspentDef += enemy.tokens['defense'][0];
+    unspentExp += enemy.tokens['defense'][1];
   });
 
   rgenemySecondary.forEach((enemy : Enemy) => {
-    unspentAdv += enemy.adv;
-    unspentDisadv += enemy.disadv;
-    unspentDef += enemy.def;
-    unspentExp += enemy.exp;
+    unspentAdv += enemy.tokens['action'][0];
+    unspentDisadv += enemy.tokens['action'][1];
+    unspentDef += enemy.tokens['defense'][0];
+    unspentExp += enemy.tokens['defense'][1];
   });
 
   return {

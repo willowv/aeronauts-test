@@ -1,8 +1,9 @@
 import Combatant from './combatant'
+import { Character } from './character';
 
 const playerHealth = 15;
 
-export class Player extends Combatant {
+export class Player extends Character {
     abilityScores : { [ability : string] : number };
     focus: number;
 
@@ -22,7 +23,7 @@ export class Player extends Combatant {
         // Temporary AI
         let rgenemyTarget = rgenemyPrimary
             .filter((enemy) => !enemy.isDead()) // only target living enemies
-            .sort((a, b) => a.health - b.health); // attack lowest health enemy
+            .sort((a, b) => a.health['none'] - b.health['none']); // attack lowest health enemy
         
         if(rgenemyTarget.length === 0)
             return 0; // No enemy to target
@@ -31,12 +32,12 @@ export class Player extends Combatant {
         for(let action = 0; action < this.actions; action++)
         {
             let enemy = rgenemyTarget[target];
-            let checkResult = this.actionCheck('coord', enemy);
+            let checkResult = this.actionCheck('coord', this.getBoost('action') - enemy.getBoost('defense')); // need to handle attacking airships, using different stats
             if(checkResult >= 15)
-                enemy.takeDamage(5);
+                enemy.takeDamage(5, 'none');
 
             else if (checkResult >= 10)
-                enemy.takeDamage(3);
+                enemy.takeDamage(3, 'none');
 
             if(enemy.isDead())
             {
@@ -49,36 +50,35 @@ export class Player extends Combatant {
     }
 
     defend(ability: string, attacker: Combatant) : number {
-        return this.defenseCheck(ability, attacker);
+        return this.defenseCheck(ability, this.getBoost('defense') - attacker.getBoost('action')); //don't need to worry about airship here, it has its own defend implementation
     }
 
-    takeDamage(damage: number) {
-        if(this.health > 10 && this.health - damage <= 10)
-            this.disadv += 1;
+    takeDamage(damage: number, component : string) {
+        let health = this.getHealth();
+        if(health > 10 && health - damage <= 10)
+            this.tokens['action'][1]++;
 
-        if(this.health > 5 && this.health - damage <= 5)
-            this.disadv += 1;
+        if(health > 5 && health - damage <= 5)
+            this.tokens['action'][1]++;
 
-        this.health -= damage;
+        this.setHealth(health - damage);
     }
 
-    actionCheck(ability : string, enemy : Combatant) : number {
+    actionCheck(ability : string, boost : number) : number {
         let modifier = this.abilityScores[ability];
         if(this.focus > 0) {
             modifier++;
             this.focus--;
         }
-        let boost = this.actionBoost() - enemy.defenseBoost();
         return rollDice(modifier, boost);
     }
 
-    defenseCheck(ability : string, enemy : Combatant) : number {
+    defenseCheck(ability : string, boost : number) : number {
         let modifier = this.abilityScores[ability];
         if(this.focus > 0) {
             modifier++;
             this.focus--;
         }
-        let boost = this.defenseBoost() - enemy.actionBoost();
         return rollDice(modifier, boost);
     }
 }

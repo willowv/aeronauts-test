@@ -1,6 +1,7 @@
 import Combatant from './combatant'
+import { Character } from './character';
 
-export class Enemy extends Combatant{
+export class Enemy extends Character{
     constructor(health: number, actions: number) {
         super(health, actions);
     }
@@ -9,7 +10,7 @@ export class Enemy extends Combatant{
         // Temporary AI
         let rgplayerTarget = rgplayer
             .filter((player) => !player.isDead()) // filter out dead players
-            .sort((a, b) => b.health - a.health); // target player with the highest health
+            .sort((a, b) => b.health['none'] - a.health['none']); // target player with the highest health
 
         if(rgplayerTarget.length === 0)
             return 0; // no players to target
@@ -20,10 +21,10 @@ export class Enemy extends Combatant{
             let player = rgplayerTarget[target];
             let checkResult = player.defend('agi', this);
             if(checkResult < 10)
-                player.takeDamage(5);
+                player.takeDamage(5, 'none'); // need to determine component
 
             else if (checkResult < 15)
-                player.takeDamage(2);
+                player.takeDamage(2, 'none');
 
             if(player.isDead())
             {
@@ -33,6 +34,14 @@ export class Enemy extends Combatant{
             }
         }
         return this.actions;
+    }
+
+    defend(ability: string, attacker: Combatant): number {
+        throw new Error("Method not implemented.");
+    }
+
+    takeDamage(damage: number, component: string = ''): void {
+        this.setHealth(this.getHealth() - damage);
     }
 }
 

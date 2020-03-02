@@ -27,8 +27,7 @@ test('4 Players, Similar Numbers, Medium Difficulty', () => {
         [1, 1, 2, 1, 2],
       ]
     },
-    isAirCombat : true,
-    isAmbush : false,
+    isAirCombat : false,
     startingFocus : 9
   }
   let rgstats : CombatStats[] = [];
