@@ -31,24 +31,30 @@ export enum Ability {
 export abstract class Combatant {
     health: number[];
     actions: number;
+    _isCritical : boolean;
 
     // tokens
     tokens : number[][] = [];
 
-    constructor(health : number[], actions : number) {
+    constructor(health : number[], actions : number, isCritical : boolean) {
         this.health = health;
         this.actions = actions;
         this.tokens[Token.Action] = [0,0];
         this.tokens[Token.Defense] = [0,0];
+        this._isCritical = isCritical;
     }
 
-    abstract act(rgplayer : Combatant[], rgenemyPrimary : Combatant[], rgenemySecondary : Combatant[]) : number
+    abstract act(rgplayer : Combatant[], rgenemy : Combatant[]) : number
 
     abstract defend(ability : Ability, token : Token, attackerBoost : number) : number
 
     abstract takeDamage(damage : number, component : Component) : void
 
     abstract isDead() : boolean
+
+    isCritical() : boolean {
+        return this._isCritical;
+    }
 
     getBoost(tokenType : Token) {
         let boost = 0;

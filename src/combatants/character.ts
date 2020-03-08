@@ -1,8 +1,8 @@
 import { Combatant, Component } from "./combatant";
 
 export abstract class Character extends Combatant {
-    constructor(health : number, actions: number) {
-        super([health], actions);
+    constructor(health : number, actions: number, isCritical : boolean) {
+        super([health], actions, isCritical);
     }
 
     isDead() : boolean {

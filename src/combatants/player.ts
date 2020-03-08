@@ -8,15 +8,15 @@ export class Player extends Character {
     focus: number;
 
     constructor(actions: number, picac : number[], focus: number) {
-        super(playerHealth, actions);
+        super(playerHealth, actions, true /* players are always critical */);
         this.abilityScores = [...picac];
         this.focus = focus;
     }
 
-    act(rgplayer : Combatant[], rgenemyPrimary : Combatant[], rgenemySecondary : Combatant[]) : number {
+    act(rgplayer : Combatant[], rgenemy : Combatant[]) : number {
         // Temporary AI
-        let rgenemyTarget = rgenemyPrimary
-            .filter((enemy) => !enemy.isDead()) // only target living enemies
+        let rgenemyTarget = rgenemy
+            .filter((enemy) => !enemy.isDead() && enemy.isCritical()) // only target living, primary enemies
             .sort((a, b) => a.health[0] - b.health[0]); // attack lowest health enemy
         
         if(rgenemyTarget.length === 0)

@@ -2,11 +2,11 @@ import Combatant, { Ability, Token, Component } from './combatant'
 import { Character } from './character';
 
 export class Enemy extends Character{
-    constructor(health: number, actions: number) {
-        super(health, actions);
+    constructor(health: number, actions: number, isCritical: boolean) {
+        super(health, actions, isCritical);
     }
 
-    act(rgplayer : Combatant[], rgenemyPrimary : Combatant[], rgenemySecondary : Combatant[]) : number {
+    act(rgplayer : Combatant[], rgenemy : Combatant[]) : number {
         // Temporary AI
         let rgplayerTarget = rgplayer
             .filter((player) => !player.isDead()) // filter out dead players
@@ -55,25 +55,29 @@ export interface EnemySet {
     cScary : number;
 }
 
-const enemyNormal = (baseActions : number) => new Enemy(4, Math.ceil(baseActions/2));
-const enemyDangerous = (baseActions : number) => new Enemy(8, Math.ceil(baseActions));
-const enemyTough = (baseActions : number) => new Enemy(12, Math.ceil(baseActions));
-const enemyScary = (baseActions : number) => new Enemy(16, Math.ceil(baseActions*2));
+const enemyNormal = (baseActions : number, isCritical : boolean) => new Enemy(4, Math.ceil(baseActions/2), isCritical);
+const enemyDangerous = (baseActions : number, isCritical : boolean) => new Enemy(8, Math.ceil(baseActions), isCritical);
+const enemyTough = (baseActions : number, isCritical : boolean) => new Enemy(12, Math.ceil(baseActions), isCritical);
+const enemyScary = (baseActions : number, isCritical : boolean) => new Enemy(16, Math.ceil(baseActions*2), isCritical);
 
-function rgEnemyByType(cenemy : number, fnEnemy : (baseActions : number) => Enemy, baseActions : number)
+function rgEnemyByType(
+    cenemy : number,
+    fnEnemy : (baseActions : number, isCritical : boolean) => Enemy,
+    baseActions : number,
+    isCritical : boolean)
 {
   let rgenemy = [];
   for(let i = 0; i < cenemy; i++)
-    rgenemy.push(fnEnemy(baseActions));
+    rgenemy.push(fnEnemy(baseActions, isCritical));
   
   return rgenemy;
 }
 
-export function rgEnemyFromEnemySet(enemySet : EnemySet, baseActions : number) {
+export function rgEnemyFromEnemySet(enemySet : EnemySet, baseActions : number, isCritical : boolean) {
     let rgenemy : Enemy[] = [];
-    rgenemy = rgenemy.concat(rgEnemyByType(enemySet.cNormal, enemyNormal, baseActions));
-    rgenemy = rgenemy.concat(rgEnemyByType(enemySet.cDangerous, enemyDangerous, baseActions));
-    rgenemy = rgenemy.concat(rgEnemyByType(enemySet.cTough, enemyTough, baseActions));
-    rgenemy = rgenemy.concat(rgEnemyByType(enemySet.cScary, enemyScary, baseActions));
+    rgenemy = rgenemy.concat(rgEnemyByType(enemySet.cNormal, enemyNormal, baseActions, isCritical));
+    rgenemy = rgenemy.concat(rgEnemyByType(enemySet.cDangerous, enemyDangerous, baseActions, isCritical));
+    rgenemy = rgenemy.concat(rgEnemyByType(enemySet.cTough, enemyTough, baseActions, isCritical));
+    rgenemy = rgenemy.concat(rgEnemyByType(enemySet.cScary, enemyScary, baseActions, isCritical));
     return rgenemy;
 }

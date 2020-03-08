@@ -1,8 +1,6 @@
 import Combatant, { Token, Component, Ability, Boost } from "./combatant";
 import { Player } from "./player";
 
-
-
 export class PlayerAirship extends Combatant {
     captain : Player;
     engineer: Player;
@@ -13,7 +11,7 @@ export class PlayerAirship extends Combatant {
         health[Component.Torpedoes] = 15;
         health[Component.Engines] = 15;
         health[Component.AntiAir] = 15;
-        super(health, 0);
+        super(health, 0, true);
         this.captain = captain;
         this.engineer = engineer;
 
@@ -24,9 +22,9 @@ export class PlayerAirship extends Combatant {
         this.tokens[Token.AntiAir] = [0,0];
     }
 
-    act(rgplayer : Combatant[], rgenemyPrimary : Combatant[], rgenemySecondary : Combatant[]) : number {
-        return this.captain.act(rgplayer, rgenemyPrimary, rgenemySecondary) +
-            this.engineer.act(rgplayer, rgenemyPrimary, rgenemySecondary);
+    act(rgplayer : Combatant[], rgenemy : Combatant[]) : number {
+        return this.captain.act(rgplayer, rgenemy) +
+            this.engineer.act(rgplayer, rgenemy); // need to handle the captain and the engineer being aware of the ship and its tokens
     }
 
     defend(ability : Ability, token : Token, attackerBoost : number) : number {

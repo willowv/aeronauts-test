@@ -35,9 +35,10 @@ export function SimulateCombat(scenario : CombatScenario) : CombatStats
   let baseActions = scenario.isAirCombat ? 1 : 2;
   let actTotal = 0;
   let actEnemy = 0;
-  let rgenemyPrimary = rgEnemyFromEnemySet(scenario.enemySetPrimary, baseActions);
-  let rgenemySecondary = rgEnemyFromEnemySet(scenario.enemySetSecondary, baseActions);
   let rgplayer = rgplayerFromPlayerSet(scenario.playerSet, baseActions, scenario.startingFocus);
+  let rgenemy =
+    rgEnemyFromEnemySet(scenario.enemySetPrimary, baseActions, true /* primary enemies are critical */).concat(
+    rgEnemyFromEnemySet(scenario.enemySetSecondary, baseActions, false /* secondary enemies are not */));
 
   let isPrimaryDefeated = false;
   let arePlayersDefeated = false;
@@ -48,40 +49,35 @@ export function SimulateCombat(scenario : CombatScenario) : CombatStats
     arePlayersDefeated = true;
     rgplayer.forEach((player : Player) => {
       if(!player.isDead()) {
-        arePlayersDefeated = false;
-        actTotal += player.act(rgplayer, rgenemyPrimary, rgenemySecondary);
+        if(player.isCritical())
+          arePlayersDefeated = false;
+        
+        actTotal += player.act(rgplayer, rgenemy);
       }
     });
     if(arePlayersDefeated) break;
 
     isPrimaryDefeated = true;
-    rgenemyPrimary.forEach((enemy : Enemy) => {
+    rgenemy.forEach((enemy : Enemy) => {
       if(!enemy.isDead()) {
-        isPrimaryDefeated = false;
-        let actions = enemy.act(rgplayer, rgenemyPrimary, rgenemySecondary);
+        if(enemy.isCritical())
+          isPrimaryDefeated = false;
+        
+        let actions = enemy.act(rgplayer, rgenemy);
         actEnemy += actions;
         actTotal += actions;
       }
     });
     if(isPrimaryDefeated) break;
-
-    rgenemySecondary.forEach((enemy : Enemy) => {
-      if(!enemy.isDead()) {
-        let actions = enemy.act(rgplayer, rgenemyPrimary, rgenemySecondary);
-        actEnemy += actions;
-        actTotal += actions;
-      }
-    });
   }
 
-  return getCombatStats(!arePlayersDefeated && isPrimaryDefeated, rgplayer, rgenemyPrimary, rgenemySecondary, actTotal, actEnemy, cRound);
+  return getCombatStats(!arePlayersDefeated && isPrimaryDefeated, rgplayer, rgenemy, actTotal, actEnemy, cRound);
 }
 
 function getCombatStats(
   didPlayersWin : boolean,
   rgplayer : Player[],
-  rgenemyPrimary : Enemy[],
-  rgenemySecondary : Enemy[],
+  rgenemy : Enemy[],
   actionsTotal : number,
   actionsEnemy : number,
   cRound : number) : CombatStats
@@ -105,14 +101,7 @@ function getCombatStats(
     unspentExp += player.tokens[Token.Defense][Boost.Negative];
   });
 
-  rgenemyPrimary.forEach((enemy : Enemy) => {
-    unspentAdv += enemy.tokens[Token.Action][Boost.Positive];
-    unspentDisadv += enemy.tokens[Token.Action][Boost.Negative];
-    unspentDef += enemy.tokens[Token.Defense][Boost.Positive];
-    unspentExp += enemy.tokens[Token.Defense][Boost.Negative];
-  });
-
-  rgenemySecondary.forEach((enemy : Enemy) => {
+  rgenemy.forEach((enemy : Enemy) => {
     unspentAdv += enemy.tokens[Token.Action][Boost.Positive];
     unspentDisadv += enemy.tokens[Token.Action][Boost.Negative];
     unspentDef += enemy.tokens[Token.Defense][Boost.Positive];
