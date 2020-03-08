@@ -11,4 +11,9 @@ Incremental steps toward a full simulator
 -- players and enemies have them, may have more than one, and need logic to choose between them
 
 - Support airship combat
+-- enemy airships implementation
+-- rewrite AI to support airships
+-- scenario setup supports airships
+-- support free attacks for bombing runs
+
 - Support for maps/movement (abstract this somehow for now)
