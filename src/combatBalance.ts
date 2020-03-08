@@ -1,5 +1,6 @@
 import { Enemy, EnemySet, rgEnemyFromEnemySet } from './combatants/enemy'
 import { Player, PlayerSet, rgplayerFromPlayerSet } from './combatants/player'
+import { Token, Boost } from './combatants/combatant';
 
 const cRoundLimit = 10;
 
@@ -98,24 +99,24 @@ function getCombatStats(
     lowestPlayerFocus = Math.min(lowestPlayerFocus, player.focus);
     totalPlayerHealth += player.getHealth();
     totalPlayerFocus += player.focus;
-    unspentAdv += player.tokens['action'][0];
-    unspentDisadv += player.tokens['action'][1];
-    unspentDef += player.tokens['defense'][0];
-    unspentExp += player.tokens['defense'][1];
+    unspentAdv += player.tokens[Token.Action][Boost.Positive];
+    unspentDisadv += player.tokens[Token.Action][Boost.Negative];
+    unspentDef += player.tokens[Token.Defense][Boost.Positive];
+    unspentExp += player.tokens[Token.Defense][Boost.Negative];
   });
 
   rgenemyPrimary.forEach((enemy : Enemy) => {
-    unspentAdv += enemy.tokens['action'][0];
-    unspentDisadv += enemy.tokens['action'][1];
-    unspentDef += enemy.tokens['defense'][0];
-    unspentExp += enemy.tokens['defense'][1];
+    unspentAdv += enemy.tokens[Token.Action][Boost.Positive];
+    unspentDisadv += enemy.tokens[Token.Action][Boost.Negative];
+    unspentDef += enemy.tokens[Token.Defense][Boost.Positive];
+    unspentExp += enemy.tokens[Token.Defense][Boost.Negative];
   });
 
   rgenemySecondary.forEach((enemy : Enemy) => {
-    unspentAdv += enemy.tokens['action'][0];
-    unspentDisadv += enemy.tokens['action'][1];
-    unspentDef += enemy.tokens['defense'][0];
-    unspentExp += enemy.tokens['defense'][1];
+    unspentAdv += enemy.tokens[Token.Action][Boost.Positive];
+    unspentDisadv += enemy.tokens[Token.Action][Boost.Negative];
+    unspentDef += enemy.tokens[Token.Defense][Boost.Positive];
+    unspentExp += enemy.tokens[Token.Defense][Boost.Negative];
   });
 
   return {

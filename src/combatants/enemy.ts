@@ -1,4 +1,4 @@
-import Combatant from './combatant'
+import Combatant, { Ability, Token, Component } from './combatant'
 import { Character } from './character';
 
 export class Enemy extends Character{
@@ -10,7 +10,7 @@ export class Enemy extends Character{
         // Temporary AI
         let rgplayerTarget = rgplayer
             .filter((player) => !player.isDead()) // filter out dead players
-            .sort((a, b) => b.health['none'] - a.health['none']); // target player with the highest health
+            .sort((a, b) => b.health[0] - a.health[0]); // target player with the highest health
 
         if(rgplayerTarget.length === 0)
             return 0; // no players to target
@@ -19,12 +19,12 @@ export class Enemy extends Character{
         for(let action = 0; action < this.actions; action++)
         {
             let player = rgplayerTarget[target];
-            let checkResult = player.defend('agi', this);
+            let checkResult = player.defend(Ability.Agility, Token.Defense, this.getBoost(Token.Action));
             if(checkResult < 10)
-                player.takeDamage(5, 'none'); // need to determine component
+                player.takeDamage(5, 0); // need to determine component
 
             else if (checkResult < 15)
-                player.takeDamage(2, 'none');
+                player.takeDamage(2, 0);
 
             if(player.isDead())
             {
@@ -36,11 +36,14 @@ export class Enemy extends Character{
         return this.actions;
     }
 
-    defend(ability: string, attacker: Combatant): number {
+    defend(ability: Ability, token: Token, attackerBoost: number): number {
         throw new Error("Method not implemented.");
     }
 
-    takeDamage(damage: number, component: string = ''): void {
+    takeDamage(damage: number, component: number): void {
+        if(component != Component.None)
+            throw new Error("Character cannot take ship component damage.");
+            
         this.setHealth(this.getHealth() - damage);
     }
 }
