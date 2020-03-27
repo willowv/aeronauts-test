@@ -1,19 +1,28 @@
-Incremental steps toward a full simulator
+Player Airships:
+x Still need to account for components being down
+xx Make sure defenses are penalized when defense components are down
+-- Make sure AI doesn't use disabled weapons
+-- Make sure hits don't double up on disabled weapons
 
-- Use real, seeded rolls with focus, tokens, and health/damage (but only use damage for now)
--- create a player class for tracking player health, ability scores, tokens, and focus (x)
--- add tokens to enemy class (x)
--- add support for having players make attack/defense checks (x)
--- update simulator to run multiple times and output statistics (x)
+Combatant AI:
+Needs to observe the entire game state
+- Map/locations of all combatants
+- Health and token status of each combatant
+- Logic which takes in this information and executes an action
+- Unique to a particular type of enemy, but re-usable so that there can be more than one
 
-- Support for weapons/special actions with limited AI (healing/shielding vs. attacking)
--- weapons/actions have thresholds, effects, possible additional costs (actions, focus, free attacks, etc), key ability score, possibly multiple targets => probably same signature as the act method
--- players and enemies have them, may have more than one, and need logic to choose between them
+Actions
+- Trigger free attacks
+- Collect tokens based on self and target, if there is one
+- Make a roll, generating initial impact
+- Get possible hit locations and choose (always choose the component with the lowest health for now, otherwise a defensive component)
+- Divide impact between targets
+- For each target, adjust impact based on that target's tokens
+- Based on impact, determine effects for that action
+- Make a few basic actions that anyone can access from their AI logic
 
-- Support airship combat
--- enemy airships implementation
--- rewrite AI to support airships
--- scenario setup supports airships
--- support free attacks for bombing runs
+Set-update
+- Support building an encounter with airships
 
+Maps
 - Support for maps/movement (abstract this somehow for now)

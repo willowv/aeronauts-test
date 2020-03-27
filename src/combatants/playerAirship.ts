@@ -28,12 +28,19 @@ export class PlayerAirship extends Combatant {
     }
 
     defend(ability : Ability, token : Token, attackerBoost : number) : number {
+        let defenderBoost = -1; // When component is down, always negative boost
         switch(token) {
             case Token.AntiAir:
-                return this.captain.defenseCheck(ability, this.getBoost(token) - attackerBoost);
+                if(this.health[Component.AntiAir] > 0)
+                    defenderBoost = this.getBoost(token);
+
+                return this.captain.defenseCheck(ability, defenderBoost - attackerBoost);
             
             case Token.Engines:
-                return this.engineer.defenseCheck(ability, this.getBoost(token) - attackerBoost);
+                if(this.health[Component.Engines] > 0)
+                    defenderBoost = this.getBoost(token);
+
+                return this.engineer.defenseCheck(ability, defenderBoost - attackerBoost);
 
             default:
                 return this.captain.defenseCheck(ability, this.captain.getBoost(token) - attackerBoost);
