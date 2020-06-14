@@ -60,6 +60,8 @@ const enemyDangerous = (baseActions : number, isCritical : boolean) => new Enemy
 const enemyTough = (baseActions : number, isCritical : boolean) => new Enemy(12, Math.ceil(baseActions), isCritical);
 const enemyScary = (baseActions : number, isCritical : boolean) => new Enemy(16, Math.ceil(baseActions*2), isCritical);
 
+export const TestNPC = enemyDangerous(2, true);
+
 function rgEnemyByType(
     cenemy : number,
     fnEnemy : (baseActions : number, isCritical : boolean) => Enemy,

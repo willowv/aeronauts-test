@@ -83,6 +83,8 @@ export class Player extends Character {
     }
 }
 
+export const TestPC : Player = new Player(2, [1, 0, 1, 1, 1], 12);
+
 export function rollDice(modifier : number, boost : number) : number {
     let d6 = 3 + Math.abs(boost);
     let rolls = Array(d6);
