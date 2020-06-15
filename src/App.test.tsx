@@ -1,6 +1,7 @@
-import { SimulateCombat, CombatScenario, CombatStats } from './combatBalance'
+import { SimulateCombat, CombatStats } from './simulator/simulator'
+import { CombatScenario } from './simulator/scenario';
 
-const cTrials = 10000;
+const cTrials = 100;
 
 interface Statistic {
   mean : number,
@@ -27,7 +28,6 @@ test('4 Players, Similar Numbers, Medium Difficulty', () => {
         [1, 1, 2, 1, 2],
       ]
     },
-    isAirCombat : false,
     startingFocus : 9
   }
   let rgstats : CombatStats[] = [];

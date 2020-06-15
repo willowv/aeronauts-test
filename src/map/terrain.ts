@@ -1,7 +1,4 @@
-export enum Attack {
-    Ranged = 0,
-    Melee
-}
+import { Attack } from "../simulator/enum";
 
 export class Terrain {
     attackBoost : (attackType : Attack) => number;
