@@ -11,4 +11,8 @@ export class Player extends Combatant {
         this.abilityScores = [...picac];
         this.focus = focus;
     }
+
+    clone() : Player {
+        return new Player(this.index, this.health, this.actions, this.tokens, this.zone, this.actionsTaken, this.abilityScores, this.focus);
+    }
 }

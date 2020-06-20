@@ -24,5 +24,9 @@ export class Combatant {
     isDead() : boolean {
         return this.health <= 0;
     }
+
+    clone() : Combatant {
+        return new Combatant(this.index, this.health, this.actions, this.tokens, this.zone, this.actionsTaken, this.isCritical);
+    }
 }
 export default Combatant;
