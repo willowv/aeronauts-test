@@ -73,6 +73,9 @@ function RunPCAction(playerIndex : number, initialState : GameState) : GameState
   let closestTargetsAndDistance = GetClosestTargets(PC.zone, state.combatantsPC, state.map);
   let interestingEnemies = closestTargetsAndDistance.targets;
   let closestDistance = closestTargetsAndDistance.distance;
+  if(interestingEnemies.length === 0) {
+    return initialState;
+  }
 
   // TODO: try doing AI using heuristic score function
   // TODO: prioritize attacking, but minimize situations where I am the only target for several enemies
@@ -96,11 +99,13 @@ function RunPCAction(playerIndex : number, initialState : GameState) : GameState
     } else if(checkResult >= 10) {
       target.health -= 3;
     }
+    PC.actionsTaken++;
   }
   else {
     // get next step toward target and move
     let newZone = state.map.nextStepBetween[PC.zone][target.zone];
     PC.zone = newZone;
+    PC.actionsTaken++;
   }
   return state;
 }
@@ -156,8 +161,16 @@ function GetClosestTargets(zone : number, targets : Combatant[], map : GameMap) 
   return { targets: closestTargets, distance: closestDistance };
 }
 
-function RunNPCTurn(npcIndex : number, initialState : GameState) : GameState {
-  // TODO: account for NPC action count
+function RunNPCTurn(npcIndex : number, initialState : GameState) : GameState {  
+  let state = initialState; // don't bother cloning, we don't mutate and only call pure functions
+  let NPC = state.combatantsNPC[npcIndex];
+  for(let action = 0; action < NPC.actions; action++) {
+    state = RunNPCAction(NPC.index, state);
+  }
+  return state;
+}
+
+function RunNPCAction(npcIndex : number, initialState : GameState) : GameState {
   let state = initialState.clone();
   let NPC = state.combatantsNPC[npcIndex];
   // What do I want to do?
@@ -165,6 +178,9 @@ function RunNPCTurn(npcIndex : number, initialState : GameState) : GameState {
   let closestTargetsAndDistance = GetClosestTargets(NPC.zone, state.combatantsPC, state.map);
   let interestingEnemies = closestTargetsAndDistance.targets;
   let closestDistance = closestTargetsAndDistance.distance;
+  if(interestingEnemies.length === 0) {
+    return initialState;
+  }
 
   // NPC DIFFERENCES - target highest health
   let prioritizedEnemies = interestingEnemies.sort((a, b) => b.health - a.health);
@@ -184,11 +200,13 @@ function RunNPCTurn(npcIndex : number, initialState : GameState) : GameState {
     } else if(checkResult < 15) {
       target.health -= 2;
     }
+    NPC.actionsTaken++;
   }
   else {
     // get next step toward target and move
     let newZone = state.map.nextStepBetween[NPC.zone][target.zone];
     NPC.zone = newZone;
+    NPC.actionsTaken++;
   }
   return state;
 }
@@ -196,10 +214,12 @@ function RunNPCTurn(npcIndex : number, initialState : GameState) : GameState {
 export function RunRound(initialState : GameState) : GameState {
     let state = initialState;
     for(let playerIndex = 0; playerIndex < state.combatantsPC.length; playerIndex++) { //assumes number and index of combatants does not change
-      state = RunPCTurn(playerIndex, state);
+      if(!state.combatantsPC[playerIndex].isDead())
+        state = RunPCTurn(playerIndex, state);
     }
     for(let npcIndex = 0; npcIndex < state.combatantsNPC.length; npcIndex++) {
-      state = RunNPCTurn(npcIndex, state);
+      if(!state.combatantsNPC[npcIndex].isDead())
+        state = RunNPCTurn(npcIndex, state);
     }
     return state;
 }
