@@ -1,4 +1,4 @@
-import { GameMap, TestMap } from '../map/map';
+import { GameMap } from '../map/map';
 import { GameState, RunRound } from './state';
 import { Token, Boost } from './enum';
 import { CombatScenario, InitialStateFromScenario } from './scenario';

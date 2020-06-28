@@ -1,6 +1,7 @@
 import { SimulateCombat, CombatStats } from './simulator/simulator'
 import { CombatScenario } from './simulator/scenario';
 import { GameMap, Dijkstras } from './map/map';
+import { TerrainDefault } from './map/terrain';
 
 const cTrials = 100;
 
@@ -17,15 +18,23 @@ interface ScenarioReport{
   avgEnemyActionCount: Statistic
 }
 
-test('Dijkstras Algorithm implementation', () => {
-  // test map is a 4 node branch and rejoin path
-  // we only care about adjacency, so we don't make a full map object
-  let testMapAdjacency = [
-    [false, true, true, false], // start node is adjacent to 2 and 3
-    [true, false, false, true], // mid nodes are adjacent to start and end, but not eachother
-    [true, false, false, true],
-    [false, true, true, false]]; // end node is adjacent to 2 and 3
+// test map is a 4 node branch and rejoin path
+let testMapTerrain = [
+  TerrainDefault,
+  TerrainDefault,
+  TerrainDefault,
+  TerrainDefault
+];
 
+let testMapAdjacency = [
+  [false, true, true, false], // start node is adjacent to 2 and 3
+  [true, false, false, true], // mid nodes are adjacent to start and end, but not eachother
+  [true, false, false, true],
+  [false, true, true, false]]; // end node is adjacent to 2 and 3
+
+let testMap = new GameMap(testMapTerrain, testMapAdjacency);
+
+test('Dijkstras Algorithm implementation', () => {
   // Run dijkstra's on each node
   let dijkstras0 = Dijkstras(testMapAdjacency, 0);
   expect(dijkstras0.distances).toEqual([0, 1, 1, 2]);
@@ -44,7 +53,6 @@ test('Dijkstras Algorithm implementation', () => {
   expect(dijkstras3.nextStepToward).toEqual([1, 1, 2, -1]);
 });
 
-/*
 test('4 Players, Similar Numbers, Medium Difficulty', () => {
   let scenario : CombatScenario = {
     enemySetPrimary : { cNormal: 0, cDangerous: 0, cTough: 6, cScary: 0 },
@@ -57,7 +65,8 @@ test('4 Players, Similar Numbers, Medium Difficulty', () => {
         [1, 1, 2, 1, 2],
       ]
     },
-    startingFocus : 9
+    startingFocus : 9,
+    map: testMap
   }
   let rgstats : CombatStats[] = [];
   for(let i = 0; i < cTrials; i++)
@@ -103,4 +112,4 @@ test('4 Players, Similar Numbers, Medium Difficulty', () => {
   }
   
   console.log(report);
-});*/
+});
