@@ -70,7 +70,7 @@ function RunPCAction(playerIndex : number, initialState : GameState) : GameState
   let PC = state.combatantsPC[playerIndex];
   // What do I want to do?
   // Default to "standard" for now, which is attacking the closest enemy with the lowest health
-  let closestTargetsAndDistance = GetClosestTargets(PC.zone, state.combatantsPC, state.map);
+  let closestTargetsAndDistance = GetClosestTargets(PC.zone, state.combatantsNPC, state.map);
   let interestingEnemies = closestTargetsAndDistance.targets;
   let closestDistance = closestTargetsAndDistance.distance;
   if(interestingEnemies.length === 0) {
@@ -196,9 +196,9 @@ function RunNPCAction(npcIndex : number, initialState : GameState) : GameState {
     }
     let checkResult = rollDice(bonus, boost);
     if(checkResult < 10) {
-      target.health -= 5;
+      target.takeDamage(5);
     } else if(checkResult < 15) {
-      target.health -= 2;
+      target.takeDamage(2);
     }
     NPC.actionsTaken++;
   }

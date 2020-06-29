@@ -17,7 +17,7 @@ export class Combatant {
         this.actions = actions;
         this.tokens = tokens;
         this.zone = zone;
-        this.actionsTaken = 0;
+        this.actionsTaken = actionsTaken;
         this.isCritical = isCritical;
     }
 

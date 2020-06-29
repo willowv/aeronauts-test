@@ -3,7 +3,7 @@ import { CombatScenario } from './simulator/scenario';
 import { GameMap, Dijkstras } from './map/map';
 import { TerrainDefault } from './map/terrain';
 
-const cTrials = 100;
+const cTrials = 10000;
 
 interface Statistic {
   mean : number,
@@ -54,6 +54,7 @@ test('Dijkstras Algorithm implementation', () => {
 });
 
 test('4 Players, Similar Numbers, Medium Difficulty', () => {
+  // need to be able to specify locations of enemies and players on the map
   let scenario : CombatScenario = {
     enemySetPrimary : { cNormal: 0, cDangerous: 0, cTough: 6, cScary: 0 },
     enemySetSecondary : { cNormal: 0, cDangerous: 0, cTough: 0, cScary: 0 },
