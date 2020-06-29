@@ -1,5 +1,5 @@
 import { SimulateCombat, CombatStats } from './simulator/simulator'
-import { CombatScenario } from './simulator/scenario';
+import { CombatScenario, EmptyPS, EmptyES, EnemySet, PlayerSet } from './simulator/scenario';
 import { GameMap, Dijkstras } from './map/map';
 import { TerrainDefault } from './map/terrain';
 
@@ -56,16 +56,14 @@ test('Dijkstras Algorithm implementation', () => {
 test('4 Players, Similar Numbers, Medium Difficulty', () => {
   // need to be able to specify locations of enemies and players on the map
   let scenario : CombatScenario = {
-    enemySetPrimary : { cNormal: 0, cDangerous: 0, cTough: 6, cScary: 0 },
-    enemySetSecondary : { cNormal: 0, cDangerous: 0, cTough: 0, cScary: 0 },
-    playerSet : {
-      rgpicac: [
+    enemySetPrimaryByZone : [ EmptyES, EmptyES, EmptyES, new EnemySet(0, 0, 6, 0)],
+    enemySetSecondaryByZone : [ EmptyES, EmptyES, EmptyES, EmptyES ],
+    playerSetByZone : [ new PlayerSet([
         [1, -1, 2, 2, 0],
         [2, 0, 1, 1, 0],
         [1, 2, 2, 1, 1],
         [1, 1, 2, 1, 2],
-      ]
-    },
+      ]), EmptyPS, EmptyPS, EmptyPS],
     startingFocus : 9,
     map: testMap
   }

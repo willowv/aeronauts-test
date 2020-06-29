@@ -4,75 +4,99 @@ import { GameState } from "./state";
 import { GameMap } from "../map/map";
 
 export interface CombatScenario {
-    enemySetPrimary : EnemySet,
-    enemySetSecondary : EnemySet,
-    playerSet : PlayerSet,
+    enemySetPrimaryByZone : EnemySet[],
+    enemySetSecondaryByZone : EnemySet[],
+    playerSetByZone : PlayerSet[],
     startingFocus : number,
     map : GameMap
 }
 
-export interface PlayerSet {
+export class PlayerSet {
     rgpicac : number[][];
+
+    constructor(rgpicac : number[][]) {
+        this.rgpicac = rgpicac;
+    }
 }
 
-export function rgplayerFromPlayerSet(playerSet : PlayerSet, actions : number, startingFocus : number) {
-    let rgplayer : Player[] = [];
-    playerSet.rgpicac.forEach((picac : number[], index : number) => {
-        rgplayer.push(new Player(index, initialPlayerHealth, actions, initialTokens, 0, 0, picac, startingFocus));
-    })
-    return rgplayer;
-}
+export const EmptyPS = new PlayerSet([]);
 
-export interface EnemySet {
+export class EnemySet {
     cNormal : number;
     cDangerous : number;
     cTough : number;
     cScary : number;
+
+    constructor(cNormal : number, cDangerous : number, cTough : number, cScary : number) {
+        this.cNormal = cNormal;
+        this.cDangerous = cDangerous;
+        this.cTough = cTough;
+        this.cScary = cScary;
+    }
+}
+
+export const EmptyES = new EnemySet(0, 0, 0, 0);
+
+export function rgplayerFromPlayerSetByZone(playerSetByZone : PlayerSet[], startingFocus : number) {
+    let rgplayer : Player[] = [];
+    let index = 0;
+    playerSetByZone.forEach((playerSet : PlayerSet, zone : number) => {
+        playerSet.rgpicac.forEach((picac : number[]) => {
+            rgplayer.push(new Player(index, initialPlayerHealth, 2, initialTokens, zone, 0, picac, startingFocus));
+            index++;
+        });
+    });
+    return rgplayer;
 }
 
 function Total(enemySet : EnemySet) : number {
     return enemySet.cNormal + enemySet.cDangerous + enemySet.cTough + enemySet.cScary;
 }
 
-const enemyNormal = (index: number, baseActions : number, isCritical : boolean) => new Combatant(index, 4, 1, initialTokens, 0, 0, isCritical);
-const enemyDangerous = (index: number, baseActions : number, isCritical : boolean) => new Combatant(index, 8, 2, initialTokens, 0, 0, isCritical);
-const enemyTough = (index: number, baseActions : number, isCritical : boolean) => new Combatant(index, 12, 2, initialTokens, 0, 0, isCritical);
-const enemyScary = (index: number, baseActions : number, isCritical : boolean) => new Combatant(index, 16, 4, initialTokens, 0, 0, isCritical);
+const enemyNormal = (index: number, zone : number, isCritical : boolean) => new Combatant(index, 4, 1, initialTokens, zone, 0, isCritical);
+const enemyDangerous = (index: number, zone : number, isCritical : boolean) => new Combatant(index, 8, 2, initialTokens, zone, 0, isCritical);
+const enemyTough = (index: number, zone : number, isCritical : boolean) => new Combatant(index, 12, 2, initialTokens, zone, 0, isCritical);
+const enemyScary = (index: number, zone : number, isCritical : boolean) => new Combatant(index, 16, 4, initialTokens, zone, 0, isCritical);
 
 function rgEnemyByType(
     startingIndex : number,
     cenemy : number,
-    fnEnemy : (index: number, baseActions : number, isCritical : boolean) => Combatant,
-    baseActions : number,
+    fnEnemy : (index: number, zone : number, isCritical : boolean) => Combatant,
+    zone : number,
     isCritical : boolean)
 {
   let rgenemy = [];
   for(let i = 0; i < cenemy; i++)
-    rgenemy.push(fnEnemy(startingIndex + i, baseActions, isCritical));
+    rgenemy.push(fnEnemy(startingIndex + i, zone, isCritical));
   
   return rgenemy;
 }
 
-export function rgEnemyFromEnemySet(i : number, enemySet : EnemySet, baseActions : number, isCritical : boolean) {
+export function rgEnemyFromEnemySet(i : number, enemySet : EnemySet, zone : number, isCritical : boolean) {
     let rgenemy : Combatant[] = [];
     let startingIndex = i;
-    rgenemy = rgenemy.concat(rgEnemyByType(startingIndex, enemySet.cNormal, enemyNormal, baseActions, isCritical));
+    rgenemy = rgenemy.concat(rgEnemyByType(startingIndex, enemySet.cNormal, enemyNormal, zone, isCritical));
     startingIndex += enemySet.cNormal;
-    rgenemy = rgenemy.concat(rgEnemyByType(startingIndex, enemySet.cDangerous, enemyDangerous, baseActions, isCritical));
+    rgenemy = rgenemy.concat(rgEnemyByType(startingIndex, enemySet.cDangerous, enemyDangerous, zone, isCritical));
     startingIndex += enemySet.cDangerous;
-    rgenemy = rgenemy.concat(rgEnemyByType(startingIndex, enemySet.cTough, enemyTough, baseActions, isCritical));
+    rgenemy = rgenemy.concat(rgEnemyByType(startingIndex, enemySet.cTough, enemyTough, zone, isCritical));
     startingIndex += enemySet.cTough;
-    rgenemy = rgenemy.concat(rgEnemyByType(startingIndex, enemySet.cScary, enemyScary, baseActions, isCritical));
+    rgenemy = rgenemy.concat(rgEnemyByType(startingIndex, enemySet.cScary, enemyScary, zone, isCritical));
     return rgenemy;
 }
 
 export function InitialStateFromScenario(scenario : CombatScenario) : GameState {
-    let baseActions = 2;
-    let rgplayer = rgplayerFromPlayerSet(scenario.playerSet, baseActions, scenario.startingFocus);
-    let startingIndex = 0;
+    let rgplayer = rgplayerFromPlayerSetByZone(scenario.playerSetByZone, scenario.startingFocus);
+    
+    let npcIndex = 0;
     let rgenemy : Combatant[] = [];
-    rgenemy = rgenemy.concat(rgEnemyFromEnemySet(startingIndex, scenario.enemySetPrimary, baseActions, true /* primary enemies are critical */));
-    startingIndex += Total(scenario.enemySetPrimary);
-    rgenemy = rgenemy.concat(rgEnemyFromEnemySet(startingIndex, scenario.enemySetSecondary, baseActions, false /* secondary enemies are not */));
+    scenario.enemySetPrimaryByZone.forEach((enemySetPrimary : EnemySet, zone : number) => {
+        rgenemy = rgenemy.concat(rgEnemyFromEnemySet(npcIndex, enemySetPrimary, zone, true /* primary enemies are critical */));
+        npcIndex += Total(enemySetPrimary);
+    });
+    scenario.enemySetSecondaryByZone.forEach((enemySetSecondary : EnemySet, zone : number) => {
+        rgenemy = rgenemy.concat(rgEnemyFromEnemySet(npcIndex, enemySetSecondary, zone, false /* secondary enemies are not */));
+        npcIndex += Total(enemySetSecondary);
+    });
     return new GameState(rgplayer, rgenemy, scenario.map);
 }
