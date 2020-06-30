@@ -110,6 +110,64 @@ function RunPCAction(playerIndex : number, initialState : GameState) : GameState
   return state;
 }
 
+// Range, thresholds, effects
+// Need to be able to get range
+// Need to take in primary target
+// Need to be able to trigger secondary effects, which may require AI to choose additional targets
+
+export class Action {
+  minRange : number;
+  maxRange : number;
+  type : Attack;
+  ability: Ability;
+  evaluate : (checkResult : number, actor : Combatant, target : Combatant, state : GameState) => void;
+
+  constructor(
+    minRange : number,
+    maxRange : number,
+    type : Attack,
+    ability : Ability,
+    evaluate : (checkResult : number, actor : Combatant, target : Combatant, state : GameState) => void) {
+    this.minRange = minRange;
+    this.maxRange = maxRange;
+    this.type = type;
+    this.ability = ability;
+    this.evaluate = evaluate;
+  }
+}
+
+const Pistol = new Action(0, 1, Attack.Ranged, Ability.Coordination, (checkResult, actor, target, state) => {
+  if(checkResult >= 15) {
+    target.health -= 4;
+    actor.tokens[Token.Action][Boost.Positive] += 2;
+  } else if (checkResult >= 9) {
+    target.health -= 2;
+  }
+});
+
+const Shotgun = new Action(0, 1, Attack.Ranged, Ability.Coordination, (checkResult, actor, target, state) => {
+  if(checkResult >= 13) {
+    target.health -= 3;
+    // push into first zone that is further away that target, if any
+    let pushableZones = state.map.ZonesMovableFrom(target.zone).filter((zone : number) => {
+      return zone != actor.zone;
+    });
+    if(pushableZones.length != 0)
+      target.zone = pushableZones[0];
+  } else if (checkResult >= 11) {
+    target.health -= 3;
+  }
+});
+
+const Rifle = new Action(1, Infinity, Attack.Ranged, Ability.Coordination, (checkResult, actor, target, state) => {
+  if(checkResult >= 17) {
+    target.health -= 5;
+    // grant an ally a move
+  } else if (checkResult >= 12) {
+    target.health -= 4;
+  }
+});
+
 // mutates state, only pass in clones
 function AttackerBoost(terrain : Terrain[], attacker : Combatant, target : Combatant) : number {
   // how does source and target terrain affect this?
