@@ -2,6 +2,7 @@ import { SimulateCombat, CombatStats } from './simulator/simulator'
 import { CombatScenario, EmptyPS, EmptyES, EnemySet, PlayerSet } from './simulator/scenario';
 import { GameMap, Dijkstras } from './map/map';
 import { TerrainDefault } from './map/terrain';
+import { Rifle, Shotgun, HeavyMelee, LightMelee } from './combatants/actions/playerActions';
 
 const cTrials = 10000;
 
@@ -59,11 +60,12 @@ test('4 Players, Similar Numbers, Medium Difficulty', () => {
     enemySetPrimaryByZone : [ EmptyES, EmptyES, EmptyES, new EnemySet(0, 0, 6, 0)],
     enemySetSecondaryByZone : [ EmptyES, EmptyES, EmptyES, EmptyES ],
     playerSetByZone : [ new PlayerSet([
-        [1, -1, 2, 2, 0],
-        [2, 0, 1, 1, 0],
-        [1, 2, 2, 1, 1],
-        [1, 1, 2, 1, 2],
-      ]), EmptyPS, EmptyPS, EmptyPS],
+        [2, 1, 1, 0, 0],
+        [0, 2, 1, 1, 0],
+        [0, 0, 2, 1, 1],
+        [1, 0, 0, 2, 1],
+      ],
+      [Rifle, Shotgun, HeavyMelee, LightMelee]), EmptyPS, EmptyPS, EmptyPS],
     startingFocus : 9,
     map: testMap
   }

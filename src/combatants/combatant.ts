@@ -1,24 +1,34 @@
-import { Token, Ability, Boost } from "../simulator/enum";
+import { Action } from "./actions/action";
 
 export const initialTokens = [[0,0],[0,0]];
 
 export class Combatant {
     index : number;
-    health: number;
-    actions: number;
+    health : number;
+    actions : Action[];
+    actionsPerTurn: number;
     tokens : number[][];
     zone : number;
     actionsTaken : number;
     isCritical : boolean;
 
-    constructor(index: number, health : number, actions : number, tokens : number[][], zone: number, actionsTaken : number, isCritical : boolean) {
-        this.index = index;
-        this.health = health;
-        this.actions = actions;
-        this.tokens = tokens;
-        this.zone = zone;
-        this.actionsTaken = actionsTaken;
-        this.isCritical = isCritical;
+    constructor(
+        index: number,
+        health : number,
+        actionsPerTurn : number,
+        tokens : number[][],
+        zone: number,
+        actionsTaken : number,
+        isCritical : boolean,
+        actions : Action[]) {
+            this.index = index;
+            this.health = health;
+            this.actionsPerTurn = actionsPerTurn;
+            this.tokens = tokens;
+            this.zone = zone;
+            this.actionsTaken = actionsTaken;
+            this.isCritical = isCritical;
+            this.actions = actions;
     }
 
     isDead() : boolean {
@@ -26,7 +36,7 @@ export class Combatant {
     }
 
     clone() : Combatant {
-        return new Combatant(this.index, this.health, this.actions, this.tokens, this.zone, this.actionsTaken, this.isCritical);
+        return new Combatant(this.index, this.health, this.actionsPerTurn, this.tokens, this.zone, this.actionsTaken, this.isCritical, this.actions);
     }
 }
 export default Combatant;

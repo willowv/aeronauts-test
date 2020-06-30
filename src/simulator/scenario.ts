@@ -2,6 +2,8 @@ import Combatant, { initialTokens } from "../combatants/combatant";
 import { Player, initialPlayerHealth } from "../combatants/player";
 import { GameState } from "./state";
 import { GameMap } from "../map/map";
+import { Action } from "../combatants/actions/action";
+import { NPCBasicAttack } from "../combatants/actions/npcActions";
 
 export interface CombatScenario {
     enemySetPrimaryByZone : EnemySet[],
@@ -13,13 +15,15 @@ export interface CombatScenario {
 
 export class PlayerSet {
     rgpicac : number[][];
+    rgweapon : Action[];
 
-    constructor(rgpicac : number[][]) {
+    constructor(rgpicac : number[][], rgweapon : Action[]) {
         this.rgpicac = rgpicac;
+        this.rgweapon = rgweapon;
     }
 }
 
-export const EmptyPS = new PlayerSet([]);
+export const EmptyPS = new PlayerSet([], []);
 
 export class EnemySet {
     cNormal : number;
@@ -41,8 +45,8 @@ export function rgplayerFromPlayerSetByZone(playerSetByZone : PlayerSet[], start
     let rgplayer : Player[] = [];
     let index = 0;
     playerSetByZone.forEach((playerSet : PlayerSet, zone : number) => {
-        playerSet.rgpicac.forEach((picac : number[]) => {
-            rgplayer.push(new Player(index, initialPlayerHealth, 2, initialTokens, zone, 0, picac, startingFocus));
+        playerSet.rgpicac.forEach((picac : number[], weaponIndex : number) => {
+            rgplayer.push(new Player(index, initialPlayerHealth, 2, initialTokens, zone, 0, picac, startingFocus, [playerSet.rgweapon[weaponIndex]]));
             index++;
         });
     });
@@ -53,10 +57,10 @@ function Total(enemySet : EnemySet) : number {
     return enemySet.cNormal + enemySet.cDangerous + enemySet.cTough + enemySet.cScary;
 }
 
-const enemyNormal = (index: number, zone : number, isCritical : boolean) => new Combatant(index, 4, 1, initialTokens, zone, 0, isCritical);
-const enemyDangerous = (index: number, zone : number, isCritical : boolean) => new Combatant(index, 8, 2, initialTokens, zone, 0, isCritical);
-const enemyTough = (index: number, zone : number, isCritical : boolean) => new Combatant(index, 12, 2, initialTokens, zone, 0, isCritical);
-const enemyScary = (index: number, zone : number, isCritical : boolean) => new Combatant(index, 16, 4, initialTokens, zone, 0, isCritical);
+const enemyNormal = (index: number, zone : number, isCritical : boolean) => new Combatant(index, 4, 1, initialTokens, zone, 0, isCritical, [NPCBasicAttack]);
+const enemyDangerous = (index: number, zone : number, isCritical : boolean) => new Combatant(index, 8, 2, initialTokens, zone, 0, isCritical, [NPCBasicAttack]);
+const enemyTough = (index: number, zone : number, isCritical : boolean) => new Combatant(index, 12, 2, initialTokens, zone, 0, isCritical, [NPCBasicAttack]);
+const enemyScary = (index: number, zone : number, isCritical : boolean) => new Combatant(index, 16, 4, initialTokens, zone, 0, isCritical, [NPCBasicAttack]);
 
 function rgEnemyByType(
     startingIndex : number,
