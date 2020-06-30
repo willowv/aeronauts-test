@@ -80,9 +80,16 @@ function RunPCAction(playerIndex : number, initialState : GameState) : GameState
   let weapon = PC.actions[0];
   let validEnemies = GetValidTargets(PC.zone, state.combatantsNPC, state.map, weapon.minRange, weapon.maxRange);
   if(validEnemies.length === 0) {
-    // TODO: Decide on a move location
-    let moves = state.map.ZonesMovableFrom(PC.zone);
-    PC.zone = moves[0];
+    let prioritizedEnemies = aliveTargets.sort((a, b) => a.health - b.health);
+    let target = prioritizedEnemies[0];
+    if(target.zone === PC.zone) {
+      // too close with rifle, move anywhere else
+      let moves = state.map.ZonesMovableFrom(PC.zone);
+      PC.zone = moves[0];
+    }
+    else { // get closer to target
+      PC.zone = state.map.nextStepBetween[PC.zone][target.zone];
+    }
     PC.actionsTaken++;
     return state;
   }
@@ -165,9 +172,16 @@ function RunNPCAction(npcIndex : number, initialState : GameState) : GameState {
   let weapon = NPC.actions[0];
   let validEnemies = GetValidTargets(NPC.zone, state.combatantsPC, state.map, weapon.minRange, weapon.maxRange);
   if(validEnemies.length === 0) {
-    // TODO: Decide on a move location
-    let moves = state.map.ZonesMovableFrom(NPC.zone);
-    NPC.zone = moves[0];
+    let prioritizedEnemies = aliveTargets.sort((a, b) => b.health - a.health);
+    let target = prioritizedEnemies[0];
+    if(target.zone === NPC.zone) {
+      // too close with rifle, move anywhere else
+      let moves = state.map.ZonesMovableFrom(NPC.zone);
+      NPC.zone = moves[0];
+    }
+    else { // get closer to target
+      NPC.zone = state.map.nextStepBetween[NPC.zone][target.zone];
+    }
     NPC.actionsTaken++;
     return state;
   }
