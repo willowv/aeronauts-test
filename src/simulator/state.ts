@@ -68,54 +68,50 @@ function RunPCTurn(playerIndex : number, initialState : GameState) : GameState {
 function RunPCAction(playerIndex : number, initialState : GameState) : GameState {
   let state = initialState.clone();
   let PC = state.combatantsPC[playerIndex];
+  // Filter to remaining alive targets
+  let aliveTargets = state.combatantsNPC.filter((combatant) => {
+    return !combatant.isDead();
+  });
+  if(aliveTargets.length === 0)
+    return initialState;
+
   // What do I want to do?
   // Default to "standard" for now, which is attacking the closest enemy with the lowest health
-  let closestTargetsAndDistance = GetClosestTargets(PC.zone, state.combatantsNPC, state.map);
-  let interestingEnemies = closestTargetsAndDistance.targets;
-  let closestDistance = closestTargetsAndDistance.distance;
-  if(interestingEnemies.length === 0) {
-    return initialState;
+  let weapon = PC.actions[0];
+  let validEnemies = GetValidTargets(PC.zone, state.combatantsNPC, state.map, weapon.minRange, weapon.maxRange);
+  if(validEnemies.length === 0) {
+    // TODO: Decide on a move location
+    let moves = state.map.ZonesMovableFrom(PC.zone);
+    PC.zone = moves[0];
+    PC.actionsTaken++;
+    return state;
   }
+
+  let prioritizedEnemies = validEnemies.sort((a, b) => a.health - b.health);
+  let target = prioritizedEnemies[0];
+
+  // attack
+  let boost = AttackerBoost(state.map.terrain, PC, target, weapon.type);
+  let bonus = PC.abilityScores[weapon.ability];
+  if(PC.focus > 0)
+  {
+    PC.focus -= 1;
+    bonus += 1;
+  }
+  let checkResult = rollDice(bonus, boost);
+  weapon.evaluate(checkResult, PC, target, state);
+  PC.actionsTaken++;
 
   // TODO: try doing AI using heuristic score function
-  // TODO: prioritize attacking, but minimize situations where I am the only target for several enemies
-  // TODO: retreat when my health is low (seek zones with favorable terrain or where there are allies with higher health, or I can't be targeted)
-
-  // Target the enemy with the lowest health
-  let prioritizedEnemies = interestingEnemies.sort((a, b) => a.health - b.health);
-  let target = prioritizedEnemies[0];
-  if(closestDistance <= 1) {
-    // attack
-    let boost = AttackerBoost(state.map.terrain, PC, target);
-    let bonus = PC.abilityScores[Ability.Coordination];
-    if(PC.focus > 0)
-    {
-      PC.focus -= 1;
-      bonus += 1;
-    }
-    let checkResult = rollDice(bonus, boost);
-    if(checkResult >= 15) {
-      target.health -= 5;
-    } else if(checkResult >= 10) {
-      target.health -= 3;
-    }
-    PC.actionsTaken++;
-  }
-  else {
-    // get next step toward target and move
-    let newZone = state.map.nextStepBetween[PC.zone][target.zone];
-    PC.zone = newZone;
-    PC.actionsTaken++;
-  }
   return state;
 }
 
 // mutates state, only pass in clones
-function AttackerBoost(terrain : Terrain[], attacker : Combatant, target : Combatant) : number {
+function AttackerBoost(terrain : Terrain[], attacker : Combatant, target : Combatant, attackType : Attack) : number {
   // how does source and target terrain affect this?
   let sourceTerrain = terrain[attacker.zone];
   let targetTerrain = terrain[target.zone];
-  let boost = sourceTerrain.attackBoost(Attack.Ranged) + targetTerrain.defenseBoost(Attack.Ranged);
+  let boost = sourceTerrain.attackBoost(attackType) + targetTerrain.defenseBoost(attackType);
   if(attacker.tokens[Token.Action][Boost.Negative] > 0) {
     attacker.tokens[Token.Action][Boost.Negative] -= 1;
     boost -= 1;
@@ -136,29 +132,13 @@ function AttackerBoost(terrain : Terrain[], attacker : Combatant, target : Comba
   return Math.max(Math.min(boost, 2), -2); // boost has a max magnitude of 2
 }
 
-function GetClosestTargets(zone : number, targets : Combatant[], map : GameMap) : { targets : Combatant[], distance : number } {
-  // Filter to remaining alive targets
-  let aliveTargets = targets.filter((combatant) => {
-    return !combatant.isDead();
-  });
-  if(aliveTargets.length === 0)
-    return { targets: aliveTargets, distance: Infinity };
-
-  // Get closest distance
-  let closestDistance = Infinity;
-  aliveTargets.forEach((target) => {
-    let distance = map.distanceBetween[zone][target.zone];
-    if(distance < closestDistance)
-      closestDistance = distance;
-  });
-
+function GetValidTargets(zone : number, targets : Combatant[], map : GameMap, minRange : number, maxRange : number) : Combatant[] {
   // get all enemies that are the same, lowest number of actions to target
-  closestDistance = Math.max(closestDistance, 1); // assumes weapon with range 1
-  let closestTargets = aliveTargets.filter((combatant) => {
-    return map.distanceBetween[zone][combatant.zone] <= closestDistance;
+  let validTargets = targets.filter((combatant) => {
+    let distance = map.distanceBetween[zone][combatant.zone];
+    return distance <= maxRange && distance >= minRange;
   });
-
-  return { targets: closestTargets, distance: closestDistance };
+  return validTargets;
 }
 
 function RunNPCTurn(npcIndex : number, initialState : GameState) : GameState {  
@@ -173,41 +153,40 @@ function RunNPCTurn(npcIndex : number, initialState : GameState) : GameState {
 function RunNPCAction(npcIndex : number, initialState : GameState) : GameState {
   let state = initialState.clone();
   let NPC = state.combatantsNPC[npcIndex];
+  // Filter to remaining alive targets
+  let aliveTargets = state.combatantsPC.filter((combatant) => {
+    return !combatant.isDead();
+  });
+  if(aliveTargets.length === 0)
+    return initialState;
+
   // What do I want to do?
   // Default to "standard" for now, which is attacking the closest enemy with the lowest health
-  let closestTargetsAndDistance = GetClosestTargets(NPC.zone, state.combatantsPC, state.map);
-  let interestingEnemies = closestTargetsAndDistance.targets;
-  let closestDistance = closestTargetsAndDistance.distance;
-  if(interestingEnemies.length === 0) {
-    return initialState;
+  let weapon = NPC.actions[0];
+  let validEnemies = GetValidTargets(NPC.zone, state.combatantsPC, state.map, weapon.minRange, weapon.maxRange);
+  if(validEnemies.length === 0) {
+    // TODO: Decide on a move location
+    let moves = state.map.ZonesMovableFrom(NPC.zone);
+    NPC.zone = moves[0];
+    NPC.actionsTaken++;
+    return state;
   }
 
   // NPC DIFFERENCES - target highest health
-  let prioritizedEnemies = interestingEnemies.sort((a, b) => b.health - a.health);
+  let prioritizedEnemies = validEnemies.sort((a, b) => b.health - a.health);
   let target = state.combatantsPC[prioritizedEnemies[0].index]; // get the player from the combatant
-  if(closestDistance <= 1) {
-    // attack
-    let boost = - AttackerBoost(state.map.terrain, NPC, target); // player rolls for defense
-    let bonus = target.abilityScores[Ability.Agility];
-    if(target.focus > 0)
-    {
-      target.focus -= 1;
-      bonus += 1;
-    }
-    let checkResult = rollDice(bonus, boost);
-    if(checkResult < 10) {
-      target.takeDamage(5);
-    } else if(checkResult < 15) {
-      target.takeDamage(2);
-    }
-    NPC.actionsTaken++;
+
+  // attack
+  let boost = - AttackerBoost(state.map.terrain, NPC, target, weapon.type); // player rolls for defense
+  let bonus = target.abilityScores[weapon.ability];
+  if(target.focus > 0)
+  {
+    target.focus -= 1;
+    bonus += 1;
   }
-  else {
-    // get next step toward target and move
-    let newZone = state.map.nextStepBetween[NPC.zone][target.zone];
-    NPC.zone = newZone;
-    NPC.actionsTaken++;
-  }
+  let checkResult = rollDice(bonus, boost);
+  weapon.evaluate(checkResult, NPC, target, state);
+  NPC.actionsTaken++;
   return state;
 }
 
