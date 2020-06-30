@@ -1,3 +1,13 @@
+# Aeronauts Combat Simulator
+
+This project is intended to simulate Aeronauts combats for the purpose of trying to set reasonable difficulty levels when designing encounters.
+
+Use `npm install` to get set up.
+
+Describe test scenario in app.test.tsx for now, run `npm test` to try it out. The scenario stats are logged to the console so you can check the rate of player victory and injury. `cTrials` controls the number of simulation trials that are run. Performance seems pretty reasonable even with 10,000 trials.
+
+No front end built yet, so `npm start` and `npm run build` are currently pointless.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
