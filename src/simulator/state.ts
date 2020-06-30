@@ -78,7 +78,7 @@ function RunPCAction(playerIndex : number, initialState : GameState) : GameState
   // What do I want to do?
   // Default to "standard" for now, which is attacking the closest enemy with the lowest health
   let weapon = PC.actions[0];
-  let validEnemies = GetValidTargets(PC.zone, state.combatantsNPC, state.map, weapon.minRange, weapon.maxRange);
+  let validEnemies = GetValidTargets(PC.zone, aliveTargets, state.map, weapon.minRange, weapon.maxRange);
   if(validEnemies.length === 0) {
     let prioritizedEnemies = aliveTargets.sort((a, b) => a.health - b.health);
     let target = prioritizedEnemies[0];
@@ -170,7 +170,7 @@ function RunNPCAction(npcIndex : number, initialState : GameState) : GameState {
   // What do I want to do?
   // Default to "standard" for now, which is attacking the closest enemy with the lowest health
   let weapon = NPC.actions[0];
-  let validEnemies = GetValidTargets(NPC.zone, state.combatantsPC, state.map, weapon.minRange, weapon.maxRange);
+  let validEnemies = GetValidTargets(NPC.zone, aliveTargets, state.map, weapon.minRange, weapon.maxRange);
   if(validEnemies.length === 0) {
     let prioritizedEnemies = aliveTargets.sort((a, b) => b.health - a.health);
     let target = prioritizedEnemies[0];
