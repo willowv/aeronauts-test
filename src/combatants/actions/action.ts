@@ -1,4 +1,4 @@
-import { Attack, Ability} from "../../simulator/enum";
+import { Attack, Ability} from "../../enum";
 import Combatant from "../combatant";
 import { GameState } from "../../simulator/state";
 

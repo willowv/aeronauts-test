@@ -1,4 +1,4 @@
-import { Attack, Ability, Token, Boost } from "../../simulator/enum";
+import { Attack, Ability, Token, Boost } from "../../enum";
 import { Action } from "./action";
 
 export const Pistol = new Action(0, 1, Attack.Ranged, Ability.Coordination, (checkResult, actor, target, state) => {

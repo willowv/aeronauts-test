@@ -1,4 +1,4 @@
-import { Attack } from "../simulator/enum";
+import { Attack } from "../enum";
 
 export class Terrain {
     name : string;

@@ -11,7 +11,7 @@ the map has all the zones, below
 
 import { Player } from "../combatants/player";
 import { GameMap } from "../map/map";
-import { Token, Boost, Ability, Attack } from "./enum";
+import { Token, Boost, Ability, Attack } from "../enum";
 import Combatant from "../combatants/combatant";
 import { Terrain } from "../map/terrain";
 import { rollDice } from "./dice";

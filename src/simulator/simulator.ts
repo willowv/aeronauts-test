@@ -1,5 +1,5 @@
 import { GameState, RunRound } from './state';
-import { Token, Boost } from './enum';
+import { Token, Boost } from '../enum';
 import { CombatScenario, InitialStateFromScenario } from './scenario';
 import { Player } from '../combatants/player';
 import Combatant from '../combatants/combatant';

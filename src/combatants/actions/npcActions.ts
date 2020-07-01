@@ -1,4 +1,4 @@
-import { Attack, Ability } from "../../simulator/enum";
+import { Attack, Ability } from "../../enum";
 import { Action } from "./action";
 
 export const NPCBasicAttack = new Action(0, 1, Attack.Ranged, Ability.Agility, (checkResult, actor, target, state) => {
