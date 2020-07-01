@@ -4,7 +4,7 @@ import { GameState } from "./state";
 import { GameMap } from "../map/map";
 import { Action } from "../combatants/actions/action";
 import { NPCBasicAttack } from "../combatants/actions/npcActions";
-import { CombatantType } from "./enum";
+import { CombatantType } from "../enum";
 
 export interface CombatScenario {
     enemySetPrimaryByZone : EnemySet[],
