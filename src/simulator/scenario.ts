@@ -4,26 +4,27 @@ import { GameState } from "./state";
 import { GameMap } from "../map/map";
 import { Action } from "../combatants/actions/action";
 import { NPCBasicAttack } from "../combatants/actions/npcActions";
+import { CombatantType } from "./enum";
 
 export interface CombatScenario {
     enemySetPrimaryByZone : EnemySet[],
     enemySetSecondaryByZone : EnemySet[],
-    playerSetByZone : PlayerSet[],
+    playerSetByZone : PlayerStub[][],
     startingFocus : number,
     map : GameMap
 }
 
-export class PlayerSet {
-    rgpicac : number[][];
-    rgweapon : Action[];
+export class PlayerStub {
+    abilityScores : number[];
+    weapon : Action;
+    name : string;
 
-    constructor(rgpicac : number[][], rgweapon : Action[]) {
-        this.rgpicac = rgpicac;
-        this.rgweapon = rgweapon;
+    constructor(abilityScores : number[], weapon : Action, name : string) {
+        this.abilityScores = abilityScores;
+        this.weapon = weapon;
+        this.name = name;
     }
 }
-
-export const EmptyPS = new PlayerSet([], []);
 
 export class EnemySet {
     cNormal : number;
@@ -41,12 +42,13 @@ export class EnemySet {
 
 export const EmptyES = new EnemySet(0, 0, 0, 0);
 
-export function rgplayerFromPlayerSetByZone(playerSetByZone : PlayerSet[], startingFocus : number) {
+export function rgplayerFromPlayerSetByZone(playerSetByZone : PlayerStub[][], startingFocus : number) {
     let rgplayer : Player[] = [];
     let index = 0;
-    playerSetByZone.forEach((playerSet : PlayerSet, zone : number) => {
-        playerSet.rgpicac.forEach((picac : number[], weaponIndex : number) => {
-            rgplayer.push(new Player(index, initialPlayerHealth, 2, initialTokens, zone, 0, picac, startingFocus, [playerSet.rgweapon[weaponIndex]]));
+    playerSetByZone.forEach((playerSet : PlayerStub[], zone : number) => {
+        playerSet.forEach((playerStub : PlayerStub) => {
+            rgplayer.push(
+                new Player(index, initialPlayerHealth, 2, initialTokens, zone, 0, playerStub.abilityScores, startingFocus, [playerStub.weapon], playerStub.name));
             index++;
         });
     });
@@ -57,10 +59,10 @@ function Total(enemySet : EnemySet) : number {
     return enemySet.cNormal + enemySet.cDangerous + enemySet.cTough + enemySet.cScary;
 }
 
-const enemyNormal = (index: number, zone : number, isCritical : boolean) => new Combatant(index, 4, 1, initialTokens, zone, 0, isCritical, [NPCBasicAttack]);
-const enemyDangerous = (index: number, zone : number, isCritical : boolean) => new Combatant(index, 8, 2, initialTokens, zone, 0, isCritical, [NPCBasicAttack]);
-const enemyTough = (index: number, zone : number, isCritical : boolean) => new Combatant(index, 12, 2, initialTokens, zone, 0, isCritical, [NPCBasicAttack]);
-const enemyScary = (index: number, zone : number, isCritical : boolean) => new Combatant(index, 16, 4, initialTokens, zone, 0, isCritical, [NPCBasicAttack]);
+const enemyNormal = (index: number, zone : number, isCritical : boolean) => new Combatant(index, 4, 1, initialTokens, zone, 0, isCritical, [NPCBasicAttack], CombatantType.Normal);
+const enemyDangerous = (index: number, zone : number, isCritical : boolean) => new Combatant(index, 8, 2, initialTokens, zone, 0, isCritical, [NPCBasicAttack], CombatantType.Dangerous);
+const enemyTough = (index: number, zone : number, isCritical : boolean) => new Combatant(index, 12, 2, initialTokens, zone, 0, isCritical, [NPCBasicAttack], CombatantType.Tough);
+const enemyScary = (index: number, zone : number, isCritical : boolean) => new Combatant(index, 16, 4, initialTokens, zone, 0, isCritical, [NPCBasicAttack], CombatantType.Scary);
 
 function rgEnemyByType(
     startingIndex : number,

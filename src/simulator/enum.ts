@@ -20,3 +20,11 @@ export enum Attack {
     Ranged = 0,
     Melee
 }
+
+export enum CombatantType {
+    Normal = 0,
+    Dangerous,
+    Tough,
+    Scary,
+    Player
+}

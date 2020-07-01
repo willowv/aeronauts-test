@@ -1,12 +1,24 @@
-import { GameMap } from '../map/map';
 import { GameState, RunRound } from './state';
 import { Token, Boost } from './enum';
 import { CombatScenario, InitialStateFromScenario } from './scenario';
 import { Player } from '../combatants/player';
 import Combatant from '../combatants/combatant';
 
+export interface Statistic {
+  mean : number,
+  sd: number
+}
+
+export interface ScenarioReport{
+  playerWinRate : number,
+  playerInjuryRate : number,
+  avgRoundCount : Statistic,
+  avgActionCount : Statistic,
+  avgEnemyActionCount: Statistic
+}
+
 // did players win; players average health/focus, lowest health/focus; unspent tokens of each type; total actions, enemy actions
-export interface CombatStats {
+interface CombatStats {
   didPlayersWin : boolean;
   avgPlayerHealth : number;
   avgPlayerFocus : number;
@@ -25,12 +37,22 @@ const cRoundLimit = 10;
 
 // Given number of each type of enemy, number of players, assumed focus percentage, and who goes first
 // Return number of total actions and number of threat actions
-export function SimulateCombat(scenario : CombatScenario) : CombatStats
+export function SimulateScenario(scenario : CombatScenario, trials : number) : ScenarioReport
+{
+  let initialState = InitialStateFromScenario(scenario);
+  let combatStats = [];
+  for(let trial = 0; trial < trials; trial++) {
+    combatStats.push(SimulateCombat(initialState));
+  }
+  return GetScenarioStats(combatStats);
+}
+
+function SimulateCombat(initialState : GameState) : CombatStats
 {
   let cRound = 0;
   let arePlayersDefeated = false;
   let isPrimaryDefeated = false;
-  let state = InitialStateFromScenario(scenario);
+  let state = initialState.clone();
   while(!isPrimaryDefeated && !arePlayersDefeated && cRound < cRoundLimit)
   {
     cRound++;
@@ -38,7 +60,6 @@ export function SimulateCombat(scenario : CombatScenario) : CombatStats
     arePlayersDefeated = state.ArePlayersDefeated();
     isPrimaryDefeated = state.AreEnemiesDefeated();
   }
-
   return getCombatStats(!arePlayersDefeated && isPrimaryDefeated, state, cRound);
 }
 
@@ -89,4 +110,46 @@ function getCombatStats(didPlayersWin : boolean, state : GameState, cRound : num
     actionsEnemy : actionsEnemy,
     cRound : cRound
   };
+}
+
+function GetScenarioStats(combatStats : CombatStats[]) : ScenarioReport {
+  let cTrials = combatStats.length;
+  let cPlayersWin = 0;
+  let cPlayerInjury = 0;
+  let totalRounds = 0;
+  let totalEnemyActions = 0;
+  let totalActions = 0;
+  combatStats.forEach((stats) => {
+    if(stats.didPlayersWin)
+      cPlayersWin++;
+    
+    if(stats.lowestPlayerHealth <= 5)
+      cPlayerInjury++;
+    
+    totalRounds += stats.cRound;
+    totalEnemyActions += stats.actionsEnemy;
+    totalActions += stats.actionsTotal;
+  });
+
+  let avgRoundCountMean = totalRounds / cTrials;
+  let avgActionCountMean = totalActions / cTrials;
+  let avgEnemyActionCountMean = totalEnemyActions / cTrials;
+  let avgRoundCountVarianceSquared = 0;
+  let avgActionCountVarianceSquared = 0;
+  let avgEnemyActionCountVarianceSquared = 0;
+  combatStats.forEach((stats) => {
+    // take each number, subtract the mean, square the result
+    // sum these differences
+    avgRoundCountVarianceSquared += Math.pow(stats.cRound - avgRoundCountMean, 2);
+    avgActionCountVarianceSquared += Math.pow(stats.actionsTotal - avgActionCountMean, 2);
+    avgEnemyActionCountVarianceSquared += Math.pow(stats.actionsEnemy - avgEnemyActionCountMean, 2);
+  })
+
+  return {
+    playerWinRate : cPlayersWin / cTrials,
+    playerInjuryRate : cPlayerInjury / cTrials,
+    avgRoundCount : { mean: avgRoundCountMean, sd: Math.sqrt(avgRoundCountVarianceSquared / cTrials) },
+    avgActionCount : { mean: avgActionCountMean, sd: Math.sqrt(avgActionCountVarianceSquared / cTrials) },
+    avgEnemyActionCount: { mean: avgEnemyActionCountMean, sd: Math.sqrt(avgEnemyActionCountVarianceSquared / cTrials) },
+  }
 }

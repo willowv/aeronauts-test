@@ -1,18 +1,14 @@
 import * as React from "react";
-import { EnemySet } from "../simulator/scenario";
+import { EnemySet, PlayerStub } from "../simulator/scenario";
 import { Terrain, TerrainOptions } from "../map/terrain";
 import { Card, Heading, Box, Flex } from "rebass";
 import { Label, Select, Input } from "@rebass/forms";
 
-interface ZoneSpecState {
+interface ZoneSpecProps {
     zone : number;
-    // players (by index)
-    playerNames : string[];
-    // enemies
-    enemySet : EnemySet;
-    // terrain
+    players : PlayerStub[];
+    npcs : EnemySet;
     terrain : Terrain;
-    // zones connected to
     zonesConnectedTo : number[];
 }
 
@@ -30,7 +26,7 @@ let badgeStyle = {
 // list of enemy types with combo box number input for each (Normal, Dangerous, Tough, Scary)
 // list of zones that are connected to as a tag list
 // list of players that are present as a tag list
-export class ZoneSpec extends React.Component<ZoneSpecState> {
+export class ZoneSpec extends React.Component<ZoneSpecProps> {
     render() {
         return <Card
             width={350}
@@ -58,7 +54,7 @@ export class ZoneSpec extends React.Component<ZoneSpecState> {
                         name='normalEnemies'
                         type='number'
                         min='0'
-                        defaultValue={this.props.enemySet.cNormal}
+                        defaultValue={this.props.npcs.cNormal}
                     />
                     </Box>
                     <Box width={1/4} px={2}>
@@ -68,7 +64,7 @@ export class ZoneSpec extends React.Component<ZoneSpecState> {
                         name='dangerousEnemies'
                         type='number'
                         min='0'
-                        defaultValue={this.props.enemySet.cDangerous}
+                        defaultValue={this.props.npcs.cDangerous}
                     />
                     </Box>
                     <Box width={1/4} px={2}>
@@ -78,7 +74,7 @@ export class ZoneSpec extends React.Component<ZoneSpecState> {
                         name='toughEnemies'
                         type='number'
                         min='0'
-                        defaultValue={this.props.enemySet.cTough}
+                        defaultValue={this.props.npcs.cTough}
                     />
                     </Box>
                     <Box width={1/4} px={2}>
@@ -88,13 +84,13 @@ export class ZoneSpec extends React.Component<ZoneSpecState> {
                         name='scaryEnemies'
                         type='number'
                         min='0'
-                        defaultValue={this.props.enemySet.cScary}
+                        defaultValue={this.props.npcs.cScary}
                     />
                     </Box>
                 </Flex>
                 <Heading as='h4'>Players</Heading>
-                {this.props.playerNames.map((playerName) => (
-                    <Box sx={badgeStyle}>{playerName}</Box>
+                {this.props.players.map((player) => (
+                    <Box sx={badgeStyle}>{player.name}</Box>
                 ))}
                 <Heading as='h4'>Connected to</Heading>
                 {this.props.zonesConnectedTo.map((zone) => (

@@ -1,12 +1,13 @@
 import Combatant from "./combatant";
-import { Token, Boost } from "../simulator/enum";
+import { Token, Boost, CombatantType } from "../simulator/enum";
 import { Action } from "./actions/action";
 
 export const initialPlayerHealth = 15;
 
 export class Player extends Combatant {
     abilityScores : number[];
-    focus: number;
+    focus : number;
+    name : string;
 
     constructor(
         index : number,
@@ -17,14 +18,16 @@ export class Player extends Combatant {
         actionsTaken : number,
         picac : number[],
         focus: number,
-        actions : Action[]) {
-        super(index, health, actionsPerTurn, tokens, zone, actionsTaken, true /* players are always critical */, actions);
+        actions : Action[],
+        name : string) {
+        super(index, health, actionsPerTurn, tokens, zone, actionsTaken, true /* players are always critical */, actions, CombatantType.Player);
         this.abilityScores = [...picac];
         this.focus = focus;
+        this.name = name;
     }
 
     clone() : Player {
-        return new Player(this.index, this.health, this.actionsPerTurn, this.tokens, this.zone, this.actionsTaken, this.abilityScores, this.focus, this.actions);
+        return new Player(this.index, this.health, this.actionsPerTurn, this.tokens, this.zone, this.actionsTaken, this.abilityScores, this.focus, this.actions, this.name);
     }
 
     // mutates, handles damage causing tokens to appear
