@@ -18,6 +18,7 @@ let badgeStyle = {
     bg: 'primary',
     px: 2,
     py: 1,
+    m: 2,
     borderRadius: 9999,
   };
 
@@ -30,7 +31,7 @@ export class ZoneSpec extends React.Component<ZoneSpecProps> {
     render() {
         return <Card
             width={350}
-            sx={{p: 1, borderRadius: 2, boxShadow: '0 0 16px rgba(0, 0, 0, .25)'}}>
+            sx={{p: 2, m:2, borderRadius: 2, boxShadow: '0 0 16px rgba(0, 0, 0, .25)'}}>
                 <Heading as='h3'>
                     {'Zone ' + this.props.zone}
                 </Heading>

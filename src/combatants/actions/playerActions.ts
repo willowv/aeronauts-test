@@ -1,7 +1,7 @@
 import { Attack, Ability, Token, Boost } from "../../enum";
 import { Action } from "./action";
 
-export const Pistol = new Action(0, 1, Attack.Ranged, Ability.Coordination, (checkResult, actor, target, state) => {
+export const Pistol = new Action("Pistol", 0, 1, Attack.Ranged, Ability.Coordination, (checkResult, actor, target, state) => {
     if(checkResult >= 15) {
       target.health -= 4;
       actor.tokens[Token.Action][Boost.Positive] += 2;
@@ -10,7 +10,7 @@ export const Pistol = new Action(0, 1, Attack.Ranged, Ability.Coordination, (che
     }
   });
   
-  export const Shotgun = new Action(0, 1, Attack.Ranged, Ability.Coordination, (checkResult, actor, target, state) => {
+  export const Shotgun = new Action("Shotgun", 0, 1, Attack.Ranged, Ability.Coordination, (checkResult, actor, target, state) => {
     if(checkResult >= 13) {
       target.health -= 3;
       // push into first zone that is further away that target, if any
@@ -24,7 +24,7 @@ export const Pistol = new Action(0, 1, Attack.Ranged, Ability.Coordination, (che
     }
   });
   
-  export const Rifle = new Action(1, Infinity, Attack.Ranged, Ability.Coordination, (checkResult, actor, target, state) => {
+  export const Rifle = new Action("Rifle", 1, Infinity, Attack.Ranged, Ability.Coordination, (checkResult, actor, target, state) => {
     if(checkResult >= 17) {
       target.health -= 5;
       // grant an ally a move (TODO: needs decision logic, which takes in a set of potential states and returns the index of the best one)
@@ -33,7 +33,7 @@ export const Pistol = new Action(0, 1, Attack.Ranged, Ability.Coordination, (che
     }
   });
   
-  export const LightMelee = new Action(0, 0, Attack.Melee, Ability.Coordination, (checkResult, actor, target, state) => {
+  export const LightMelee = new Action("Light Melee", 0, 0, Attack.Melee, Ability.Coordination, (checkResult, actor, target, state) => {
     if(checkResult >= 16) {
       target.health -=6;
       target.tokens[Token.Defense][Boost.Negative] += 2;
@@ -42,7 +42,7 @@ export const Pistol = new Action(0, 1, Attack.Ranged, Ability.Coordination, (che
     }
   });
   
-  export const MediumMelee = new Action(0, 0, Attack.Melee, Ability.Coordination, (checkResult, actor, target, state) => {
+  export const MediumMelee = new Action("Medium Melee", 0, 0, Attack.Melee, Ability.Coordination, (checkResult, actor, target, state) => {
     if(checkResult >= 16) {
       target.health -= 5;
       target.tokens[Token.Action][Boost.Negative] += 2;
@@ -51,10 +51,12 @@ export const Pistol = new Action(0, 1, Attack.Ranged, Ability.Coordination, (che
     }
   });
   
-  export const HeavyMelee = new Action(0, 0, Attack.Melee, Ability.Coordination, (checkResult, actor, target, state) => {
+  export const HeavyMelee = new Action("Heavy Melee", 0, 0, Attack.Melee, Ability.Coordination, (checkResult, actor, target, state) => {
     if(checkResult >= 15) {
       target.health -= 6;
     } else if (checkResult >= 12) {
       target.health -= 4;
     }
   });
+
+  export const WeaponOptions = [Pistol, Shotgun, Rifle, LightMelee, MediumMelee, HeavyMelee];

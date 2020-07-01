@@ -1,17 +1,20 @@
 import React from 'react';
-import { Box } from 'rebass';
+import { Box, Flex, Heading, Card } from 'rebass';
 import { EnemySet, PlayerStub, EmptyES } from '../simulator/scenario';
 import { TerrainExposed, TerrainDefault } from '../map/terrain';
 import { GameMap } from '../map/map';
 import { Player } from '../combatants/player';
 import { ZoneSpec } from './zoneSpec';
+import { Pistol } from '../combatants/actions/playerActions';
+import { PlayerSpec } from './PlayerSpec';
 
 // Player specs across the top, w/ plus button for adding more players
 // Zone layout/connections on the left
 // Zone spec on the right for the selected zone
 
 interface ScenarioSpecState {
-  playersByZone : PlayerStub[][];
+  players : PlayerStub[];
+  playerIndexByZone : number[][];
   npcSetsByZone : EnemySet[];
   map : GameMap;
   selectedZone : number;
@@ -21,7 +24,8 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
   constructor(props: any){
     super(props);
     this.state = {
-      playersByZone: [[]],
+      players: [new PlayerStub([0, 1, 1, 0, 2], Pistol, "Captain")],
+      playerIndexByZone: [[0]],
       npcSetsByZone: [EmptyES],
       map: new GameMap([TerrainDefault], [[true]]),
       selectedZone : 0
@@ -29,6 +33,12 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
   }
 
   render() {
+    let playerSpecs = this.state.players.map((player) => 
+      (<PlayerSpec
+        abilityScores={player.abilityScores}
+        weapon={player.weapon}
+        name={player.name}
+      />));
     return (
       <Box
         sx={{
@@ -39,13 +49,25 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
           fontWeight: 'body',
           lineHeight: 'body',
         }}>
-          < ZoneSpec
-            zone={this.state.selectedZone}
-            players={this.state.playersByZone[this.state.selectedZone]}
-            npcs={this.state.npcSetsByZone[this.state.selectedZone]}
-            terrain={this.state.map.terrain[this.state.selectedZone]}
-            zonesConnectedTo={this.state.map.ZonesMovableFrom(this.state.selectedZone)}
-          />
+          <Flex>
+            {playerSpecs}
+            <Card
+              sx={{bg: 'primary', color:'white', width: 350, height: 200, p: 2, m:2, borderRadius: 2, boxShadow: '0 0 16px rgba(0, 0, 0, .25)'}}>
+                <Heading as='h3' textAlign='center' verticalAlign='middle'>+</Heading>
+            </Card>
+          </Flex>
+          <Flex>
+            <Box flex='1 1 auto' p='2' m='2'>
+              
+            </Box>
+            <ZoneSpec
+              zone={this.state.selectedZone}
+              players={this.state.playerIndexByZone[this.state.selectedZone].map((playerIndex) => this.state.players[playerIndex])}
+              npcs={this.state.npcSetsByZone[this.state.selectedZone]}
+              terrain={this.state.map.terrain[this.state.selectedZone]}
+              zonesConnectedTo={this.state.map.ZonesMovableFrom(this.state.selectedZone)}
+            />
+          </Flex>
         </Box>
     );
   }
