@@ -7,6 +7,7 @@ import { Player } from '../combatants/player';
 import { ZoneSpec } from './zoneSpec';
 import { Pistol } from '../combatants/actions/playerActions';
 import { PlayerSpec } from './PlayerSpec';
+import { MapVis } from './MapVis';
 
 // Player specs across the top, w/ plus button for adding more players
 // Zone layout/connections on the left
@@ -25,9 +26,14 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
     super(props);
     this.state = {
       players: [new PlayerStub([0, 1, 1, 0, 2], Pistol, "Captain")],
-      playerIndexByZone: [[0]],
-      npcSetsByZone: [EmptyES],
-      map: new GameMap([TerrainDefault], [[true]]),
+      playerIndexByZone: [[0],[],[],[]],
+      npcSetsByZone: [EmptyES, EmptyES, EmptyES, EmptyES],
+      map: new GameMap(
+        [TerrainDefault, TerrainDefault, TerrainDefault, TerrainDefault],
+        [[false, true, true, false],
+        [true, false, false, true],
+        [true, false, false, true],
+        [false, true, true, false]]),
       selectedZone : 0
     };
   }
@@ -58,7 +64,12 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
           </Flex>
           <Flex>
             <Box flex='1 1 auto' p='2' m='2'>
-              
+              <MapVis
+                map={this.state.map}
+                playerIndexByZone={this.state.playerIndexByZone}
+                enemySetByZone={this.state.npcSetsByZone}
+                selectedZone={this.state.selectedZone}
+              />
             </Box>
             <ZoneSpec
               zone={this.state.selectedZone}

@@ -18,7 +18,7 @@ let badgeStyle = {
     bg: 'primary',
     px: 2,
     py: 1,
-    m: 2,
+    m: 1,
     borderRadius: 9999,
   };
 
