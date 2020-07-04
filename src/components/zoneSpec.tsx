@@ -43,7 +43,7 @@ export class ZoneSpec extends React.Component<ZoneSpecProps> {
                 </Select>
                 <Heading as='h4'>Enemies</Heading>
                 <Flex mx={-2} mb={3}>
-                    <Box width={1/4} px={2}>
+                    <Box width={1/2} px={2}>
                     <Label htmlFor='name'>Normal</Label>
                     <Input
                         id='normalEnemies'
@@ -59,7 +59,7 @@ export class ZoneSpec extends React.Component<ZoneSpecProps> {
                         }}
                     />
                     </Box>
-                    <Box width={1/4} px={2}>
+                    <Box width={1/2} px={2}>
                     <Label htmlFor='name'>Dangerous</Label>
                     <Input
                         id='dangerousEnemies'
@@ -75,7 +75,9 @@ export class ZoneSpec extends React.Component<ZoneSpecProps> {
                         }}
                     />
                     </Box>
-                    <Box width={1/4} px={2}>
+                </Flex>
+                <Flex mx={-2} mb={3}>
+                    <Box width={1/2} px={2}>
                     <Label htmlFor='name'>Tough</Label>
                     <Input
                         id='toughEnemies'
@@ -91,7 +93,7 @@ export class ZoneSpec extends React.Component<ZoneSpecProps> {
                         }}
                     />
                     </Box>
-                    <Box width={1/4} px={2}>
+                    <Box width={1/2} px={2}>
                     <Label htmlFor='name'>Scary</Label>
                     <Input
                         id='scaryEnemies'
