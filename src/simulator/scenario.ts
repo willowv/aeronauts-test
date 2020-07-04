@@ -40,6 +40,10 @@ export class EnemySet {
         this.cTough = cTough;
         this.cScary = cScary;
     }
+
+    clone() {
+        return new EnemySet(this.cNormal, this.cDangerous, this.cTough, this.cScary);
+    }
 }
 
 export const EmptyES = new EnemySet(0, 0, 0, 0);

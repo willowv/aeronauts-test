@@ -81,6 +81,20 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
               zone={this.state.selectedZone}
               npcs={this.state.npcSetsByZone[this.state.selectedZone]}
               terrain={this.state.map.terrain[this.state.selectedZone]}
+              handleNpcsChange={(newNpcSet) => {
+                this.setState((state : ScenarioSpecState) => {
+                  let newNpcSetsByZone = state.npcSetsByZone.map((npcSet) => npcSet.clone());
+                  newNpcSetsByZone[state.selectedZone] = newNpcSet;
+                  return { npcSetsByZone: newNpcSetsByZone };
+                })
+              }}
+              handleTerrainChange={(newTerrain) => {
+                this.setState((state : ScenarioSpecState) => {
+                  let newMap = state.map.clone();
+                  newMap.terrain[state.selectedZone] = newTerrain;
+                  return { map: newMap };
+                })
+              }}
             />
           </Flex>
         </Box>

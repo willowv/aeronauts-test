@@ -32,6 +32,10 @@ export class GameMap {
     ZonesMovableFrom(zoneStart : number) : number[] {
         return ZonesAdjacentTo(zoneStart, this.moveAdjacency);
     }
+
+    clone() {
+        return new GameMap(this.terrain, this.moveAdjacency);
+    }
 }
 
 export function ZonesAdjacentTo(zoneStart : number, adjacencyMatrix : boolean[][]) : number[] {

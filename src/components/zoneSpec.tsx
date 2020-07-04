@@ -8,6 +8,8 @@ interface ZoneSpecProps {
     zone : number;
     npcs : EnemySet;
     terrain : Terrain;
+    handleTerrainChange : (newTerrain : Terrain) => void;
+    handleNpcsChange : (npcs : EnemySet) => void;
 }
 
 // zone index in top left
@@ -27,7 +29,12 @@ export class ZoneSpec extends React.Component<ZoneSpecProps> {
                 <Select
                     id='terrain'
                     name='terrain'
-                    defaultValue={this.props.terrain.name}>
+                    value={this.props.terrain.name}
+                    onChange={(event) => {
+                        let newTerrain = TerrainOptions[event.target.selectedIndex];
+                        this.props.handleTerrainChange(newTerrain);
+                    }}
+                    >
                         {TerrainOptions.map((terrain, index) => (
                         <option
                             key={index}>
@@ -43,7 +50,13 @@ export class ZoneSpec extends React.Component<ZoneSpecProps> {
                         name='normalEnemies'
                         type='number'
                         min='0'
-                        defaultValue={this.props.npcs.cNormal}
+                        value={this.props.npcs.cNormal}
+                        onChange={(event) => {
+                            let newCount = event.target.valueAsNumber;
+                            let newNpcs = this.props.npcs.clone();
+                            newNpcs.cNormal = newCount;
+                            this.props.handleNpcsChange(newNpcs);
+                        }}
                     />
                     </Box>
                     <Box width={1/4} px={2}>
@@ -53,7 +66,13 @@ export class ZoneSpec extends React.Component<ZoneSpecProps> {
                         name='dangerousEnemies'
                         type='number'
                         min='0'
-                        defaultValue={this.props.npcs.cDangerous}
+                        value={this.props.npcs.cDangerous}
+                        onChange={(event) => {
+                            let newCount = event.target.valueAsNumber;
+                            let newNpcs = this.props.npcs.clone();
+                            newNpcs.cDangerous = newCount;
+                            this.props.handleNpcsChange(newNpcs);
+                        }}
                     />
                     </Box>
                     <Box width={1/4} px={2}>
@@ -63,7 +82,13 @@ export class ZoneSpec extends React.Component<ZoneSpecProps> {
                         name='toughEnemies'
                         type='number'
                         min='0'
-                        defaultValue={this.props.npcs.cTough}
+                        value={this.props.npcs.cTough}
+                        onChange={(event) => {
+                            let newCount = event.target.valueAsNumber;
+                            let newNpcs = this.props.npcs.clone();
+                            newNpcs.cTough = newCount;
+                            this.props.handleNpcsChange(newNpcs);
+                        }}
                     />
                     </Box>
                     <Box width={1/4} px={2}>
@@ -73,7 +98,13 @@ export class ZoneSpec extends React.Component<ZoneSpecProps> {
                         name='scaryEnemies'
                         type='number'
                         min='0'
-                        defaultValue={this.props.npcs.cScary}
+                        value={this.props.npcs.cScary}
+                        onChange={(event) => {
+                            let newCount = event.target.valueAsNumber;
+                            let newNpcs = this.props.npcs.clone();
+                            newNpcs.cScary = newCount;
+                            this.props.handleNpcsChange(newNpcs);
+                        }}
                     />
                     </Box>
                 </Flex>
