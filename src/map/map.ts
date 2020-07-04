@@ -1,10 +1,16 @@
 import { Terrain, TerrainDefault } from "./terrain";
 
+interface XY {
+    x : number;
+    y : number;
+}
+
 export class GameMap {
     terrain : Terrain[];
     moveAdjacency : boolean[][]; // X,Y is 1 if zone X and zone Y are adjacent, 0 otherwise
     distanceBetween : number[][]; // X,Y is the number of moves to get between X and Y
     nextStepBetween : number[][]; // X, Y is the next move you would take to go shortest path from X to Y
+    positioning : XY[]; // calculate positions of these nodes for visualization
 
     constructor(
         terrain : Terrain[],
@@ -13,10 +19,13 @@ export class GameMap {
             this.moveAdjacency = moveAdjacency;
             this.distanceBetween = [];
             this.nextStepBetween = [];
+            this.positioning = [];
             for(let zone = 0; zone < this.terrain.length; zone++) {
                 let dijkstras = Dijkstras(this.moveAdjacency, zone);
                 this.distanceBetween[zone] = dijkstras.distances;
                 this.nextStepBetween[zone] = dijkstras.nextStepToward;
+                if(zone == 0)
+                    this.positioning = dijkstras.positioning;
             }
     }
 
@@ -35,11 +44,19 @@ export function ZonesAdjacentTo(zoneStart : number, adjacencyMatrix : boolean[][
     return zonesDest;
 }
 
-export function Dijkstras(adjacencyMatrix : boolean[][], zoneStart : number) : { distances : number[], nextStepToward : number[] } {
+interface DijkstrasOutput {
+    distances : number[];
+    nextStepToward : number[];
+    positioning : XY[];
+}
+
+export function Dijkstras(adjacencyMatrix : boolean[][], zoneStart : number) : DijkstrasOutput {
     // initialize
+    // positioning - x increment when we add new children to the stack, y increment for each child after the first
     let distances : number[] = []; // track distance to each zone
     let prevStep : number[] = []; // track which zone was before this on shortest path
     let zoneVisited : boolean[] = []; // track whether zone has been visited
+    let positioning : XY[] = [];
     adjacencyMatrix.forEach((_, zone) => {
         prevStep[zone] = -1;
         if(zone === zoneStart)
@@ -52,8 +69,10 @@ export function Dijkstras(adjacencyMatrix : boolean[][], zoneStart : number) : {
 
     //execute
     let zoneQueue = [zoneStart];
+    positioning[zoneStart] = { x: 0, y: 0};
     while(zoneQueue.length > 0) {
         let zoneCur = zoneQueue.shift() ?? -1;
+        let y = 0;
         zoneVisited[zoneCur] = true;
         adjacencyMatrix.forEach((_, zone) => {
             if(adjacencyMatrix[zoneCur][zone]) {
@@ -62,9 +81,13 @@ export function Dijkstras(adjacencyMatrix : boolean[][], zoneStart : number) : {
                     distances[zone] = tentativeDistance;
                     prevStep[zone] = zoneCur;
                 }
-
-                if(!zoneVisited[zone])
+                if(!zoneVisited[zone]) {
                     zoneQueue.push(zone);
+                    if(positioning[zone] == undefined){
+                        positioning[zone] = { x: positioning[zoneCur].x + 1, y: y};
+                        y++;
+                    }
+                }
             }
         });
     }
@@ -88,5 +111,5 @@ export function Dijkstras(adjacencyMatrix : boolean[][], zoneStart : number) : {
         }   
     }
 
-    return { distances, nextStepToward };
+    return { distances, nextStepToward, positioning };
 }

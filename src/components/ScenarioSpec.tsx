@@ -63,7 +63,10 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
             </Card>
           </Flex>
           <Flex>
-            <Box flex='1 1 auto' p='2' m='2'>
+            <Box
+              flex='1 1 auto'
+              sx={{p: 2, m:2, borderRadius: 2, boxShadow: '0 0 16px rgba(0, 0, 0, .25)'}}
+            >
               <MapVis
                 map={this.state.map}
                 playerIndexByZone={this.state.playerIndexByZone}
