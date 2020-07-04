@@ -15,7 +15,6 @@ import { MapVis } from './MapVis';
 
 interface ScenarioSpecState {
   players : PlayerStub[];
-  playerIndexByZone : number[][];
   npcSetsByZone : EnemySet[];
   map : GameMap;
   selectedZone : number;
@@ -25,8 +24,7 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
   constructor(props: any){
     super(props);
     this.state = {
-      players: [new PlayerStub([0, 1, 1, 0, 2], Pistol, "Captain")],
-      playerIndexByZone: [[0],[],[],[]],
+      players: [new PlayerStub([0, 1, 1, 0, 2], Pistol, "Captain", 0)],
       npcSetsByZone: [EmptyES, EmptyES, EmptyES, EmptyES],
       map: new GameMap(
         [TerrainDefault, TerrainDefault, TerrainDefault, TerrainDefault],
@@ -44,6 +42,8 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
         abilityScores={player.abilityScores}
         weapon={player.weapon}
         name={player.name}
+        zone={player.zone}
+        zonesAvailable={this.state.map.terrain.length}
       />));
     return (
       <Box
@@ -69,7 +69,7 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
             >
               <MapVis
                 map={this.state.map}
-                playerIndexByZone={this.state.playerIndexByZone}
+                players={this.state.players}
                 enemySetByZone={this.state.npcSetsByZone}
                 selectedZone={this.state.selectedZone}
                 setSelectedZone={(zone : number) => {
@@ -79,10 +79,8 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
             </Box>
             <ZoneSpec
               zone={this.state.selectedZone}
-              players={this.state.playerIndexByZone[this.state.selectedZone].map((playerIndex) => this.state.players[playerIndex])}
               npcs={this.state.npcSetsByZone[this.state.selectedZone]}
               terrain={this.state.map.terrain[this.state.selectedZone]}
-              zonesConnectedTo={this.state.map.ZonesMovableFrom(this.state.selectedZone)}
             />
           </Flex>
         </Box>

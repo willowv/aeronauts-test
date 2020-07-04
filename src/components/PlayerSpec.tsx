@@ -5,72 +5,61 @@ import { Label, Select, Input } from "@rebass/forms";
 import { WeaponOptions } from "../combatants/actions/playerActions";
 import { Ability } from "../enum";
 
+interface PlayerSpecProps extends PlayerStub{
+    zonesAvailable : number;
+}
+
+interface AbilitySpecProps {
+    name : string;
+    value : number;
+}
+
+class AbilitySpec extends React.Component<AbilitySpecProps> {
+    render() {
+        return (
+            <Box width={1/5} px={2}>
+                <Label>{this.props.name}</Label>
+                <Input
+                    id={this.props.name}
+                    name={this.props.name}
+                    type='number'
+                    min='-1'
+                    max='2'
+                    defaultValue={this.props.value}
+                />
+            </Box>
+        )
+    }
+}
+
 // name at the top
 // ability scores with numeric input
 // weapon drop down selector
-export class PlayerSpec extends React.Component<PlayerStub> {
+export class PlayerSpec extends React.Component<PlayerSpecProps> {
     render() {
         return <Card
-            sx={{width: 350, height: 200, p: 2, m:2, borderRadius: 2, boxShadow: '0 0 16px rgba(0, 0, 0, .25)'}}>
-                <Heading as='h3'>
-                    {this.props.name}
-                </Heading>
+            sx={{width: 350, p: 2, m:2, borderRadius: 2, boxShadow: '0 0 16px rgba(0, 0, 0, .25)'}}>
+                <Label>Name</Label>
+                <Input id='name'
+                    name='name'
+                    type='string'
+                    defaultValue={this.props.name} />
                 <Flex mx={-2} mb={3}>
-                    <Box width={1/5} px={2}>
-                    <Label htmlFor='name'>Per</Label>
-                    <Input
-                        id='perception'
-                        name='perception'
-                        type='number'
-                        min='-1'
-                        max='2'
-                        defaultValue={this.props.abilityScores[Ability.Perception]}
-                    />
-                    </Box>
-                    <Box width={1/5} px={2}>
-                    <Label htmlFor='name'>Int</Label>
-                    <Input
-                        id='intelligence'
-                        name='intelligence'
-                        type='number'
-                        min='-1'
-                        max='2'
-                        defaultValue={this.props.abilityScores[Ability.Intelligence]}
-                    />
-                    </Box>
-                    <Box width={1/5} px={2}>
-                    <Label htmlFor='name'>Coord</Label>
-                    <Input
-                        id='coordination'
-                        name='coordination'
-                        type='number'
-                        min='-1'
-                        max='2'
-                        defaultValue={this.props.abilityScores[Ability.Coordination]}
-                    />
-                    </Box>
-                    <Box width={1/5} px={2}>
-                    <Label htmlFor='name'>Agi</Label>
-                    <Input
-                        id='agility'
-                        name='agility'
-                        type='number'
-                        min='-1'
-                        max='2'
-                        defaultValue={this.props.abilityScores[Ability.Agility]}
-                    />
-                    </Box>
-                    <Box width={1/5} px={2}>
-                    <Label htmlFor='name'>Conv</Label>
-                    <Input
-                        id='conviction'
-                        name='conviction'
-                        type='number'
-                        min='-1'
-                        max='2'
-                        defaultValue={this.props.abilityScores[Ability.Conviction]}
-                    />
-                    </Box>
+                    <AbilitySpec
+                        name='Per'
+                        value={this.props.abilityScores[Ability.Perception]} />
+                    <AbilitySpec
+                        name='Int'
+                        value={this.props.abilityScores[Ability.Intelligence]} />
+                    <AbilitySpec
+                        name='Coord'
+                        value={this.props.abilityScores[Ability.Coordination]} />
+                    <AbilitySpec
+                        name='Agi'
+                        value={this.props.abilityScores[Ability.Agility]} />
+                    <AbilitySpec
+                        name='Conv'
+                        value={this.props.abilityScores[Ability.Conviction]} />
                 </Flex>
                 <Label>Weapon</Label>
                 <Select
@@ -78,11 +67,17 @@ export class PlayerSpec extends React.Component<PlayerStub> {
                     name='weapon'
                     defaultValue={this.props.weapon.name}>
                         {WeaponOptions.map((weapon, index) => (
-                        <option
-                            key={index}>
-                            {weapon.name}
-                        </option>))}
+                            <option key={index}>{weapon.name}</option>))}
                 </Select>
+                <Label>Zone</Label>
+                <Input
+                    id='zone'
+                    name='zone'
+                    type='number'
+                    min='0'
+                    max={this.props.zonesAvailable - 1}
+                    defaultValue={this.props.zone}
+                />
         </Card>
     }
 }

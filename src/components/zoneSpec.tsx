@@ -6,21 +6,9 @@ import { Label, Select, Input } from "@rebass/forms";
 
 interface ZoneSpecProps {
     zone : number;
-    players : PlayerStub[];
     npcs : EnemySet;
     terrain : Terrain;
-    zonesConnectedTo : number[];
 }
-
-let badgeStyle = {
-    display: 'inline-block',
-    color: 'white',
-    bg: 'primary',
-    px: 2,
-    py: 1,
-    m: 1,
-    borderRadius: 9999,
-  };
 
 // zone index in top left
 // Terrain, right of that, as a drop-down selector
@@ -30,7 +18,7 @@ let badgeStyle = {
 export class ZoneSpec extends React.Component<ZoneSpecProps> {
     render() {
         return <Card
-            width={350}
+            width={375}
             sx={{p: 2, m:2, borderRadius: 2, boxShadow: '0 0 16px rgba(0, 0, 0, .25)'}}>
                 <Heading as='h3'>
                     {'Zone ' + this.props.zone}
@@ -89,14 +77,6 @@ export class ZoneSpec extends React.Component<ZoneSpecProps> {
                     />
                     </Box>
                 </Flex>
-                <Heading as='h4'>Players</Heading>
-                {this.props.players.map((player) => (
-                    <Box sx={badgeStyle}>{player.name}</Box>
-                ))}
-                <Heading as='h4'>Connected to</Heading>
-                {this.props.zonesConnectedTo.map((zone) => (
-                    <Box sx={badgeStyle}>{'Zone '+zone}</Box>
-                ))}
         </Card>
     }
 }

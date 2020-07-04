@@ -18,11 +18,13 @@ export class PlayerStub {
     abilityScores : number[];
     weapon : Action;
     name : string;
+    zone : number;
 
-    constructor(abilityScores : number[], weapon : Action, name : string) {
+    constructor(abilityScores : number[], weapon : Action, name : string, zone : number) {
         this.abilityScores = abilityScores;
         this.weapon = weapon;
         this.name = name;
+        this.zone = zone;
     }
 }
 
