@@ -69,6 +69,9 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
                 playerIndexByZone={this.state.playerIndexByZone}
                 enemySetByZone={this.state.npcSetsByZone}
                 selectedZone={this.state.selectedZone}
+                setSelectedZone={(zone : number) => {
+                  this.setState({selectedZone: zone});
+                }}
               />
             </Box>
             <ZoneSpec
