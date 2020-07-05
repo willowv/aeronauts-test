@@ -37,13 +37,24 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
   }
 
   render() {
-    let playerSpecs = this.state.players.map((player) => 
+    let playerSpecs = this.state.players.map((player, index) => 
       (<PlayerSpec
-        abilityScores={player.abilityScores}
-        weapon={player.weapon}
-        name={player.name}
-        zone={player.zone}
+        player={player}
         zonesAvailable={this.state.map.terrain.length}
+        handlePlayerChange={(newPlayer) => {
+          this.setState((state) => {
+            let newPlayers = state.players.map((player) => player.clone());
+            newPlayers[index] = newPlayer;
+            return { players: newPlayers };
+          });
+        }}
+        handlePlayerDelete={() => {
+          this.setState((state) => {
+            let newPlayers = state.players.map((player) => player.clone());
+            newPlayers.splice(index);
+            return { players: newPlayers };
+          });
+        }}
       />));
     if(this.state.players.length < 6) { // if we're under the max number of players, include the add player button
       playerSpecs.push(
