@@ -64,7 +64,7 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
           newPlayers.push(new PlayerStub([0,0,0,0,0], Pistol, "", 0));
           this.setState({players: newPlayers});
         }}
-        sx={{bg: 'primary', color:'white', width: 350, height: 200, p: 2, m:2, borderRadius: 2, boxShadow: '0 0 16px rgba(0, 0, 0, .25)'}}>
+        sx={{bg: 'primary', color:'white', width: 175, height: 300, p: 2, m:2, borderRadius: 2, boxShadow: '0 0 16px rgba(0, 0, 0, .25)'}}>
           <Heading as='h3' textAlign='center' verticalAlign='middle'>Add Player</Heading>
       </Button>));
     }
