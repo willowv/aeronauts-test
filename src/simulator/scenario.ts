@@ -26,6 +26,10 @@ export class PlayerStub {
         this.name = name;
         this.zone = zone;
     }
+
+    clone() {
+        return new PlayerStub(this.abilityScores, this.weapon, this.name, this.zone);
+    }
 }
 
 export class EnemySet {

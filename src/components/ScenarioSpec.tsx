@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Flex, Heading, Card } from 'rebass';
+import { Box, Flex, Heading, Card, Button } from 'rebass';
 import { EnemySet, PlayerStub, EmptyES } from '../simulator/scenario';
 import { TerrainExposed, TerrainDefault } from '../map/terrain';
 import { GameMap } from '../map/map';
@@ -45,6 +45,18 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
         zone={player.zone}
         zonesAvailable={this.state.map.terrain.length}
       />));
+    if(this.state.players.length < 6) { // if we're under the max number of players, include the add player button
+      playerSpecs.push(
+      (<Button
+        onClick={() => {
+          let newPlayers = this.state.players.map((player) => player.clone());
+          newPlayers.push(new PlayerStub([0,0,0,0,0], Pistol, "", 0));
+          this.setState({players: newPlayers});
+        }}
+        sx={{bg: 'primary', color:'white', width: 350, height: 200, p: 2, m:2, borderRadius: 2, boxShadow: '0 0 16px rgba(0, 0, 0, .25)'}}>
+          <Heading as='h3' textAlign='center' verticalAlign='middle'>Add Player</Heading>
+      </Button>));
+    }
     return (
       <Box
         sx={{
@@ -55,12 +67,8 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
           fontWeight: 'body',
           lineHeight: 'body',
         }}>
-          <Flex>
+          <Flex flexWrap='wrap'>
             {playerSpecs}
-            <Card
-              sx={{bg: 'primary', color:'white', width: 350, height: 200, p: 2, m:2, borderRadius: 2, boxShadow: '0 0 16px rgba(0, 0, 0, .25)'}}>
-                <Heading as='h3' textAlign='center' verticalAlign='middle'>+</Heading>
-            </Card>
           </Flex>
           <Flex>
             <Box

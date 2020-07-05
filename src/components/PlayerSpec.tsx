@@ -4,8 +4,13 @@ import { Card, Heading, Box, Flex } from "rebass";
 import { Label, Select, Input } from "@rebass/forms";
 import { WeaponOptions } from "../combatants/actions/playerActions";
 import { Ability } from "../enum";
+import { Action } from "../combatants/actions/action";
 
-interface PlayerSpecProps extends PlayerStub{
+interface PlayerSpecProps {
+    abilityScores : number[];
+    weapon : Action;
+    name : string;
+    zone : number;
     zonesAvailable : number;
 }
 
