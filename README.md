@@ -3,10 +3,9 @@
 This project is intended to simulate Aeronauts combats for the purpose of trying to set reasonable difficulty levels when designing encounters.
 
 Use `npm install` to get set up.
+Use `npm start` to launch in local development mode. This will launch the site and let you play with it.
 
-Describe test scenario in app.test.tsx for now, run `npm test` to try it out. The scenario stats are logged to the console so you can check the rate of player victory and injury. `cTrials` controls the number of simulation trials that are run. Performance seems pretty reasonable even with 10,000 trials.
-
-No front end built yet, so `npm start` and `npm run build` are currently pointless.
+I have also set up automatic deployment to https://aeronauts-simulator.herokuapp.com/ for now.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
