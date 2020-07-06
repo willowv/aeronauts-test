@@ -9,12 +9,20 @@ export interface Statistic {
   sd: number
 }
 
-export interface ScenarioReport{
-  playerWinRate : number,
-  playerInjuryRate : number,
-  avgRoundCount : Statistic,
-  avgActionCount : Statistic,
-  avgEnemyActionCount: Statistic
+export class ScenarioReport{
+  playerWinRate : number;
+  playerInjuryRate : number;
+  avgRoundCount : Statistic;
+  avgActionCount : Statistic;
+  avgEnemyActionCount: Statistic;
+
+  constructor(playerWinRate : number, playerInjuryRate : number, avgRoundCount : Statistic, avgActionCount : Statistic, avgEnemyActionCount : Statistic) {
+    this.playerWinRate = playerWinRate;
+    this.playerInjuryRate = playerInjuryRate;
+    this.avgRoundCount = avgRoundCount;
+    this.avgActionCount = avgActionCount;
+    this.avgEnemyActionCount = avgEnemyActionCount;
+  }
 }
 
 // did players win; players average health/focus, lowest health/focus; unspent tokens of each type; total actions, enemy actions

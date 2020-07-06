@@ -6,12 +6,21 @@ import { Action } from "../combatants/actions/action";
 import { NPCBasicAttack } from "../combatants/actions/npcActions";
 import { CombatantType } from "../enum";
 
-export interface CombatScenario {
-    enemySetPrimaryByZone : EnemySet[],
-    enemySetSecondaryByZone : EnemySet[],
-    playerSetByZone : PlayerStub[][],
-    startingFocus : number,
-    map : GameMap
+export class CombatScenario {
+    enemySetByZone : EnemySet[];
+    players : PlayerStub[];
+    startingFocus : number;
+    map : GameMap;
+
+    constructor(enemySetByZone : EnemySet[],
+        players : PlayerStub[],
+        startingFocus : number,
+        map : GameMap) {
+            this.enemySetByZone = enemySetByZone;
+            this.players = players;
+            this.startingFocus = startingFocus;
+            this.map = map;
+        }
 }
 
 export class PlayerStub {
@@ -52,15 +61,9 @@ export class EnemySet {
 
 export const EmptyES = new EnemySet(0, 0, 0, 0);
 
-export function rgplayerFromPlayerSetByZone(playerSetByZone : PlayerStub[][], startingFocus : number) {
-    let rgplayer : Player[] = [];
-    let index = 0;
-    playerSetByZone.forEach((playerSet : PlayerStub[], zone : number) => {
-        playerSet.forEach((playerStub : PlayerStub) => {
-            rgplayer.push(
-                new Player(index, initialPlayerHealth, 2, initialTokens, zone, 0, playerStub.abilityScores, startingFocus, [playerStub.weapon], playerStub.name));
-            index++;
-        });
+export function rgplayerFromPlayerStubs(playerStubs : PlayerStub[], startingFocus : number) {
+    let rgplayer : Player[] = playerStubs.map((playerStub : PlayerStub, index : number) => {
+        return new Player(index, initialPlayerHealth, 2, initialTokens, playerStub.zone, 0, playerStub.abilityScores, startingFocus, [playerStub.weapon], playerStub.name);
     });
     return rgplayer;
 }
@@ -102,17 +105,12 @@ export function rgEnemyFromEnemySet(i : number, enemySet : EnemySet, zone : numb
 }
 
 export function InitialStateFromScenario(scenario : CombatScenario) : GameState {
-    let rgplayer = rgplayerFromPlayerSetByZone(scenario.playerSetByZone, scenario.startingFocus);
-    
+    let rgplayer = rgplayerFromPlayerStubs(scenario.players, scenario.startingFocus);
     let npcIndex = 0;
     let rgenemy : Combatant[] = [];
-    scenario.enemySetPrimaryByZone.forEach((enemySetPrimary : EnemySet, zone : number) => {
+    scenario.enemySetByZone.forEach((enemySetPrimary : EnemySet, zone : number) => {
         rgenemy = rgenemy.concat(rgEnemyFromEnemySet(npcIndex, enemySetPrimary, zone, true /* primary enemies are critical */));
         npcIndex += Total(enemySetPrimary);
-    });
-    scenario.enemySetSecondaryByZone.forEach((enemySetSecondary : EnemySet, zone : number) => {
-        rgenemy = rgenemy.concat(rgEnemyFromEnemySet(npcIndex, enemySetSecondary, zone, false /* secondary enemies are not */));
-        npcIndex += Total(enemySetSecondary);
     });
     return new GameState(rgplayer, rgenemy, scenario.map);
 }

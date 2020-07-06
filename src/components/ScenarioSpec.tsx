@@ -1,13 +1,15 @@
 import React from 'react';
 import { Box, Flex, Heading, Card, Button } from 'rebass';
-import { EnemySet, PlayerStub, EmptyES } from '../simulator/scenario';
-import { TerrainExposed, TerrainDefault } from '../map/terrain';
+import { EnemySet, PlayerStub, EmptyES, CombatScenario } from '../simulator/scenario';
+import { TerrainExposed, TerrainDefault, TerrainCover } from '../map/terrain';
 import { GameMap } from '../map/map';
 import { Player } from '../combatants/player';
 import { ZoneSpec } from './zoneSpec';
-import { Pistol } from '../combatants/actions/playerActions';
+import { Pistol, Shotgun, HeavyMelee } from '../combatants/actions/playerActions';
 import { PlayerSpec } from './PlayerSpec';
 import { MapVis } from './MapVis';
+import { StatsVis } from './StatsVis';
+import { ScenarioReport, SimulateScenario } from '../simulator/simulator';
 
 // Player specs across the top, w/ plus button for adding more players
 // Zone layout/connections on the left
@@ -18,21 +20,26 @@ interface ScenarioSpecState {
   npcSetsByZone : EnemySet[];
   map : GameMap;
   selectedZone : number;
+  reports : ScenarioReport[];
 }
 
 export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
   constructor(props: any){
     super(props);
     this.state = {
-      players: [new PlayerStub([0, 1, 1, 0, 2], Pistol, "Captain", 0)],
-      npcSetsByZone: [EmptyES, EmptyES, EmptyES, EmptyES],
+      players: [
+        new PlayerStub([0, 1, 1, 0, 2], Shotgun, "Captain", 0),
+        new PlayerStub([1, 2, 0, 1, 0], Pistol, "Engineer", 0),
+        new PlayerStub([0, 0, 2, 1, 1], HeavyMelee, "Strongman", 0)],
+      npcSetsByZone: [EmptyES, new EnemySet(2,0,0,0), new EnemySet(2,0,0,0), new EnemySet(0,0,1,0)],
       map: new GameMap(
-        [TerrainDefault, TerrainDefault, TerrainDefault, TerrainDefault],
+        [TerrainDefault, TerrainDefault, TerrainDefault, TerrainCover],
         [[false, true, true, false],
         [true, false, false, true],
         [true, false, false, true],
         [false, true, true, false]]),
-      selectedZone : 0
+      selectedZone : 0,
+      reports: []
     };
   }
 
@@ -116,6 +123,15 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
               }}
             />
           </Flex>
+          <StatsVis
+            reports={this.state.reports}
+            triggerNewSimulation={() => {
+              let newReport = SimulateScenario(new CombatScenario(this.state.npcSetsByZone, this.state.players, 12, this.state.map), 10000);
+              this.setState((prevState) => {
+                return { reports: prevState.reports.concat(newReport) }
+              });
+            }}
+          />
         </Box>
     );
   }
