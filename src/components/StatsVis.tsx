@@ -44,7 +44,7 @@ export class StatsVis extends React.Component<StatsVisProps> {
         return (
         <Card
             sx={{p: 2, m:2, borderRadius: 2, boxShadow: '0 0 16px rgba(0, 0, 0, .25)'}}>
-            <Flex>
+            <Flex flexWrap='wrap'>
                 <Box mx='2' >
                     <Heading>Statistics</Heading>
                     <p>Win Rate</p>

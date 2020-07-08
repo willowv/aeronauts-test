@@ -88,7 +88,7 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
           <Flex flexWrap='wrap'>
             {playerSpecs}
           </Flex>
-          <Flex>
+          <Flex flexWrap='wrap'>
             <Box
               flex='1 1 auto'
               sx={{p: 2, m:2, borderRadius: 2, boxShadow: '0 0 16px rgba(0, 0, 0, .25)'}}
