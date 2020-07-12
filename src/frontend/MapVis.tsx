@@ -47,66 +47,58 @@ const verticalSpacing = 200;
 const horizontalSpacing = 300;
 const margins = 50;
 
-export class MapVis extends React.Component<MapVisProps> {
-  render() {
-    let flowpoints: JSX.Element[] = this.props.map.terrain.map(
-      (terrain, zone) => {
-        let x =
-          this.props.map.positioning[zone].x * horizontalSpacing + margins;
-        let y = this.props.map.positioning[zone].y * verticalSpacing + margins;
-        let outputs = this.props.map
-          .ZonesMovableFrom(zone)
-          .filter((zoneDest) => zoneDest > zone); // don't add repeat edges
-        let players = this.props.players.filter(
-          (player) => player.zone === zone
-        );
-        let npcSet = this.props.enemySetByZone[zone];
-        let enemyBadges: JSX.Element[] = [];
-        if (npcSet.cNormal > 0)
-          enemyBadges.push(
-            <Box sx={NpcBadgeStyle}>{"N: " + npcSet.cNormal}</Box>
-          );
-        if (npcSet.cDangerous > 0)
-          enemyBadges.push(
-            <Box sx={NpcBadgeStyle}>{"D: " + npcSet.cDangerous}</Box>
-          );
-        if (npcSet.cTough > 0)
-          enemyBadges.push(
-            <Box sx={NpcBadgeStyle}>{"T: " + npcSet.cTough}</Box>
-          );
-        if (npcSet.cScary > 0)
-          enemyBadges.push(
-            <Box sx={NpcBadgeStyle}>{"S: " + npcSet.cScary}</Box>
-          );
+export const MapVis = ({
+  map,
+  players,
+  selectedZone,
+  setSelectedZone,
+  enemySetByZone,
+}: MapVisProps) => {
+  let flowpoints: JSX.Element[] = map.terrain.map((terrain, zone) => {
+    let x = map.positioning[zone].x * horizontalSpacing + margins;
+    let y = map.positioning[zone].y * verticalSpacing + margins;
+    let outputs = map
+      .ZonesMovableFrom(zone)
+      .filter((zoneDest) => zoneDest > zone); // don't add repeat edges
+    let players2 = players.filter((player) => player.zone === zone);
+    let npcSet = enemySetByZone[zone];
+    
+    let enemyBadges: JSX.Element[] = [];
+    if (npcSet.cNormal > 0)
+      enemyBadges.push(<Box sx={NpcBadgeStyle}>{"N: " + npcSet.cNormal}</Box>);
+    if (npcSet.cDangerous > 0)
+      enemyBadges.push(
+        <Box sx={NpcBadgeStyle}>{"D: " + npcSet.cDangerous}</Box>
+      );
+    if (npcSet.cTough > 0)
+      enemyBadges.push(<Box sx={NpcBadgeStyle}>{"T: " + npcSet.cTough}</Box>);
+    if (npcSet.cScary > 0)
+      enemyBadges.push(<Box sx={NpcBadgeStyle}>{"S: " + npcSet.cScary}</Box>);
 
-        let style = this.props.selectedZone === zone ? ZoneSelected : ZoneStyle;
-        return (
-          <Flowpoint
-            key={zone}
-            outputs={outputs}
-            startPosition={{ x: x, y: y }}
-            width={200}
-            onClick={() => {
-              this.props.setSelectedZone(zone);
-            }}
-          >
-            <Card sx={style}>
-              <Heading as="h3">{"Zone " + zone}</Heading>
-              <p>{"Terrain: " + terrain.name}</p>
-              {players.map((player) => (
-                <Box sx={PlayerBadgeStyle}>{player.name}</Box>
-              ))}
-              {enemyBadges}
-            </Card>
-          </Flowpoint>
-        );
-      }
-    );
-
-    // Use terrain to generate nodes
-    // Use adjacency matrix to generate edges
+    let style = selectedZone === zone ? ZoneSelected : ZoneStyle;
     return (
-      <Flowspace selected={this.props.selectedZone}>{flowpoints}</Flowspace>
+      <Flowpoint
+        key={zone}
+        outputs={outputs}
+        startPosition={{ x: x, y: y }}
+        width={200}
+        onClick={() => {
+          setSelectedZone(zone)
+        }}
+      >
+        <Card sx={style}>
+          <Heading as="h3">{"Zone " + zone}</Heading>
+          <p>{"Terrain: " + terrain.name}</p>
+          {players2.map((player) => (
+            <Box sx={PlayerBadgeStyle}>{player.name}</Box>
+          ))}
+          {enemyBadges}
+        </Card>
+      </Flowpoint>
     );
-  }
+  });
+
+  // Use terrain to generate nodes
+  // Use adjacency matrix to generate edges
+  return <Flowspace selected={selectedZone}>{flowpoints}</Flowspace>;
 }
