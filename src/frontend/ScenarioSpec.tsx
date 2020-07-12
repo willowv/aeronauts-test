@@ -1,15 +1,15 @@
 import React from 'react';
-import { Box, Flex, Heading, Card, Button } from 'rebass';
-import { EnemySet, PlayerStub, EmptyES, CombatScenario } from '../simulator/scenario';
-import { TerrainExposed, TerrainDefault, TerrainCover } from '../map/terrain';
-import { GameMap } from '../map/map';
-import { Player } from '../combatants/player';
+import { Box, Flex, Heading, Button } from 'rebass';
+import { EnemySet, PlayerStub, EmptyES, CombatScenario } from '../simulation/scenario';
+import { TerrainDefault, TerrainCover } from '../simulation/map/terrain';
+import { GameMap } from '../simulation/map/map';
 import { ZoneSpec } from './zoneSpec';
-import { Pistol, Shotgun, HeavyMelee } from '../combatants/actions/playerActions';
+import { Pistol, Shotgun, HeavyMelee } from '../simulation/combatants/actions/playerActions';
 import { PlayerSpec } from './PlayerSpec';
 import { MapVis } from './MapVis';
 import { StatsVis } from './StatsVis';
-import { ScenarioReport, SimulateScenario } from '../simulator/simulator';
+import { SimulateScenario } from '../simulation/simulator';
+import { ScenarioReport } from '../simulation/statistics';
 
 // Player specs across the top, w/ plus button for adding more players
 // Zone layout/connections on the left

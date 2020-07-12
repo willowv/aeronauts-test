@@ -1,8 +1,8 @@
 import * as React from "react";
-import { EnemySet, PlayerStub } from "../simulator/scenario";
-import { Terrain, TerrainOptions } from "../map/terrain";
+import { Terrain, TerrainOptions } from "../simulation/map/terrain";
 import { Card, Heading, Box, Flex } from "rebass";
 import { Label, Select, Input } from "@rebass/forms";
+import { EnemySet } from "../simulation/scenario";
 
 interface ZoneSpecProps {
     zone : number;

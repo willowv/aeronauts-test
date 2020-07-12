@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Card, Heading, Box, Flex, Button } from "rebass";
-import { Label } from "@rebass/forms";
-import { ScenarioReport } from "../simulator/simulator";
+import { ScenarioReport } from "../simulation/statistics";
 
 interface StatsVisProps {
     reports : ScenarioReport[];
@@ -28,7 +27,7 @@ export class StatsVis extends React.Component<StatsVisProps> {
         if(this.props.reports.length > 0) {
             let reportsToDisplay = this.props.reports.slice(Math.max(this.props.reports.length - 10, 0)).reverse();
             reportVis = reportsToDisplay.map((report, index) => {
-                let title = (index == 0) ? 'Current' : 'Current -'+index;
+                let title = (index === 0) ? 'Current' : 'Current -'+index;
                 return ScenarioReportVis(title, report);
         })
         } else {

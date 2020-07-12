@@ -1,8 +1,8 @@
 import * as React from "react";
-import { PlayerStub, EnemySet } from "../simulator/scenario";
-import { GameMap } from "../map/map";
+import { GameMap } from "../simulation/map/map";
 import { Box, Heading, Card } from "rebass";
 import { Flowpoint, Flowspace } from 'flowpoints';
+import { PlayerStub, EnemySet } from "../simulation/scenario";
 
 interface MapVisProps {
     map : GameMap;
@@ -46,7 +46,7 @@ export class MapVis extends React.Component<MapVisProps> {
             let y = this.props.map.positioning[zone].y * verticalSpacing + margins;
             let outputs = this.props.map.ZonesMovableFrom(zone)
                 .filter((zoneDest) => zoneDest > zone); // don't add repeat edges
-            let players = this.props.players.filter((player) => player.zone == zone);
+            let players = this.props.players.filter((player) => player.zone === zone);
             let npcSet = this.props.enemySetByZone[zone];
             let enemyBadges : JSX.Element[] = [];
             if(npcSet.cNormal > 0)
@@ -58,7 +58,7 @@ export class MapVis extends React.Component<MapVisProps> {
             if(npcSet.cScary > 0)
                 enemyBadges.push((<Box sx={NpcBadgeStyle}>{'S: '+npcSet.cScary}</Box>));
             
-            let style = (this.props.selectedZone == zone) ? ZoneSelected : ZoneStyle;
+            let style = (this.props.selectedZone === zone) ? ZoneSelected : ZoneStyle;
             return (
                 <Flowpoint
                     key={zone}

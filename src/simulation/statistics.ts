@@ -1,77 +1,46 @@
-import { GameState, RunRound } from './state';
-import { Token, Boost } from '../enum';
-import { CombatScenario, InitialStateFromScenario } from './scenario';
-import { Player } from '../combatants/player';
-import Combatant from '../combatants/combatant';
+import { GameState } from "./state";
+import { Player } from "./combatants/player";
+import { Token, Boost } from "../enum";
+import Combatant from "./combatants/combatant";
 
 export interface Statistic {
-  mean : number,
-  sd: number
-}
-
-export class ScenarioReport{
-  playerWinRate : number;
-  playerInjuryRate : number;
-  avgRoundCount : Statistic;
-  avgActionCount : Statistic;
-  avgEnemyActionCount: Statistic;
-
-  constructor(playerWinRate : number, playerInjuryRate : number, avgRoundCount : Statistic, avgActionCount : Statistic, avgEnemyActionCount : Statistic) {
-    this.playerWinRate = playerWinRate;
-    this.playerInjuryRate = playerInjuryRate;
-    this.avgRoundCount = avgRoundCount;
-    this.avgActionCount = avgActionCount;
-    this.avgEnemyActionCount = avgEnemyActionCount;
+    mean : number,
+    sd: number
   }
+  
+  export class ScenarioReport{
+    playerWinRate : number;
+    playerInjuryRate : number;
+    avgRoundCount : Statistic;
+    avgActionCount : Statistic;
+    avgEnemyActionCount: Statistic;
+  
+    constructor(playerWinRate : number, playerInjuryRate : number, avgRoundCount : Statistic, avgActionCount : Statistic, avgEnemyActionCount : Statistic) {
+      this.playerWinRate = playerWinRate;
+      this.playerInjuryRate = playerInjuryRate;
+      this.avgRoundCount = avgRoundCount;
+      this.avgActionCount = avgActionCount;
+      this.avgEnemyActionCount = avgEnemyActionCount;
+    }
 }
-
+  
 // did players win; players average health/focus, lowest health/focus; unspent tokens of each type; total actions, enemy actions
-interface CombatStats {
-  didPlayersWin : boolean;
-  avgPlayerHealth : number;
-  avgPlayerFocus : number;
-  lowestPlayerHealth : number;
-  lowestPlayerFocus : number;
-  unspentAdv : number;
-  unspentDisadv : number;
-  unspentDef : number;
-  unspentExp : number;
-  actionsTotal : number;
-  actionsEnemy : number;
-  cRound: number;
+export interface CombatStats {
+    didPlayersWin : boolean;
+    avgPlayerHealth : number;
+    avgPlayerFocus : number;
+    lowestPlayerHealth : number;
+    lowestPlayerFocus : number;
+    unspentAdv : number;
+    unspentDisadv : number;
+    unspentDef : number;
+    unspentExp : number;
+    actionsTotal : number;
+    actionsEnemy : number;
+    cRound: number;
 }
 
-const cRoundLimit = 10;
-
-// Given number of each type of enemy, number of players, assumed focus percentage, and who goes first
-// Return number of total actions and number of threat actions
-export function SimulateScenario(scenario : CombatScenario, trials : number) : ScenarioReport
-{
-  let initialState = InitialStateFromScenario(scenario);
-  let combatStats = [];
-  for(let trial = 0; trial < trials; trial++) {
-    combatStats.push(SimulateCombat(initialState));
-  }
-  return GetScenarioStats(combatStats);
-}
-
-function SimulateCombat(initialState : GameState) : CombatStats
-{
-  let cRound = 0;
-  let arePlayersDefeated = false;
-  let isPrimaryDefeated = false;
-  let state = initialState.clone();
-  while(!isPrimaryDefeated && !arePlayersDefeated && cRound < cRoundLimit)
-  {
-    cRound++;
-    state = RunRound(state);
-    arePlayersDefeated = state.ArePlayersDefeated();
-    isPrimaryDefeated = state.AreEnemiesDefeated();
-  }
-  return getCombatStats(!arePlayersDefeated && isPrimaryDefeated, state, cRound);
-}
-
-function getCombatStats(didPlayersWin : boolean, state : GameState, cRound : number) : CombatStats
+export function getCombatStats(didPlayersWin : boolean, state : GameState, cRound : number) : CombatStats
 {
   let totalPlayerHealth = 0;
   let totalPlayerFocus = 0;
@@ -120,7 +89,7 @@ function getCombatStats(didPlayersWin : boolean, state : GameState, cRound : num
   };
 }
 
-function GetScenarioStats(combatStats : CombatStats[]) : ScenarioReport {
+export function GetScenarioStats(combatStats : CombatStats[]) : ScenarioReport {
   let cTrials = combatStats.length;
   let cPlayersWin = 0;
   let cPlayerInjury = 0;

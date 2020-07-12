@@ -1,4 +1,4 @@
-import { Terrain, TerrainDefault } from "./terrain";
+import { Terrain } from "./terrain";
 
 interface XY {
     x : number;
@@ -24,7 +24,7 @@ export class GameMap {
                 let dijkstras = Dijkstras(this.moveAdjacency, zone);
                 this.distanceBetween[zone] = dijkstras.distances;
                 this.nextStepBetween[zone] = dijkstras.nextStepToward;
-                if(zone == 0)
+                if(zone === 0)
                     this.positioning = dijkstras.positioning;
             }
     }
@@ -87,7 +87,7 @@ export function Dijkstras(adjacencyMatrix : boolean[][], zoneStart : number) : D
                 }
                 if(!zoneVisited[zone]) {
                     zoneQueue.push(zone);
-                    if(positioning[zone] == undefined){
+                    if(positioning[zone] === undefined){
                         positioning[zone] = { x: positioning[zoneCur].x + 1, y: y};
                         y++;
                     }
@@ -105,7 +105,7 @@ export function Dijkstras(adjacencyMatrix : boolean[][], zoneStart : number) : D
         }
 
         let prospectiveNextStep = zoneDest;
-        while(prospectiveNextStep != zoneStart && prospectiveNextStep != -1) {
+        while(prospectiveNextStep !== zoneStart && prospectiveNextStep !== -1) {
             if(prevStep[prospectiveNextStep] === zoneStart)
             {
                 nextStepToward[zoneDest] = prospectiveNextStep;

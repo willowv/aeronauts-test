@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ScenarioSpec } from './components/ScenarioSpec';
+import { ScenarioSpec } from './frontend/ScenarioSpec';
 import * as serviceWorker from './serviceWorker';
 import {ThemeProvider} from 'emotion-theming';
 import theme from '@rebass/preset'

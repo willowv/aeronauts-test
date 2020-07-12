@@ -1,4 +1,4 @@
-import { Attack } from "../enum";
+import { Attack } from "../../enum";
 
 export class Terrain {
     name : string;
@@ -24,16 +24,16 @@ export const TerrainDefault = new Terrain(
 export const TerrainCover = new Terrain(
     "Cover",
     (attackType) => 0,
-    (defenseType) => defenseType == Attack.Ranged ? 1 : 0);
+    (defenseType) => defenseType === Attack.Ranged ? 1 : 0);
 
 export const TerrainExposed = new Terrain(
     "Exposed",
     (attackType) => 0,
-    (defenseType) => defenseType == Attack.Ranged ? -1 : 0);
+    (defenseType) => defenseType === Attack.Ranged ? -1 : 0);
 
 export const TerrainVantage = new Terrain(
     "Vantage Point",
-    (attackType) => attackType == Attack.Ranged ? 1 : 0,
+    (attackType) => attackType === Attack.Ranged ? 1 : 0,
     (defenseType) => 0);
 
 export const TerrainUnstable = new Terrain(
@@ -43,7 +43,7 @@ export const TerrainUnstable = new Terrain(
 
 export const TerrainUneven = new Terrain(
     "Uneven",
-    (attackType) => attackType == Attack.Melee ? -1 : 0,
+    (attackType) => attackType === Attack.Melee ? -1 : 0,
     (defenseType) => 0);
 
 export const TerrainOptions = [ TerrainDefault, TerrainCover, TerrainExposed, TerrainVantage, TerrainUnstable, TerrainUneven ];

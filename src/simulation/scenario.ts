@@ -1,9 +1,9 @@
-import Combatant, { initialTokens } from "../combatants/combatant";
-import { Player, initialPlayerHealth } from "../combatants/player";
+import Combatant, { initialTokens } from "../simulation/combatants/combatant";
+import { Player, initialPlayerHealth } from "../simulation/combatants/player";
 import { GameState } from "./state";
-import { GameMap } from "../map/map";
-import { Action } from "../combatants/actions/action";
-import { NPCBasicAttack } from "../combatants/actions/npcActions";
+import { GameMap } from "../simulation/map/map";
+import { Action } from "../simulation/combatants/actions/action";
+import { NPCBasicAttack } from "../simulation/combatants/actions/npcActions";
 import { CombatantType } from "../enum";
 
 export class CombatScenario {

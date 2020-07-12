@@ -1,10 +1,9 @@
 import * as React from "react";
-import { PlayerStub } from "../simulator/scenario";
-import { Card, Heading, Box, Flex, Button } from "rebass";
+import { Card, Box, Flex, Button } from "rebass";
 import { Label, Select, Input } from "@rebass/forms";
-import { WeaponOptions } from "../combatants/actions/playerActions";
+import { WeaponOptions } from "../simulation/combatants/actions/playerActions";
 import { Ability } from "../enum";
-import { Action } from "../combatants/actions/action";
+import { PlayerStub } from "../simulation/scenario";
 
 interface AbilitySpecProps {
     name : string;

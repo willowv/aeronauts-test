@@ -1,4 +1,4 @@
-import { Attack, Ability, Token, Boost } from "../../enum";
+import { Attack, Ability, Token, Boost } from "../../../enum";
 import { Action } from "./action";
 
 export const Pistol = new Action("Pistol", 0, 1, Attack.Ranged, Ability.Coordination, (checkResult, actor, target, state) => {
@@ -15,9 +15,9 @@ export const Pistol = new Action("Pistol", 0, 1, Attack.Ranged, Ability.Coordina
       target.health -= 3;
       // push into first zone that is further away that target, if any
       let pushableZones = state.map.ZonesMovableFrom(target.zone).filter((zone : number) => {
-        return zone != actor.zone;
+        return zone !== actor.zone;
       });
-      if(pushableZones.length != 0)
+      if(pushableZones.length !== 0)
         target.zone = pushableZones[0];
     } else if (checkResult >= 11) {
       target.health -= 3;

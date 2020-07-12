@@ -1,6 +1,6 @@
-import { Attack, Ability} from "../../enum";
+import { Attack, Ability} from "../../../enum";
 import Combatant from "../combatant";
-import { GameState } from "../../simulator/state";
+import { GameState } from "../../state";
 
 export class Action {
     name : string;

@@ -1,5 +1,5 @@
 import { Action } from "./actions/action";
-import { CombatantType } from "../enum";
+import { CombatantType } from "../../enum";
 
 export const initialTokens = [[0,0],[0,0]];
 

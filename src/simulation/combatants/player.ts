@@ -1,5 +1,5 @@
 import Combatant from "./combatant";
-import { Token, Boost, CombatantType } from "../enum";
+import { Token, Boost, CombatantType } from "../../enum";
 import { Action } from "./actions/action";
 
 export const initialPlayerHealth = 15;
