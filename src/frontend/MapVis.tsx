@@ -3,6 +3,7 @@ import { GameMap } from "../simulation/map/map";
 import { Box, Heading, Card } from "rebass";
 import { Flowpoint, Flowspace } from "flowpoints";
 import { PlayerStub, EnemySet } from "../simulation/scenario";
+import { CombatantType } from "../enum";
 
 interface MapVisProps {
   map: GameMap;
@@ -64,16 +65,30 @@ export const MapVis = ({
     let npcSet = enemySetByZone[zone];
 
     let enemyBadges: JSX.Element[] = [];
-    if (npcSet.cNormal > 0)
-      enemyBadges.push(<Box sx={NpcBadgeStyle}>{"N: " + npcSet.cNormal}</Box>);
-    if (npcSet.cDangerous > 0)
+    if (npcSet.count[CombatantType.Normal] > 0)
       enemyBadges.push(
-        <Box sx={NpcBadgeStyle}>{"D: " + npcSet.cDangerous}</Box>
+        <Box sx={NpcBadgeStyle}>
+          {"N: " + npcSet.count[CombatantType.Normal]}
+        </Box>
       );
-    if (npcSet.cTough > 0)
-      enemyBadges.push(<Box sx={NpcBadgeStyle}>{"T: " + npcSet.cTough}</Box>);
-    if (npcSet.cScary > 0)
-      enemyBadges.push(<Box sx={NpcBadgeStyle}>{"S: " + npcSet.cScary}</Box>);
+    if (npcSet.count[CombatantType.Dangerous] > 0)
+      enemyBadges.push(
+        <Box sx={NpcBadgeStyle}>
+          {"D: " + npcSet.count[CombatantType.Dangerous]}
+        </Box>
+      );
+    if (npcSet.count[CombatantType.Tough] > 0)
+      enemyBadges.push(
+        <Box sx={NpcBadgeStyle}>
+          {"T: " + npcSet.count[CombatantType.Tough]}
+        </Box>
+      );
+    if (npcSet.count[CombatantType.Scary] > 0)
+      enemyBadges.push(
+        <Box sx={NpcBadgeStyle}>
+          {"S: " + npcSet.count[CombatantType.Scary]}
+        </Box>
+      );
 
     let style = selectedZone === zone ? ZoneSelected : ZoneStyle;
     return (

@@ -43,9 +43,9 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
       ],
       npcSetsByZone: [
         EmptyES,
-        new EnemySet(2, 0, 0, 0),
-        new EnemySet(2, 0, 0, 0),
-        new EnemySet(0, 0, 1, 0),
+        new EnemySet([2, 0, 0, 0]),
+        new EnemySet([2, 0, 0, 0]),
+        new EnemySet([0, 0, 1, 0]),
       ],
       map: new GameMap(
         [TerrainDefault, TerrainDefault, TerrainDefault, TerrainCover],

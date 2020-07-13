@@ -54,34 +54,27 @@ export class PlayerStub {
 }
 
 export class EnemySet {
-  cNormal: number;
-  cDangerous: number;
-  cTough: number;
-  cScary: number;
+  count: number[];
 
-  constructor(
-    cNormal: number,
-    cDangerous: number,
-    cTough: number,
-    cScary: number
-  ) {
-    this.cNormal = cNormal;
-    this.cDangerous = cDangerous;
-    this.cTough = cTough;
-    this.cScary = cScary;
+  constructor(count: number[]) {
+    this.count = count;
   }
 
   clone() {
-    return new EnemySet(
-      this.cNormal,
-      this.cDangerous,
-      this.cTough,
-      this.cScary
+    return new EnemySet(this.count);
+  }
+
+  total(): number {
+    return (
+      this.count[CombatantType.Normal] +
+      this.count[CombatantType.Dangerous] +
+      this.count[CombatantType.Tough] +
+      this.count[CombatantType.Scary]
     );
   }
 }
 
-export const EmptyES = new EnemySet(0, 0, 0, 0);
+export const EmptyES = new EnemySet([0, 0, 0, 0]);
 
 export function rgplayerFromPlayerStubs(
   playerStubs: PlayerStub[],
@@ -104,12 +97,6 @@ export function rgplayerFromPlayerStubs(
     }
   );
   return rgplayer;
-}
-
-function Total(enemySet: EnemySet): number {
-  return (
-    enemySet.cNormal + enemySet.cDangerous + enemySet.cTough + enemySet.cScary
-  );
 }
 
 const enemyNormal = (index: number, zone: number, isCritical: boolean) =>
@@ -186,29 +173,41 @@ export function rgEnemyFromEnemySet(
   rgenemy = rgenemy.concat(
     rgEnemyByType(
       startingIndex,
-      enemySet.cNormal,
+      enemySet.count[CombatantType.Normal],
       enemyNormal,
       zone,
       isCritical
     )
   );
-  startingIndex += enemySet.cNormal;
+  startingIndex += enemySet.count[CombatantType.Normal];
   rgenemy = rgenemy.concat(
     rgEnemyByType(
       startingIndex,
-      enemySet.cDangerous,
+      enemySet.count[CombatantType.Dangerous],
       enemyDangerous,
       zone,
       isCritical
     )
   );
-  startingIndex += enemySet.cDangerous;
+  startingIndex += enemySet.count[CombatantType.Dangerous];
   rgenemy = rgenemy.concat(
-    rgEnemyByType(startingIndex, enemySet.cTough, enemyTough, zone, isCritical)
+    rgEnemyByType(
+      startingIndex,
+      enemySet.count[CombatantType.Tough],
+      enemyTough,
+      zone,
+      isCritical
+    )
   );
-  startingIndex += enemySet.cTough;
+  startingIndex += enemySet.count[CombatantType.Tough];
   rgenemy = rgenemy.concat(
-    rgEnemyByType(startingIndex, enemySet.cScary, enemyScary, zone, isCritical)
+    rgEnemyByType(
+      startingIndex,
+      enemySet.count[CombatantType.Scary],
+      enemyScary,
+      zone,
+      isCritical
+    )
   );
   return rgenemy;
 }
@@ -229,7 +228,7 @@ export function InitialStateFromScenario(scenario: CombatScenario): GameState {
         true /* primary enemies are critical */
       )
     );
-    npcIndex += Total(enemySetPrimary);
+    npcIndex += enemySetPrimary.total();
   });
   return new GameState(rgplayer, rgenemy, scenario.map);
 }

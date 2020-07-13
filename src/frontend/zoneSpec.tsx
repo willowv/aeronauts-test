@@ -3,6 +3,40 @@ import { Terrain, TerrainOptions } from "../simulation/map/terrain";
 import { Card, Heading, Box, Flex } from "rebass";
 import { Label, Select, Input } from "@rebass/forms";
 import { EnemySet } from "../simulation/scenario";
+import { CombatantType } from "../enum";
+
+interface NpcSpecProps {
+  name: string;
+  npcs: EnemySet;
+  combatantType: CombatantType;
+  handleNpcsChange: (npcs: EnemySet) => void;
+}
+
+const NpcSpec = ({
+  name,
+  npcs,
+  combatantType,
+  handleNpcsChange,
+}: NpcSpecProps) => {
+  return (
+    <Box width={1 / 2} px={2}>
+      <Label>{name}</Label>
+      <Input
+        id={name}
+        name={name}
+        type="number"
+        min="0"
+        value={npcs.count[combatantType]}
+        onChange={(event) => {
+          let newCount = event.target.valueAsNumber;
+          let newNpcs = npcs.clone();
+          newNpcs.count[combatantType] = newCount;
+          handleNpcsChange(newNpcs);
+        }}
+      />
+    </Box>
+  );
+};
 
 interface ZoneSpecProps {
   zone: number;
@@ -12,11 +46,6 @@ interface ZoneSpecProps {
   handleNpcsChange: (npcs: EnemySet) => void;
 }
 
-// zone index in top left
-// Terrain, right of that, as a drop-down selector
-// list of enemy types with combo box number input for each (Normal, Dangerous, Tough, Scary)
-// list of zones that are connected to as a tag list
-// list of players that are present as a tag list
 export const ZoneSpec = ({
   zone,
   npcs,
@@ -51,72 +80,30 @@ export const ZoneSpec = ({
       </Select>
       <Heading as="h4">Enemies</Heading>
       <Flex mx={-2} mb={3}>
-        <Box width={1 / 2} px={2}>
-          <Label htmlFor="name">Normal</Label>
-          <Input
-            id="normalEnemies"
-            name="normalEnemies"
-            type="number"
-            min="0"
-            value={npcs.cNormal}
-            onChange={(event) => {
-              let newCount = event.target.valueAsNumber;
-              let newNpcs = npcs.clone();
-              newNpcs.cNormal = newCount;
-              handleNpcsChange(newNpcs);
-            }}
-          />
-        </Box>
-        <Box width={1 / 2} px={2}>
-          <Label htmlFor="name">Dangerous</Label>
-          <Input
-            id="dangerousEnemies"
-            name="dangerousEnemies"
-            type="number"
-            min="0"
-            value={npcs.cDangerous}
-            onChange={(event) => {
-              let newCount = event.target.valueAsNumber;
-              let newNpcs = npcs.clone();
-              newNpcs.cDangerous = newCount;
-              handleNpcsChange(newNpcs);
-            }}
-          />
-        </Box>
-      </Flex>
-      <Flex mx={-2} mb={3}>
-        <Box width={1 / 2} px={2}>
-          <Label htmlFor="name">Tough</Label>
-          <Input
-            id="toughEnemies"
-            name="toughEnemies"
-            type="number"
-            min="0"
-            value={npcs.cTough}
-            onChange={(event) => {
-              let newCount = event.target.valueAsNumber;
-              let newNpcs = npcs.clone();
-              newNpcs.cTough = newCount;
-              handleNpcsChange(newNpcs);
-            }}
-          />
-        </Box>
-        <Box width={1 / 2} px={2}>
-          <Label htmlFor="name">Scary</Label>
-          <Input
-            id="scaryEnemies"
-            name="scaryEnemies"
-            type="number"
-            min="0"
-            value={npcs.cScary}
-            onChange={(event) => {
-              let newCount = event.target.valueAsNumber;
-              let newNpcs = npcs.clone();
-              newNpcs.cScary = newCount;
-              handleNpcsChange(newNpcs);
-            }}
-          />
-        </Box>
+        <NpcSpec
+          name="Normal"
+          npcs={npcs}
+          combatantType={CombatantType.Normal}
+          handleNpcsChange={handleNpcsChange}
+        />
+        <NpcSpec
+          name="Dangerous"
+          npcs={npcs}
+          combatantType={CombatantType.Dangerous}
+          handleNpcsChange={handleNpcsChange}
+        />
+        <NpcSpec
+          name="Tough"
+          npcs={npcs}
+          combatantType={CombatantType.Tough}
+          handleNpcsChange={handleNpcsChange}
+        />
+        <NpcSpec
+          name="Scary"
+          npcs={npcs}
+          combatantType={CombatantType.Scary}
+          handleNpcsChange={handleNpcsChange}
+        />
       </Flex>
     </Card>
   );
