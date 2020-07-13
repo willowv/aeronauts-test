@@ -2,11 +2,6 @@ import * as React from "react";
 import { Card, Heading, Box, Flex, Button } from "rebass";
 import { ScenarioReport } from "../simulation/statistics";
 
-interface StatsVisProps {
-  reports: ScenarioReport[];
-  triggerNewSimulation: () => void;
-}
-
 interface ScenarioReportVisProps {
   title: string;
   report: ScenarioReport;
@@ -35,17 +30,22 @@ const ScenarioReportVis = ({
   </Box>
 );
 
-export const StatsVis = (props: StatsVisProps) => {
+interface StatsVisProps {
+  reports: ScenarioReport[];
+  triggerNewSimulation: () => void;
+}
+
+export const StatsVis = ({ reports, triggerNewSimulation }: StatsVisProps) => {
   // Grab the last 10 reports
   let reportVis: JSX.Element[];
-  if (props.reports.length > 0) {
-    let reportsToDisplay = props.reports
-      .slice(Math.max(props.reports.length - 10, 0))
+  if (reports.length > 0) {
+    let reportsToDisplay = reports
+      .slice(Math.max(reports.length - 10, 0))
       .reverse();
     reportVis = reportsToDisplay.map((report, index) => {
       let title = index === 0 ? "Current" : "Current -" + index;
       return <ScenarioReportVis title={title} report={report} />;
-    })
+    });
   } else {
     reportVis = [
       <Box mx="2">
@@ -78,7 +78,7 @@ export const StatsVis = (props: StatsVisProps) => {
         </Box>
         {reportVis}
       </Flex>
-      <Button onClick={props.triggerNewSimulation}>Simulate Combat</Button>
+      <Button onClick={triggerNewSimulation}>Simulate Combat</Button>
     </Card>
   );
-}
+};

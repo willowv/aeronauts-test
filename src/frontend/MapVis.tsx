@@ -62,7 +62,7 @@ export const MapVis = ({
       .filter((zoneDest) => zoneDest > zone); // don't add repeat edges
     let players2 = players.filter((player) => player.zone === zone);
     let npcSet = enemySetByZone[zone];
-    
+
     let enemyBadges: JSX.Element[] = [];
     if (npcSet.cNormal > 0)
       enemyBadges.push(<Box sx={NpcBadgeStyle}>{"N: " + npcSet.cNormal}</Box>);
@@ -83,7 +83,7 @@ export const MapVis = ({
         startPosition={{ x: x, y: y }}
         width={200}
         onClick={() => {
-          setSelectedZone(zone)
+          setSelectedZone(zone);
         }}
       >
         <Card sx={style}>
@@ -101,4 +101,4 @@ export const MapVis = ({
   // Use terrain to generate nodes
   // Use adjacency matrix to generate edges
   return <Flowspace selected={selectedZone}>{flowpoints}</Flowspace>;
-}
+};

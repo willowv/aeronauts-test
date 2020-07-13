@@ -4,7 +4,7 @@ export function rollDice(modifier: number, boost: number): number {
   for (let i = 0; i < d6; i++) {
     rolls[i] = Math.floor(Math.random() * 6 + 1);
   }
-  let rollsSorted = rolls.sort((a,b) => a - b);
+  let rollsSorted = rolls.sort((a, b) => a - b);
   if (boost > 0) {
     rollsSorted = rollsSorted.reverse(); // get highest three if boost is positive
   }

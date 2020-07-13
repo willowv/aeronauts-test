@@ -7,31 +7,37 @@ import { PlayerStub } from "../simulation/scenario";
 
 interface AbilitySpecProps {
   name: string;
-  value: number;
-  handleScoreChange: (newScore: number) => void;
+  player: PlayerStub;
+  ability: Ability;
+  handlePlayerChange: (newPlayer: PlayerStub) => void;
 }
 
-class AbilitySpec extends React.Component<AbilitySpecProps> {
-  render() {
-    return (
-      <Box width={1 / 5} px={2}>
-        <Label>{this.props.name}</Label>
-        <Input
-          id={this.props.name}
-          name={this.props.name}
-          type="number"
-          min="-1"
-          max="2"
-          value={this.props.value}
-          onChange={(event) => {
-            let newScore = event.target.valueAsNumber;
-            this.props.handleScoreChange(newScore);
-          }}
-        />
-      </Box>
-    );
-  }
-}
+const AbilitySpec = ({
+  name,
+  player,
+  ability,
+  handlePlayerChange,
+}: AbilitySpecProps) => {
+  return (
+    <Box width={1 / 5} px={2}>
+      <Label>{name}</Label>
+      <Input
+        id={name}
+        name={name}
+        type="number"
+        min="-1"
+        max="2"
+        value={player.abilityScores[ability]}
+        onChange={(event) => {
+          let newScore = event.target.valueAsNumber;
+          let newPlayer = player.clone();
+          newPlayer.abilityScores[ability] = newScore;
+          handlePlayerChange(newPlayer);
+        }}
+      />
+    </Box>
+  );
+};
 
 interface PlayerSpecProps {
   player: PlayerStub;
@@ -40,122 +46,110 @@ interface PlayerSpecProps {
   handlePlayerDelete: () => void;
 }
 
-export class PlayerSpec extends React.Component<PlayerSpecProps> {
-  render() {
-    return (
-      <Card
-        sx={{
-          width: 350,
-          p: 2,
-          m: 2,
-          borderRadius: 2,
-          boxShadow: "0 0 16px rgba(0, 0, 0, .25)",
+export const PlayerSpec = ({
+  player,
+  zonesAvailable,
+  handlePlayerChange,
+  handlePlayerDelete,
+}: PlayerSpecProps) => {
+  return (
+    <Card
+      sx={{
+        width: 350,
+        p: 2,
+        m: 2,
+        borderRadius: 2,
+        boxShadow: "0 0 16px rgba(0, 0, 0, .25)",
+      }}
+    >
+      <Flex>
+        <Box flex="1 1 auto">
+          <Label>Name</Label>
+          <Input
+            id="name"
+            name="name"
+            type="string"
+            value={player.name}
+            onChange={(event) => {
+              let newPlayer = player.clone();
+              newPlayer.name = event.target.value;
+              handlePlayerChange(newPlayer);
+            }}
+          />
+        </Box>
+        <Box sx={{ paddingLeft: 2 }}>
+          <Button
+            backgroundColor={"secondary"}
+            onClick={() => {
+              handlePlayerDelete();
+            }}
+          >
+            X
+          </Button>
+        </Box>
+      </Flex>
+      <Flex mx={-2} mb={3}>
+        <AbilitySpec
+          name="Per"
+          player={player}
+          ability={Ability.Perception}
+          handlePlayerChange={handlePlayerChange}
+        />
+        <AbilitySpec
+          name="Int"
+          player={player}
+          ability={Ability.Intelligence}
+          handlePlayerChange={handlePlayerChange}
+        />
+        <AbilitySpec
+          name="Coord"
+          player={player}
+          ability={Ability.Coordination}
+          handlePlayerChange={handlePlayerChange}
+        />
+        <AbilitySpec
+          name="Agi"
+          player={player}
+          ability={Ability.Agility}
+          handlePlayerChange={handlePlayerChange}
+        />
+        <AbilitySpec
+          name="Conv"
+          player={player}
+          ability={Ability.Conviction}
+          handlePlayerChange={handlePlayerChange}
+        />
+      </Flex>
+      <Label>Weapon</Label>
+      <Select
+        id="weapon"
+        name="weapon"
+        value={player.weapon.name}
+        onChange={(event) => {
+          let newPlayer = player.clone();
+          newPlayer.weapon = WeaponOptions[event.target.selectedIndex];
+          handlePlayerChange(newPlayer);
         }}
       >
-        <Flex>
-          <Box flex="1 1 auto">
-            <Label>Name</Label>
-            <Input
-              id="name"
-              name="name"
-              type="string"
-              value={this.props.player.name}
-              onChange={(event) => {
-                let newPlayer = this.props.player.clone();
-                newPlayer.name = event.target.value;
-                this.props.handlePlayerChange(newPlayer);
-              }}
-            />
-          </Box>
-          <Box sx={{ paddingLeft: 2 }}>
-            <Button
-              backgroundColor={"secondary"}
-              onClick={() => {
-                this.props.handlePlayerDelete();
-              }}
-            >
-              X
-            </Button>
-          </Box>
-        </Flex>
-        <Flex mx={-2} mb={3}>
-          <AbilitySpec
-            name="Per"
-            value={this.props.player.abilityScores[Ability.Perception]}
-            handleScoreChange={(newScore) => {
-              let newPlayer = this.props.player.clone();
-              newPlayer.abilityScores[Ability.Perception] = newScore;
-              this.props.handlePlayerChange(newPlayer);
-            }}
-          />
-          <AbilitySpec
-            name="Int"
-            value={this.props.player.abilityScores[Ability.Intelligence]}
-            handleScoreChange={(newScore) => {
-              let newPlayer = this.props.player.clone();
-              newPlayer.abilityScores[Ability.Intelligence] = newScore;
-              this.props.handlePlayerChange(newPlayer);
-            }}
-          />
-          <AbilitySpec
-            name="Coord"
-            value={this.props.player.abilityScores[Ability.Coordination]}
-            handleScoreChange={(newScore) => {
-              let newPlayer = this.props.player.clone();
-              newPlayer.abilityScores[Ability.Coordination] = newScore;
-              this.props.handlePlayerChange(newPlayer);
-            }}
-          />
-          <AbilitySpec
-            name="Agi"
-            value={this.props.player.abilityScores[Ability.Agility]}
-            handleScoreChange={(newScore) => {
-              let newPlayer = this.props.player.clone();
-              newPlayer.abilityScores[Ability.Agility] = newScore;
-              this.props.handlePlayerChange(newPlayer);
-            }}
-          />
-          <AbilitySpec
-            name="Conv"
-            value={this.props.player.abilityScores[Ability.Conviction]}
-            handleScoreChange={(newScore) => {
-              let newPlayer = this.props.player.clone();
-              newPlayer.abilityScores[Ability.Conviction] = newScore;
-              this.props.handlePlayerChange(newPlayer);
-            }}
-          />
-        </Flex>
-        <Label>Weapon</Label>
-        <Select
-          id="weapon"
-          name="weapon"
-          value={this.props.player.weapon.name}
-          onChange={(event) => {
-            let newPlayer = this.props.player.clone();
-            newPlayer.weapon = WeaponOptions[event.target.selectedIndex];
-            this.props.handlePlayerChange(newPlayer);
-          }}
-        >
-          {WeaponOptions.map((weapon, index) => (
-            <option key={index}>{weapon.name}</option>
-          ))}
-        </Select>
-        <Label>Zone</Label>
-        <Input
-          id="zone"
-          name="zone"
-          type="number"
-          min="0"
-          max={this.props.zonesAvailable - 1}
-          value={this.props.player.zone}
-          onChange={(event) => {
-            let newZone = event.target.valueAsNumber;
-            let newPlayer = this.props.player.clone();
-            newPlayer.zone = newZone;
-            this.props.handlePlayerChange(newPlayer);
-          }}
-        />
-      </Card>
-    );
-  }
-}
+        {WeaponOptions.map((weapon, index) => (
+          <option key={index}>{weapon.name}</option>
+        ))}
+      </Select>
+      <Label>Zone</Label>
+      <Input
+        id="zone"
+        name="zone"
+        type="number"
+        min="0"
+        max={zonesAvailable - 1}
+        value={player.zone}
+        onChange={(event) => {
+          let newZone = event.target.valueAsNumber;
+          let newPlayer = player.clone();
+          newPlayer.zone = newZone;
+          handlePlayerChange(newPlayer);
+        }}
+      />
+    </Card>
+  );
+};
