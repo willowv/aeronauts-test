@@ -2,14 +2,14 @@ import * as React from "react";
 import { Terrain, TerrainOptions } from "../simulation/map/terrain";
 import { Card, Heading, Box, Flex } from "rebass";
 import { Label, Select, Input } from "@rebass/forms";
-import { EnemySet } from "../simulation/scenario";
+import { ScenarioEnemySet } from "../simulation/scenario";
 import { CombatantType } from "../enum";
 
 interface NpcSpecProps {
   name: string;
-  npcs: EnemySet;
+  npcs: ScenarioEnemySet;
   combatantType: CombatantType;
-  handleNpcsChange: (npcs: EnemySet) => void;
+  handleNpcsChange: (npcs: ScenarioEnemySet) => void;
 }
 
 const NpcSpec = ({
@@ -26,11 +26,11 @@ const NpcSpec = ({
         name={name}
         type="number"
         min="0"
-        value={npcs.count[combatantType]}
+        value={npcs.countByCombatantType[combatantType]}
         onChange={(event) => {
           let newCount = event.target.valueAsNumber;
           let newNpcs = npcs.clone();
-          newNpcs.count[combatantType] = newCount;
+          newNpcs.countByCombatantType[combatantType] = newCount;
           handleNpcsChange(newNpcs);
         }}
       />
@@ -40,10 +40,10 @@ const NpcSpec = ({
 
 interface ZoneSpecProps {
   zone: number;
-  npcs: EnemySet;
+  npcs: ScenarioEnemySet;
   terrain: Terrain;
   handleTerrainChange: (newTerrain: Terrain) => void;
-  handleNpcsChange: (npcs: EnemySet) => void;
+  handleNpcsChange: (npcs: ScenarioEnemySet) => void;
 }
 
 export const ZoneSpec = ({

@@ -1,6 +1,6 @@
 import { GameState } from "./state";
 import { Token, Boost, Attack } from "../enum";
-import { CombatScenario, InitialStateFromScenario } from "./scenario";
+import { Scenario, InitialStateFromScenario } from "./scenario";
 import Combatant from "./combatants/combatant";
 import {
   ScenarioReport,
@@ -16,7 +16,7 @@ const cRoundLimit = 10;
 // Given number of each type of enemy, number of players, assumed focus percentage, and who goes first
 // Return number of total actions and number of threat actions
 export function SimulateScenario(
-  scenario: CombatScenario,
+  scenario: Scenario,
   trials: number
 ): ScenarioReport {
   let initialState = InitialStateFromScenario(scenario);

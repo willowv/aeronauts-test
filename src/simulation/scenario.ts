@@ -6,15 +6,15 @@ import { Action } from "../simulation/combatants/actions/action";
 import { NPCBasicAttack } from "../simulation/combatants/actions/npcActions";
 import { CombatantType } from "../enum";
 
-export class CombatScenario {
-  enemySetByZone: EnemySet[];
-  players: PlayerStub[];
+export class Scenario {
+  enemySetByZone: ScenarioEnemySet[];
+  players: ScenarioPlayer[];
   startingFocus: number;
   map: GameMap;
 
   constructor(
-    enemySetByZone: EnemySet[],
-    players: PlayerStub[],
+    enemySetByZone: ScenarioEnemySet[],
+    players: ScenarioPlayer[],
     startingFocus: number,
     map: GameMap
   ) {
@@ -25,7 +25,7 @@ export class CombatScenario {
   }
 }
 
-export class PlayerStub {
+export class ScenarioPlayer {
   abilityScores: number[];
   weapon: Action;
   name: string;
@@ -44,7 +44,7 @@ export class PlayerStub {
   }
 
   clone() {
-    return new PlayerStub(
+    return new ScenarioPlayer(
       this.abilityScores,
       this.weapon,
       this.name,
@@ -53,53 +53,44 @@ export class PlayerStub {
   }
 }
 
-export class EnemySet {
-  count: number[];
+export class ScenarioEnemySet {
+  countByCombatantType: number[];
 
   constructor(count: number[]) {
-    this.count = count;
+    this.countByCombatantType = count;
   }
 
   clone() {
-    return new EnemySet(this.count);
-  }
-
-  total(): number {
-    return (
-      this.count[CombatantType.Normal] +
-      this.count[CombatantType.Dangerous] +
-      this.count[CombatantType.Tough] +
-      this.count[CombatantType.Scary]
-    );
+    return new ScenarioEnemySet(this.countByCombatantType);
   }
 }
 
-export const EmptyES = new EnemySet([0, 0, 0, 0]);
+export const EmptyEnemySet = () => new ScenarioEnemySet([0,0,0,0]);
 
-export function rgplayerFromPlayerStubs(
-  playerStubs: PlayerStub[],
+function PlayersFromScenarioPlayers(
+  scenarioPlayers: ScenarioPlayer[],
   startingFocus: number
-) {
-  let rgplayer: Player[] = playerStubs.map(
-    (playerStub: PlayerStub, index: number) => {
+) : Player[] {
+  let players: Player[] = scenarioPlayers.map(
+    (scenarioPlayer: ScenarioPlayer, index: number) => {
       return new Player(
         index,
         initialPlayerHealth,
         2,
         initialTokens,
-        playerStub.zone,
+        scenarioPlayer.zone,
         0,
-        playerStub.abilityScores,
+        scenarioPlayer.abilityScores,
         startingFocus,
-        [playerStub.weapon],
-        playerStub.name
+        [scenarioPlayer.weapon],
+        scenarioPlayer.name
       );
     }
   );
-  return rgplayer;
+  return players;
 }
 
-const enemyNormal = (index: number, zone: number, isCritical: boolean) =>
+const CreateNormalEnemy = (index: number, zone: number, isCritical: boolean) =>
   new Combatant(
     index,
     4,
@@ -111,7 +102,7 @@ const enemyNormal = (index: number, zone: number, isCritical: boolean) =>
     [NPCBasicAttack],
     CombatantType.Normal
   );
-const enemyDangerous = (index: number, zone: number, isCritical: boolean) =>
+const CreateDangerousEnemy = (index: number, zone: number, isCritical: boolean) =>
   new Combatant(
     index,
     8,
@@ -123,7 +114,7 @@ const enemyDangerous = (index: number, zone: number, isCritical: boolean) =>
     [NPCBasicAttack],
     CombatantType.Dangerous
   );
-const enemyTough = (index: number, zone: number, isCritical: boolean) =>
+const CreateToughEnemy = (index: number, zone: number, isCritical: boolean) =>
   new Combatant(
     index,
     12,
@@ -135,7 +126,7 @@ const enemyTough = (index: number, zone: number, isCritical: boolean) =>
     [NPCBasicAttack],
     CombatantType.Tough
   );
-const enemyScary = (index: number, zone: number, isCritical: boolean) =>
+const CreateScaryEnemy = (index: number, zone: number, isCritical: boolean) =>
   new Combatant(
     index,
     16,
@@ -148,87 +139,30 @@ const enemyScary = (index: number, zone: number, isCritical: boolean) =>
     CombatantType.Scary
   );
 
-function rgEnemyByType(
-  startingIndex: number,
-  cenemy: number,
-  fnEnemy: (index: number, zone: number, isCritical: boolean) => Combatant,
-  zone: number,
-  isCritical: boolean
-) {
-  let rgenemy = [];
-  for (let i = 0; i < cenemy; i++)
-    rgenemy.push(fnEnemy(startingIndex + i, zone, isCritical));
+const CreateEnemyByType = [CreateNormalEnemy, CreateDangerousEnemy, CreateToughEnemy, CreateScaryEnemy];
 
-  return rgenemy;
+function EnemiesFromScenarioEnemySetByZone(enemySetByZone : ScenarioEnemySet[]) : Combatant[] {
+  let enemyStartingIndex = 0;
+  let enemies: Combatant[] = [];
+  enemySetByZone.forEach((enemySet, zone) => {
+    enemySet.countByCombatantType.forEach((count, combatantType) => {
+      let createEnemy = CreateEnemyByType[combatantType];
+      for (let i = 0; i < count; i++)
+        enemies.push(createEnemy(enemyStartingIndex + i, zone, true));
+
+      enemyStartingIndex += count;
+    });
+  });
+  return enemies;
 }
 
-export function rgEnemyFromEnemySet(
-  i: number,
-  enemySet: EnemySet,
-  zone: number,
-  isCritical: boolean
-) {
-  let rgenemy: Combatant[] = [];
-  let startingIndex = i;
-  rgenemy = rgenemy.concat(
-    rgEnemyByType(
-      startingIndex,
-      enemySet.count[CombatantType.Normal],
-      enemyNormal,
-      zone,
-      isCritical
-    )
-  );
-  startingIndex += enemySet.count[CombatantType.Normal];
-  rgenemy = rgenemy.concat(
-    rgEnemyByType(
-      startingIndex,
-      enemySet.count[CombatantType.Dangerous],
-      enemyDangerous,
-      zone,
-      isCritical
-    )
-  );
-  startingIndex += enemySet.count[CombatantType.Dangerous];
-  rgenemy = rgenemy.concat(
-    rgEnemyByType(
-      startingIndex,
-      enemySet.count[CombatantType.Tough],
-      enemyTough,
-      zone,
-      isCritical
-    )
-  );
-  startingIndex += enemySet.count[CombatantType.Tough];
-  rgenemy = rgenemy.concat(
-    rgEnemyByType(
-      startingIndex,
-      enemySet.count[CombatantType.Scary],
-      enemyScary,
-      zone,
-      isCritical
-    )
-  );
-  return rgenemy;
-}
-
-export function InitialStateFromScenario(scenario: CombatScenario): GameState {
-  let rgplayer = rgplayerFromPlayerStubs(
+export function InitialStateFromScenario(scenario: Scenario): GameState {
+  let players = PlayersFromScenarioPlayers(
     scenario.players,
     scenario.startingFocus
   );
-  let npcIndex = 0;
-  let rgenemy: Combatant[] = [];
-  scenario.enemySetByZone.forEach((enemySetPrimary: EnemySet, zone: number) => {
-    rgenemy = rgenemy.concat(
-      rgEnemyFromEnemySet(
-        npcIndex,
-        enemySetPrimary,
-        zone,
-        true /* primary enemies are critical */
-      )
-    );
-    npcIndex += enemySetPrimary.total();
-  });
-  return new GameState(rgplayer, rgenemy, scenario.map);
+
+  let enemies = EnemiesFromScenarioEnemySetByZone(scenario.enemySetByZone);
+  
+  return new GameState(players, enemies, scenario.map);
 }

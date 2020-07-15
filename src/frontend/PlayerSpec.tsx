@@ -3,13 +3,13 @@ import { Card, Box, Flex, Button } from "rebass";
 import { Label, Select, Input } from "@rebass/forms";
 import { WeaponOptions } from "../simulation/combatants/actions/playerActions";
 import { Ability } from "../enum";
-import { PlayerStub } from "../simulation/scenario";
+import { ScenarioPlayer } from "../simulation/scenario";
 
 interface AbilitySpecProps {
   name: string;
-  player: PlayerStub;
+  player: ScenarioPlayer;
   ability: Ability;
-  handlePlayerChange: (newPlayer: PlayerStub) => void;
+  handlePlayerChange: (newPlayer: ScenarioPlayer) => void;
 }
 
 const AbilitySpec = ({
@@ -40,9 +40,9 @@ const AbilitySpec = ({
 };
 
 interface PlayerSpecProps {
-  player: PlayerStub;
+  player: ScenarioPlayer;
   zonesAvailable: number;
-  handlePlayerChange: (newPlayer: PlayerStub) => void;
+  handlePlayerChange: (newPlayer: ScenarioPlayer) => void;
   handlePlayerDelete: () => void;
 }
 

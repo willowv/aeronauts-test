@@ -1,10 +1,10 @@
 import React from "react";
 import { Box, Flex, Heading, Button } from "rebass";
 import {
-  EnemySet,
-  PlayerStub,
-  EmptyES,
-  CombatScenario,
+  ScenarioEnemySet,
+  ScenarioPlayer,
+  EmptyEnemySet,
+  Scenario,
 } from "../simulation/scenario";
 import { TerrainDefault, TerrainCover } from "../simulation/map/terrain";
 import { GameMap } from "../simulation/map/map";
@@ -25,8 +25,8 @@ import { ScenarioReport } from "../simulation/statistics";
 // Zone spec on the right for the selected zone
 
 interface ScenarioSpecState {
-  players: PlayerStub[];
-  npcSetsByZone: EnemySet[];
+  players: ScenarioPlayer[];
+  npcSetsByZone: ScenarioEnemySet[];
   map: GameMap;
   selectedZone: number;
   reports: ScenarioReport[];
@@ -37,15 +37,15 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
     super(props);
     this.state = {
       players: [
-        new PlayerStub([0, 1, 1, 0, 2], Shotgun, "Captain", 0),
-        new PlayerStub([1, 2, 0, 1, 0], Pistol, "Engineer", 0),
-        new PlayerStub([0, 0, 2, 1, 1], HeavyMelee, "Strongman", 0),
+        new ScenarioPlayer([0, 1, 1, 0, 2], Shotgun, "Captain", 0),
+        new ScenarioPlayer([1, 2, 0, 1, 0], Pistol, "Engineer", 0),
+        new ScenarioPlayer([0, 0, 2, 1, 1], HeavyMelee, "Strongman", 0),
       ],
       npcSetsByZone: [
-        EmptyES,
-        new EnemySet([2, 0, 0, 0]),
-        new EnemySet([2, 0, 0, 0]),
-        new EnemySet([0, 0, 1, 0]),
+        EmptyEnemySet(),
+        new ScenarioEnemySet([2, 0, 0, 0]),
+        new ScenarioEnemySet([2, 0, 0, 0]),
+        new ScenarioEnemySet([0, 0, 1, 0]),
       ],
       map: new GameMap(
         [TerrainDefault, TerrainDefault, TerrainDefault, TerrainCover],
@@ -88,7 +88,7 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
         <Button
           onClick={() => {
             let newPlayers = this.state.players.map((player) => player.clone());
-            newPlayers.push(new PlayerStub([0, 0, 0, 0, 0], Pistol, "", 0));
+            newPlayers.push(new ScenarioPlayer([0, 0, 0, 0, 0], Pistol, "", 0));
             this.setState({ players: newPlayers });
           }}
           sx={{
@@ -166,7 +166,7 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
           reports={this.state.reports}
           triggerNewSimulation={() => {
             let newReport = SimulateScenario(
-              new CombatScenario(
+              new Scenario(
                 this.state.npcSetsByZone,
                 this.state.players,
                 12,
