@@ -31,7 +31,7 @@ export class ScenarioReport {
 }
 
 // did players win; players average health/focus, lowest health/focus; unspent tokens of each type; total actions, enemy actions
-export interface CombatStats {
+export interface CombatReport {
   didPlayersWin: boolean;
   avgPlayerHealth: number;
   avgPlayerFocus: number;
@@ -46,11 +46,11 @@ export interface CombatStats {
   cRound: number;
 }
 
-export function getCombatStats(
+export function CombatReportFromFinalState(
   didPlayersWin: boolean,
-  state: GameState,
-  cRound: number
-): CombatStats {
+  finalState: GameState,
+  numberOfRounds: number
+): CombatReport {
   let totalPlayerHealth = 0;
   let totalPlayerFocus = 0;
   let unspentAdv = 0;
@@ -61,7 +61,7 @@ export function getCombatStats(
   let lowestPlayerFocus = 12;
   let actionsTotal = 0;
   let actionsEnemy = 0;
-  state.combatantsPC.forEach((player: Player) => {
+  finalState.combatantsPC.forEach((player: Player) => {
     lowestPlayerHealth = Math.min(lowestPlayerHealth, player.health);
     lowestPlayerFocus = Math.min(lowestPlayerFocus, player.focus);
     totalPlayerHealth += player.health;
@@ -73,7 +73,7 @@ export function getCombatStats(
     actionsTotal += player.actionsTaken;
   });
 
-  state.combatantsNPC.forEach((enemy: Combatant) => {
+  finalState.combatantsNPC.forEach((enemy: Combatant) => {
     unspentAdv += enemy.tokens[Token.Action][Boost.Positive];
     unspentDisadv += enemy.tokens[Token.Action][Boost.Negative];
     unspentDef += enemy.tokens[Token.Defense][Boost.Positive];
@@ -84,8 +84,8 @@ export function getCombatStats(
 
   return {
     didPlayersWin: didPlayersWin,
-    avgPlayerHealth: totalPlayerHealth / state.combatantsPC.length,
-    avgPlayerFocus: totalPlayerFocus / state.combatantsPC.length,
+    avgPlayerHealth: totalPlayerHealth / finalState.combatantsPC.length,
+    avgPlayerFocus: totalPlayerFocus / finalState.combatantsPC.length,
     lowestPlayerHealth: lowestPlayerHealth,
     lowestPlayerFocus: lowestPlayerFocus,
     unspentAdv: unspentAdv,
@@ -94,34 +94,36 @@ export function getCombatStats(
     unspentExp: unspentExp,
     actionsTotal: actionsTotal,
     actionsEnemy: actionsEnemy,
-    cRound: cRound,
+    cRound: numberOfRounds,
   };
 }
 
-export function GetScenarioStats(combatStats: CombatStats[]): ScenarioReport {
-  let cTrials = combatStats.length;
-  let cPlayersWin = 0;
-  let cPlayerInjury = 0;
+export function ScenarioReportFromCombatReports(
+  combatReports: CombatReport[]
+): ScenarioReport {
+  let numberOfTrials = combatReports.length;
+  let numberOfPlayerWins = 0;
+  let numberOfCombatsWithInjury = 0;
   let totalRounds = 0;
   let totalEnemyActions = 0;
   let totalActions = 0;
-  combatStats.forEach((stats) => {
-    if (stats.didPlayersWin) cPlayersWin++;
+  combatReports.forEach((stats) => {
+    if (stats.didPlayersWin) numberOfPlayerWins++;
 
-    if (stats.lowestPlayerHealth <= 5) cPlayerInjury++;
+    if (stats.lowestPlayerHealth <= 5) numberOfCombatsWithInjury++;
 
     totalRounds += stats.cRound;
     totalEnemyActions += stats.actionsEnemy;
     totalActions += stats.actionsTotal;
   });
 
-  let avgRoundCountMean = totalRounds / cTrials;
-  let avgActionCountMean = totalActions / cTrials;
-  let avgEnemyActionCountMean = totalEnemyActions / cTrials;
+  let avgRoundCountMean = totalRounds / numberOfTrials;
+  let avgActionCountMean = totalActions / numberOfTrials;
+  let avgEnemyActionCountMean = totalEnemyActions / numberOfTrials;
   let avgRoundCountVarianceSquared = 0;
   let avgActionCountVarianceSquared = 0;
   let avgEnemyActionCountVarianceSquared = 0;
-  combatStats.forEach((stats) => {
+  combatReports.forEach((stats) => {
     // take each number, subtract the mean, square the result
     // sum these differences
     avgRoundCountVarianceSquared += Math.pow(
@@ -139,19 +141,19 @@ export function GetScenarioStats(combatStats: CombatStats[]): ScenarioReport {
   });
 
   return {
-    playerWinRate: cPlayersWin / cTrials,
-    playerInjuryRate: cPlayerInjury / cTrials,
+    playerWinRate: numberOfPlayerWins / numberOfTrials,
+    playerInjuryRate: numberOfCombatsWithInjury / numberOfTrials,
     avgRoundCount: {
       mean: avgRoundCountMean,
-      sd: Math.sqrt(avgRoundCountVarianceSquared / cTrials),
+      sd: Math.sqrt(avgRoundCountVarianceSquared / numberOfTrials),
     },
     avgActionCount: {
       mean: avgActionCountMean,
-      sd: Math.sqrt(avgActionCountVarianceSquared / cTrials),
+      sd: Math.sqrt(avgActionCountVarianceSquared / numberOfTrials),
     },
     avgEnemyActionCount: {
       mean: avgEnemyActionCountMean,
-      sd: Math.sqrt(avgEnemyActionCountVarianceSquared / cTrials),
+      sd: Math.sqrt(avgEnemyActionCountVarianceSquared / numberOfTrials),
     },
   };
 }

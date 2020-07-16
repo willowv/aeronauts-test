@@ -4,9 +4,9 @@ import { Scenario, InitialStateFromScenario } from "./scenario";
 import Combatant from "./combatants/combatant";
 import {
   ScenarioReport,
-  GetScenarioStats,
-  getCombatStats,
-  CombatStats,
+  ScenarioReportFromCombatReports,
+  CombatReportFromFinalState,
+  CombatReport,
 } from "./statistics";
 import { RunPCAction, RunNPCAction } from "./combatants/ai";
 import { Terrain } from "./map/terrain";
@@ -24,10 +24,10 @@ export function SimulateScenario(
   for (let trial = 0; trial < trials; trial++) {
     combatStats.push(SimulateCombat(initialState));
   }
-  return GetScenarioStats(combatStats);
+  return ScenarioReportFromCombatReports(combatStats);
 }
 
-function SimulateCombat(initialState: GameState): CombatStats {
+function SimulateCombat(initialState: GameState): CombatReport {
   let cRound = 0;
   let arePlayersDefeated = false;
   let isPrimaryDefeated = false;
@@ -38,7 +38,7 @@ function SimulateCombat(initialState: GameState): CombatStats {
     arePlayersDefeated = state.ArePlayersDefeated();
     isPrimaryDefeated = state.AreEnemiesDefeated();
   }
-  return getCombatStats(
+  return CombatReportFromFinalState(
     !arePlayersDefeated && isPrimaryDefeated,
     state,
     cRound
