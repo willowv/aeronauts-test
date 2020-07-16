@@ -1,11 +1,11 @@
-import { Attack, Ability } from "../../../enum";
+import { AttackType, Ability } from "../../../enum";
 import { Action } from "./action";
 
 export const NPCBasicAttack = new Action(
   "NPC Basic Action",
   0,
   1,
-  Attack.Ranged,
+  AttackType.Ranged,
   Ability.Agility,
   (checkResult, actor, target, state) => {
     if (checkResult < 10) {

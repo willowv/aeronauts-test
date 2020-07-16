@@ -1,5 +1,5 @@
 import { GameState } from "./state";
-import { Token, Boost, Attack } from "../enum";
+import { Token, Boost, AttackType } from "../enum";
 import { Scenario, InitialStateFromScenario } from "./scenario";
 import Combatant from "./combatants/combatant";
 import {
@@ -86,7 +86,7 @@ export function AttackerBoost(
   terrain: Terrain[],
   attacker: Combatant,
   target: Combatant,
-  attackType: Attack
+  attackType: AttackType
 ): number {
   // how does source and target terrain affect this?
   let sourceTerrain = terrain[attacker.zone];

@@ -1,14 +1,14 @@
-import { Attack } from "../../enum";
+import { AttackType } from "../../enum";
 
 export class Terrain {
   name: string;
-  attackBoost: (attackType: Attack) => number;
-  defenseBoost: (defenseType: Attack) => number;
+  attackBoost: (attackType: AttackType) => number;
+  defenseBoost: (defenseType: AttackType) => number;
 
   constructor(
     name: string,
-    attackBoost: (attackType: Attack) => number,
-    defenseBoost: (defenseType: Attack) => number
+    attackBoost: (attackType: AttackType) => number,
+    defenseBoost: (defenseType: AttackType) => number
   ) {
     this.name = name;
     this.attackBoost = attackBoost;
@@ -25,30 +25,30 @@ export const TerrainDefault = new Terrain(
 export const TerrainCover = new Terrain(
   "Cover",
   (attackType) => 0,
-  (defenseType) => (defenseType === Attack.Ranged ? 1 : 0)
+  (defenseType) => (defenseType === AttackType.Ranged ? 1 : 0)
 );
 
 export const TerrainExposed = new Terrain(
   "Exposed",
   (attackType) => 0,
-  (defenseType) => (defenseType === Attack.Ranged ? -1 : 0)
+  (defenseType) => (defenseType === AttackType.Ranged ? -1 : 0)
 );
 
 export const TerrainVantage = new Terrain(
   "Vantage Point",
-  (attackType) => (attackType === Attack.Ranged ? 1 : 0),
+  (attackType) => (attackType === AttackType.Ranged ? 1 : 0),
   (defenseType) => 0
 );
 
 export const TerrainUnstable = new Terrain(
   "Unstable",
-  (attackType) => -1,
+  (attackType) => (attackType !== AttackType.Special ? -1 : 0),
   (defenseType) => 0
 );
 
 export const TerrainUneven = new Terrain(
   "Uneven",
-  (attackType) => (attackType === Attack.Melee ? -1 : 0),
+  (attackType) => (attackType === AttackType.Melee ? -1 : 0),
   (defenseType) => 0
 );
 

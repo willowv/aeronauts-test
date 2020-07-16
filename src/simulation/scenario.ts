@@ -65,12 +65,12 @@ export class ScenarioEnemySet {
   }
 }
 
-export const EmptyEnemySet = () => new ScenarioEnemySet([0,0,0,0]);
+export const EmptyEnemySet = () => new ScenarioEnemySet([0, 0, 0, 0]);
 
 function PlayersFromScenarioPlayers(
   scenarioPlayers: ScenarioPlayer[],
   startingFocus: number
-) : Player[] {
+): Player[] {
   let players: Player[] = scenarioPlayers.map(
     (scenarioPlayer: ScenarioPlayer, index: number) => {
       return new Player(
@@ -102,7 +102,11 @@ const CreateNormalEnemy = (index: number, zone: number, isCritical: boolean) =>
     [NPCBasicAttack],
     CombatantType.Normal
   );
-const CreateDangerousEnemy = (index: number, zone: number, isCritical: boolean) =>
+const CreateDangerousEnemy = (
+  index: number,
+  zone: number,
+  isCritical: boolean
+) =>
   new Combatant(
     index,
     8,
@@ -139,9 +143,16 @@ const CreateScaryEnemy = (index: number, zone: number, isCritical: boolean) =>
     CombatantType.Scary
   );
 
-const CreateEnemyByType = [CreateNormalEnemy, CreateDangerousEnemy, CreateToughEnemy, CreateScaryEnemy];
+const CreateEnemyByType = [
+  CreateNormalEnemy,
+  CreateDangerousEnemy,
+  CreateToughEnemy,
+  CreateScaryEnemy,
+];
 
-function EnemiesFromScenarioEnemySetByZone(enemySetByZone : ScenarioEnemySet[]) : Combatant[] {
+function EnemiesFromScenarioEnemySetByZone(
+  enemySetByZone: ScenarioEnemySet[]
+): Combatant[] {
   let enemyStartingIndex = 0;
   let enemies: Combatant[] = [];
   enemySetByZone.forEach((enemySet, zone) => {
@@ -163,6 +174,6 @@ export function InitialStateFromScenario(scenario: Scenario): GameState {
   );
 
   let enemies = EnemiesFromScenarioEnemySetByZone(scenario.enemySetByZone);
-  
+
   return new GameState(players, enemies, scenario.map);
 }

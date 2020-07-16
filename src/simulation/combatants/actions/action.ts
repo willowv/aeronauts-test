@@ -1,4 +1,4 @@
-import { Attack, Ability } from "../../../enum";
+import { AttackType, Ability } from "../../../enum";
 import Combatant from "../combatant";
 import { GameState } from "../../state";
 
@@ -6,7 +6,7 @@ export class Action {
   name: string;
   minRange: number;
   maxRange: number;
-  type: Attack;
+  type: AttackType;
   ability: Ability;
   evaluate: (
     checkResult: number,
@@ -19,7 +19,7 @@ export class Action {
     name: string,
     minRange: number,
     maxRange: number,
-    type: Attack,
+    type: AttackType,
     ability: Ability,
     evaluate: (
       checkResult: number,
