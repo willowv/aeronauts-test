@@ -1,5 +1,5 @@
 import { GameState } from "../state";
-import { AttackerBoost } from "../simulator";
+import { ConsumeTokensAndGetAttackerBoost } from "../simulator";
 import { rollDice } from "../dice";
 import Combatant from "./combatant";
 import { GameMap } from "../map/map";
@@ -45,7 +45,12 @@ export function RunPCAction(
   let target = prioritizedEnemies[0];
 
   // attack
-  let boost = AttackerBoost(state.map.terrain, PC, target, weapon.type);
+  let boost = ConsumeTokensAndGetAttackerBoost(
+    state.map.terrain,
+    PC,
+    target,
+    weapon.type
+  );
   let bonus = PC.abilityScores[weapon.ability];
   if (PC.focus > 0) {
     PC.focus -= 1;
@@ -116,7 +121,12 @@ export function RunNPCAction(
   let target = state.players[prioritizedEnemies[0].index]; // get the player from the combatant
 
   // attack
-  let boost = -AttackerBoost(state.map.terrain, NPC, target, weapon.type); // player rolls for defense
+  let boost = -ConsumeTokensAndGetAttackerBoost(
+    state.map.terrain,
+    NPC,
+    target,
+    weapon.type
+  ); // player rolls for defense
   let bonus = target.abilityScores[weapon.ability];
   if (target.focus > 0) {
     target.focus -= 1;

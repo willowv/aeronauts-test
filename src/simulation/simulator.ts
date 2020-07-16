@@ -8,76 +8,90 @@ import {
   CombatReportFromFinalState,
   CombatReport,
 } from "./statistics";
-import { RunPCAction, RunNPCAction } from "./combatants/ai";
+import {
+  RunPCAction as SimulatePlayerAction,
+  RunNPCAction as SimulateEnemyAction,
+} from "./combatants/ai";
 import { Terrain } from "./map/terrain";
 
-const cRoundLimit = 10;
+const roundLimit = 10;
 
 // Given number of each type of enemy, number of players, assumed focus percentage, and who goes first
 // Return number of total actions and number of threat actions
 export function SimulateScenario(
   scenario: Scenario,
-  trials: number
+  numberOfTrials: number
 ): ScenarioReport {
   let initialState = InitialStateFromScenario(scenario);
-  let combatStats = [];
-  for (let trial = 0; trial < trials; trial++) {
-    combatStats.push(SimulateCombat(initialState));
+  let combatReports = [];
+  for (let trial = 0; trial < numberOfTrials; trial++) {
+    combatReports.push(SimulateCombat(initialState));
   }
-  return ScenarioReportFromCombatReports(combatStats);
+  return ScenarioReportFromCombatReports(combatReports);
 }
 
 function SimulateCombat(initialState: GameState): CombatReport {
-  let cRound = 0;
+  let numberOfRounds = 0;
   let arePlayersDefeated = false;
-  let isPrimaryDefeated = false;
+  let areEnemiesDefeated = false;
   let state = initialState.clone();
-  while (!isPrimaryDefeated && !arePlayersDefeated && cRound < cRoundLimit) {
-    cRound++;
-    state = RunRound(state);
+  while (
+    !areEnemiesDefeated &&
+    !arePlayersDefeated &&
+    numberOfRounds < roundLimit
+  ) {
+    numberOfRounds++;
+    state = SimulateRound(state);
     arePlayersDefeated = state.ArePlayersDefeated();
-    isPrimaryDefeated = state.AreEnemiesDefeated();
+    areEnemiesDefeated = state.AreEnemiesDefeated();
   }
   return CombatReportFromFinalState(
-    !arePlayersDefeated && isPrimaryDefeated,
+    !arePlayersDefeated && areEnemiesDefeated,
     state,
-    cRound
+    numberOfRounds
   );
 }
 
-function RunRound(initialState: GameState): GameState {
+function SimulateRound(initialState: GameState): GameState {
   let state = initialState;
   for (let playerIndex = 0; playerIndex < state.players.length; playerIndex++) {
     //assumes number and index of combatants does not change
     if (!state.players[playerIndex].isDead())
-      state = RunPCTurn(playerIndex, state);
+      state = SimulatePlayerTurn(playerIndex, state);
   }
-  for (let npcIndex = 0; npcIndex < state.enemies.length; npcIndex++) {
-    if (!state.enemies[npcIndex].isDead()) state = RunNPCTurn(npcIndex, state);
-  }
-  return state;
-}
-
-function RunPCTurn(playerIndex: number, initialState: GameState): GameState {
-  let state = initialState; // don't bother cloning, we don't mutate and only call pure functions
-  let PC = state.players[playerIndex];
-  for (let action = 0; action < PC.actionsPerTurn; action++) {
-    state = RunPCAction(PC.index, state);
+  for (let enemyIndex = 0; enemyIndex < state.enemies.length; enemyIndex++) {
+    if (!state.enemies[enemyIndex].isDead())
+      state = SimulateEnemyTurn(enemyIndex, state);
   }
   return state;
 }
 
-function RunNPCTurn(npcIndex: number, initialState: GameState): GameState {
+function SimulatePlayerTurn(
+  playerIndex: number,
+  initialState: GameState
+): GameState {
   let state = initialState; // don't bother cloning, we don't mutate and only call pure functions
-  let NPC = state.enemies[npcIndex];
-  for (let action = 0; action < NPC.actionsPerTurn; action++) {
-    state = RunNPCAction(NPC.index, state);
+  let player = state.players[playerIndex];
+  for (let action = 0; action < player.actionsPerTurn; action++) {
+    state = SimulatePlayerAction(player.index, state);
+  }
+  return state;
+}
+
+function SimulateEnemyTurn(
+  enemyIndex: number,
+  initialState: GameState
+): GameState {
+  let state = initialState; // don't bother cloning, we don't mutate and only call pure functions
+  let enemy = state.enemies[enemyIndex];
+  for (let action = 0; action < enemy.actionsPerTurn; action++) {
+    state = SimulateEnemyAction(enemy.index, state);
   }
   return state;
 }
 
 // mutates state, only pass in clones
-export function AttackerBoost(
+export function ConsumeTokensAndGetAttackerBoost(
   terrain: Terrain[],
   attacker: Combatant,
   target: Combatant,
