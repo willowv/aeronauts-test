@@ -61,7 +61,7 @@ export function CombatReportFromFinalState(
   let lowestPlayerFocus = 12;
   let actionsTotal = 0;
   let actionsEnemy = 0;
-  finalState.combatantsPC.forEach((player: Player) => {
+  finalState.players.forEach((player: Player) => {
     lowestPlayerHealth = Math.min(lowestPlayerHealth, player.health);
     lowestPlayerFocus = Math.min(lowestPlayerFocus, player.focus);
     totalPlayerHealth += player.health;
@@ -73,7 +73,7 @@ export function CombatReportFromFinalState(
     actionsTotal += player.actionsTaken;
   });
 
-  finalState.combatantsNPC.forEach((enemy: Combatant) => {
+  finalState.enemies.forEach((enemy: Combatant) => {
     unspentAdv += enemy.tokens[Token.Action][Boost.Positive];
     unspentDisadv += enemy.tokens[Token.Action][Boost.Negative];
     unspentDef += enemy.tokens[Token.Defense][Boost.Positive];
@@ -84,8 +84,8 @@ export function CombatReportFromFinalState(
 
   return {
     didPlayersWin: didPlayersWin,
-    avgPlayerHealth: totalPlayerHealth / finalState.combatantsPC.length,
-    avgPlayerFocus: totalPlayerFocus / finalState.combatantsPC.length,
+    avgPlayerHealth: totalPlayerHealth / finalState.players.length,
+    avgPlayerFocus: totalPlayerFocus / finalState.players.length,
     lowestPlayerHealth: lowestPlayerHealth,
     lowestPlayerFocus: lowestPlayerFocus,
     unspentAdv: unspentAdv,

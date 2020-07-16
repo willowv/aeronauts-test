@@ -9,9 +9,9 @@ export function RunPCAction(
   initialState: GameState
 ): GameState {
   let state = initialState.clone();
-  let PC = state.combatantsPC[playerIndex];
+  let PC = state.players[playerIndex];
   // Filter to remaining alive targets
-  let aliveTargets = state.combatantsNPC.filter((combatant) => {
+  let aliveTargets = state.enemies.filter((combatant) => {
     return !combatant.isDead();
   });
   if (aliveTargets.length === 0) return initialState;
@@ -79,9 +79,9 @@ export function RunNPCAction(
   initialState: GameState
 ): GameState {
   let state = initialState.clone();
-  let NPC = state.combatantsNPC[npcIndex];
+  let NPC = state.enemies[npcIndex];
   // Filter to remaining alive targets
-  let aliveTargets = state.combatantsPC.filter((combatant) => {
+  let aliveTargets = state.players.filter((combatant) => {
     return !combatant.isDead();
   });
   if (aliveTargets.length === 0) return initialState;
@@ -113,7 +113,7 @@ export function RunNPCAction(
 
   // NPC DIFFERENCES - target highest health
   let prioritizedEnemies = validEnemies.sort((a, b) => b.health - a.health);
-  let target = state.combatantsPC[prioritizedEnemies[0].index]; // get the player from the combatant
+  let target = state.players[prioritizedEnemies[0].index]; // get the player from the combatant
 
   // attack
   let boost = -AttackerBoost(state.map.terrain, NPC, target, weapon.type); // player rolls for defense

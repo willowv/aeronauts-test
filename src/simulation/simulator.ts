@@ -47,25 +47,20 @@ function SimulateCombat(initialState: GameState): CombatReport {
 
 function RunRound(initialState: GameState): GameState {
   let state = initialState;
-  for (
-    let playerIndex = 0;
-    playerIndex < state.combatantsPC.length;
-    playerIndex++
-  ) {
+  for (let playerIndex = 0; playerIndex < state.players.length; playerIndex++) {
     //assumes number and index of combatants does not change
-    if (!state.combatantsPC[playerIndex].isDead())
+    if (!state.players[playerIndex].isDead())
       state = RunPCTurn(playerIndex, state);
   }
-  for (let npcIndex = 0; npcIndex < state.combatantsNPC.length; npcIndex++) {
-    if (!state.combatantsNPC[npcIndex].isDead())
-      state = RunNPCTurn(npcIndex, state);
+  for (let npcIndex = 0; npcIndex < state.enemies.length; npcIndex++) {
+    if (!state.enemies[npcIndex].isDead()) state = RunNPCTurn(npcIndex, state);
   }
   return state;
 }
 
 function RunPCTurn(playerIndex: number, initialState: GameState): GameState {
   let state = initialState; // don't bother cloning, we don't mutate and only call pure functions
-  let PC = state.combatantsPC[playerIndex];
+  let PC = state.players[playerIndex];
   for (let action = 0; action < PC.actionsPerTurn; action++) {
     state = RunPCAction(PC.index, state);
   }
@@ -74,7 +69,7 @@ function RunPCTurn(playerIndex: number, initialState: GameState): GameState {
 
 function RunNPCTurn(npcIndex: number, initialState: GameState): GameState {
   let state = initialState; // don't bother cloning, we don't mutate and only call pure functions
-  let NPC = state.combatantsNPC[npcIndex];
+  let NPC = state.enemies[npcIndex];
   for (let action = 0; action < NPC.actionsPerTurn; action++) {
     state = RunNPCAction(NPC.index, state);
   }
