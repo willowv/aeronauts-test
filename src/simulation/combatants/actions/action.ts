@@ -1,6 +1,6 @@
 import { AttackType, Ability } from "../../../enum";
 import Combatant from "../combatant";
-import { GameState } from "../../state";
+import { CombatState } from "../../state";
 
 export class Action {
   name: string;
@@ -12,7 +12,7 @@ export class Action {
     checkResult: number,
     actor: Combatant,
     target: Combatant,
-    state: GameState
+    state: CombatState
   ) => void;
 
   constructor(
@@ -25,7 +25,7 @@ export class Action {
       checkResult: number,
       actor: Combatant,
       target: Combatant,
-      state: GameState
+      state: CombatState
     ) => void
   ) {
     this.name = name;

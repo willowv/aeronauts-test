@@ -1,4 +1,4 @@
-import { GameState } from "./state";
+import { CombatState } from "./state";
 import { Token, Boost, AttackType } from "../enum";
 import { Scenario, InitialStateFromScenario } from "./scenario";
 import Combatant from "./combatants/combatant";
@@ -30,7 +30,7 @@ export function SimulateScenario(
   return ScenarioReportFromCombatReports(combatReports);
 }
 
-function SimulateCombat(initialState: GameState): CombatReport {
+function SimulateCombat(initialState: CombatState): CombatReport {
   let numberOfRounds = 0;
   let arePlayersDefeated = false;
   let areEnemiesDefeated = false;
@@ -52,7 +52,7 @@ function SimulateCombat(initialState: GameState): CombatReport {
   );
 }
 
-function SimulateRound(initialState: GameState): GameState {
+function SimulateRound(initialState: CombatState): CombatState {
   let state = initialState;
   for (let playerIndex = 0; playerIndex < state.players.length; playerIndex++) {
     //assumes number and index of combatants does not change
@@ -68,8 +68,8 @@ function SimulateRound(initialState: GameState): GameState {
 
 function SimulatePlayerTurn(
   playerIndex: number,
-  initialState: GameState
-): GameState {
+  initialState: CombatState
+): CombatState {
   let state = initialState; // don't bother cloning, we don't mutate and only call pure functions
   let player = state.players[playerIndex];
   for (let action = 0; action < player.actionsPerTurn; action++) {
@@ -80,8 +80,8 @@ function SimulatePlayerTurn(
 
 function SimulateEnemyTurn(
   enemyIndex: number,
-  initialState: GameState
-): GameState {
+  initialState: CombatState
+): CombatState {
   let state = initialState; // don't bother cloning, we don't mutate and only call pure functions
   let enemy = state.enemies[enemyIndex];
   for (let action = 0; action < enemy.actionsPerTurn; action++) {

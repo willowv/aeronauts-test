@@ -2,7 +2,7 @@ import { Player } from "./combatants/player";
 import { GameMap } from "./map/map";
 import Combatant from "./combatants/combatant";
 
-export class GameState {
+export class CombatState {
   players: Player[];
   enemies: Combatant[];
   map: GameMap;
@@ -29,9 +29,9 @@ export class GameState {
     return defeat;
   }
 
-  clone(): GameState {
+  clone(): CombatState {
     let clonePlayers = this.players.map((player) => player.clone());
     let cloneEnemies = this.enemies.map((combatant) => combatant.clone());
-    return new GameState(clonePlayers, cloneEnemies, this.map);
+    return new CombatState(clonePlayers, cloneEnemies, this.map);
   }
 }

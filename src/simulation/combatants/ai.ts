@@ -1,4 +1,4 @@
-import { GameState } from "../state";
+import { CombatState } from "../state";
 import { ConsumeTokensAndGetAttackerBoost } from "../simulator";
 import { rollDice } from "../dice";
 import Combatant from "./combatant";
@@ -6,8 +6,8 @@ import { GameMap } from "../map/map";
 
 export function RunPCAction(
   playerIndex: number,
-  initialState: GameState
-): GameState {
+  initialState: CombatState
+): CombatState {
   let state = initialState.clone();
   let PC = state.players[playerIndex];
   // Filter to remaining alive targets
@@ -81,8 +81,8 @@ function GetValidTargets(
 
 export function RunNPCAction(
   npcIndex: number,
-  initialState: GameState
-): GameState {
+  initialState: CombatState
+): CombatState {
   let state = initialState.clone();
   let NPC = state.enemies[npcIndex];
   // Filter to remaining alive targets

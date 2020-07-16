@@ -1,4 +1,4 @@
-import { GameState } from "./state";
+import { CombatState } from "./state";
 import { Player } from "./combatants/player";
 import { Token, Boost } from "../enum";
 import Combatant from "./combatants/combatant";
@@ -48,7 +48,7 @@ export interface CombatReport {
 
 export function CombatReportFromFinalState(
   didPlayersWin: boolean,
-  finalState: GameState,
+  finalState: CombatState,
   numberOfRounds: number
 ): CombatReport {
   let totalPlayerHealth = 0;

@@ -1,6 +1,6 @@
 import Combatant, { initialTokens } from "../simulation/combatants/combatant";
 import { Player, initialPlayerHealth } from "../simulation/combatants/player";
-import { GameState } from "./state";
+import { CombatState } from "./state";
 import { GameMap } from "../simulation/map/map";
 import { Action } from "../simulation/combatants/actions/action";
 import { NPCBasicAttack } from "../simulation/combatants/actions/npcActions";
@@ -167,7 +167,7 @@ function EnemiesFromScenarioEnemySetByZone(
   return enemies;
 }
 
-export function InitialStateFromScenario(scenario: Scenario): GameState {
+export function InitialStateFromScenario(scenario: Scenario): CombatState {
   let players = PlayersFromScenarioPlayers(
     scenario.players,
     scenario.startingFocus
@@ -175,5 +175,5 @@ export function InitialStateFromScenario(scenario: Scenario): GameState {
 
   let enemies = EnemiesFromScenarioEnemySetByZone(scenario.enemySetByZone);
 
-  return new GameState(players, enemies, scenario.map);
+  return new CombatState(players, enemies, scenario.map);
 }
