@@ -1,12 +1,14 @@
 import { AttackType, Ability } from "../../../enum";
 import { Action } from "./action";
 
-export const NPCBasicAttack = new Action(
-  "NPC Basic Action",
+export const EnemyBasicAttack = new Action(
+  "Enemy Basic Attack",
   0,
   1,
   AttackType.Ranged,
   Ability.Agility,
+  10,
+  15,
   (checkResult, actor, target, state) => {
     if (checkResult < 10) {
       target.health -= 5;

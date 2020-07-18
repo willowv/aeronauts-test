@@ -8,6 +8,8 @@ export class Action {
   maxRange: number;
   type: AttackType;
   ability: Ability;
+  lowThreshold : number;
+  highThreshold : number;
   evaluate: (
     checkResult: number,
     actor: Combatant,
@@ -21,6 +23,8 @@ export class Action {
     maxRange: number,
     type: AttackType,
     ability: Ability,
+    lowThreshold : number,
+    highThreshold : number,
     evaluate: (
       checkResult: number,
       actor: Combatant,
@@ -34,5 +38,7 @@ export class Action {
     this.type = type;
     this.ability = ability;
     this.evaluate = evaluate;
+    this.lowThreshold = lowThreshold;
+    this.highThreshold = highThreshold;
   }
 }
