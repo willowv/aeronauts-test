@@ -1,6 +1,6 @@
 import { CombatState } from "../state";
 import { ConsumeTokensAndGetAttackerBoost } from "../simulator";
-import { rollDice } from "../dice";
+import { RollDice } from "../dice";
 import Combatant from "./combatant";
 import { GameMap } from "../map/map";
 
@@ -56,7 +56,7 @@ export function RunPCAction(
     PC.focus -= 1;
     bonus += 1;
   }
-  let checkResult = rollDice(bonus, boost);
+  let checkResult = RollDice(bonus, boost);
   weapon.evaluate(checkResult, PC, target, state);
   PC.actionsTaken++;
 
@@ -132,7 +132,7 @@ export function RunNPCAction(
     target.focus -= 1;
     bonus += 1;
   }
-  let checkResult = rollDice(bonus, boost);
+  let checkResult = RollDice(bonus, boost);
   weapon.evaluate(checkResult, NPC, target, state);
   NPC.actionsTaken++;
   return state;
