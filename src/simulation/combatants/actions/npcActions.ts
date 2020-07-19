@@ -1,4 +1,4 @@
-import { AttackType, Ability } from "../../../enum";
+import { AttackType, Ability, Faction } from "../../../enum";
 import { Action } from "./action";
 
 export const EnemyBasicAttack = new Action(
@@ -9,6 +9,7 @@ export const EnemyBasicAttack = new Action(
   Ability.Agility,
   10,
   15,
+  Faction.Players,
   (checkResult, actor, target, state) => {
     if (checkResult < 10) {
       target.health -= 5;

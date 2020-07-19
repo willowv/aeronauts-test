@@ -1,4 +1,4 @@
-import { AttackType, Ability } from "../../../enum";
+import { AttackType, Ability, Faction } from "../../../enum";
 import Combatant from "../combatant";
 import { CombatState } from "../../state";
 
@@ -10,6 +10,7 @@ export class Action {
   ability: Ability;
   lowThreshold : number;
   highThreshold : number;
+  target : Faction;
   evaluate: (
     checkResult: number,
     actor: Combatant,
@@ -25,6 +26,7 @@ export class Action {
     ability: Ability,
     lowThreshold : number,
     highThreshold : number,
+    target : Faction,
     evaluate: (
       checkResult: number,
       actor: Combatant,
@@ -40,5 +42,6 @@ export class Action {
     this.evaluate = evaluate;
     this.lowThreshold = lowThreshold;
     this.highThreshold = highThreshold;
+    this.target = target;
   }
 }

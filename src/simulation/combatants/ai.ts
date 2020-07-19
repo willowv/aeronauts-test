@@ -4,6 +4,29 @@ import { RollDice } from "../dice";
 import Combatant from "./combatant";
 import { CombatMap } from "../map/map";
 
+export class AI {
+  name : string;
+  score : (state : CombatState) => number;
+
+  constructor(name : string,
+    score : (state : CombatState) => number) {
+      this.name = name;
+    this.score = score;
+  }
+
+  FindBestMove(initialState : CombatState, combatant : Combatant) : CombatState {
+    // Try moving target to each movable zone, check score, and return the state with the best score
+    return initialState;
+  }
+
+  FindBestAction(initialState : CombatState, combatant : Combatant) : CombatState {
+    // Try each of combatant's actions on each possible target
+    // Try an action by scoring it on each of its outcomes, and calculating expected value
+    // For the action with the highest expected value, evaluate it normally, and return that state
+    return initialState;
+  }
+}
+
 export function RunPCAction(
   playerIndex: number,
   initialState: CombatState

@@ -29,3 +29,8 @@ export enum CombatantType {
   Scary,
   Player,
 }
+
+export enum Faction {
+  Players,
+  Enemies
+}

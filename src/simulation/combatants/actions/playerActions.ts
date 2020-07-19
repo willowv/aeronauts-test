@@ -1,14 +1,15 @@
-import { AttackType, Ability, Token, Boost } from "../../../enum";
+import { AttackType, Ability, Token, Boost, Faction } from "../../../enum";
 import { Action } from "./action";
 
 export const Pistol = new Action(
   "Pistol",
   0,
   1,
-  9,
-  15,
   AttackType.Ranged,
   Ability.Coordination,
+  9,
+  15,
+  Faction.Enemies,
   (checkResult, actor, target, state) => {
     if (checkResult >= 15) {
       target.health -= 4;
@@ -27,6 +28,7 @@ export const Shotgun = new Action(
   Ability.Coordination,
   11,
   13,
+  Faction.Enemies,
   (checkResult, actor, target, state) => {
     if (checkResult >= 13) {
       target.health -= 3;
@@ -51,6 +53,7 @@ export const Rifle = new Action(
   Ability.Coordination,
   12,
   17,
+  Faction.Enemies,
   (checkResult, actor, target, state) => {
     if (checkResult >= 17) {
       target.health -= 5;
@@ -69,6 +72,7 @@ export const LightMelee = new Action(
   Ability.Coordination,
   9,
   16,
+  Faction.Enemies,
   (checkResult, actor, target, state) => {
     if (checkResult >= 16) {
       target.health -= 6;
@@ -87,6 +91,7 @@ export const MediumMelee = new Action(
   Ability.Coordination,
   10,
   16,
+  Faction.Enemies,
   (checkResult, actor, target, state) => {
     if (checkResult >= 16) {
       target.health -= 5;
@@ -105,6 +110,7 @@ export const HeavyMelee = new Action(
   Ability.Coordination,
   12,
   15,
+  Faction.Enemies,
   (checkResult, actor, target, state) => {
     if (checkResult >= 15) {
       target.health -= 6;
