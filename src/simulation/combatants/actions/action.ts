@@ -8,9 +8,9 @@ export class Action {
   maxRange: number;
   type: AttackType;
   ability: Ability;
-  lowThreshold : number;
-  highThreshold : number;
-  target : Faction;
+  lowThreshold: number;
+  highThreshold: number;
+  target: Faction;
   evaluate: (
     checkResult: number,
     actor: Combatant,
@@ -24,9 +24,9 @@ export class Action {
     maxRange: number,
     type: AttackType,
     ability: Ability,
-    lowThreshold : number,
-    highThreshold : number,
-    target : Faction,
+    lowThreshold: number,
+    highThreshold: number,
+    target: Faction,
     evaluate: (
       checkResult: number,
       actor: Combatant,

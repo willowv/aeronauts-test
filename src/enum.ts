@@ -32,5 +32,5 @@ export enum CombatantType {
 
 export enum Faction {
   Players,
-  Enemies
+  Enemies,
 }
