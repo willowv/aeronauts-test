@@ -5,9 +5,9 @@ interface XY {
   y: number;
 }
 
-export class GameMap {
+export class CombatMap {
   terrain: Terrain[];
-  moveAdjacency: boolean[][]; // X,Y is 1 if zone X and zone Y are adjacent, 0 otherwise
+  moveAdjacency: boolean[][]; // X,Y is true if zone X and zone Y are adjacent, false otherwise
   distanceBetween: number[][]; // X,Y is the number of moves to get between X and Y
   nextStepBetween: number[][]; // X, Y is the next move you would take to go shortest path from X to Y
   positioning: XY[]; // calculate positions of these nodes for visualization
@@ -31,7 +31,7 @@ export class GameMap {
   }
 
   clone() {
-    return new GameMap(this.terrain, this.moveAdjacency);
+    return new CombatMap(this.terrain, this.moveAdjacency);
   }
 }
 

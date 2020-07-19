@@ -7,7 +7,7 @@ import {
   Scenario,
 } from "../simulation/scenario";
 import { TerrainDefault, TerrainCover } from "../simulation/map/terrain";
-import { GameMap } from "../simulation/map/map";
+import { CombatMap } from "../simulation/map/map";
 import { ZoneSpec } from "./zoneSpec";
 import {
   Pistol,
@@ -27,7 +27,7 @@ import { ScenarioReport } from "../simulation/statistics";
 interface ScenarioSpecState {
   players: ScenarioPlayer[];
   npcSetsByZone: ScenarioEnemySet[];
-  map: GameMap;
+  map: CombatMap;
   selectedZone: number;
   reports: ScenarioReport[];
 }
@@ -47,7 +47,7 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
         new ScenarioEnemySet([2, 0, 0, 0]),
         new ScenarioEnemySet([0, 0, 1, 0]),
       ],
-      map: new GameMap(
+      map: new CombatMap(
         [TerrainDefault, TerrainDefault, TerrainDefault, TerrainCover],
         [
           [false, true, true, false],

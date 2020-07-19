@@ -16,7 +16,7 @@ export class Player extends Combatant {
     tokens: number[][],
     zone: number,
     actionsTaken: number,
-    picac: number[],
+    abilityScores: number[],
     focus: number,
     actions: Action[],
     name: string
@@ -32,7 +32,7 @@ export class Player extends Combatant {
       actions,
       CombatantType.Player
     );
-    this.abilityScores = [...picac];
+    this.abilityScores = [...abilityScores];
     this.focus = focus;
     this.name = name;
   }

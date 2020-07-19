@@ -2,7 +2,7 @@ import { CombatState } from "../state";
 import { ConsumeTokensAndGetAttackerBoost } from "../simulator";
 import { RollDice } from "../dice";
 import Combatant from "./combatant";
-import { GameMap } from "../map/map";
+import { CombatMap } from "../map/map";
 
 export function RunPCAction(
   playerIndex: number,
@@ -67,7 +67,7 @@ export function RunPCAction(
 function GetValidTargets(
   zone: number,
   targets: Combatant[],
-  map: GameMap,
+  map: CombatMap,
   minRange: number,
   maxRange: number
 ): Combatant[] {

@@ -1,13 +1,13 @@
 import { Player } from "./combatants/player";
-import { GameMap } from "./map/map";
+import { CombatMap } from "./map/map";
 import Combatant from "./combatants/combatant";
 
 export class CombatState {
   players: Player[];
   enemies: Combatant[];
-  map: GameMap;
+  map: CombatMap;
 
-  constructor(players: Player[], enemies: Combatant[], map: GameMap) {
+  constructor(players: Player[], enemies: Combatant[], map: CombatMap) {
     this.players = players;
     this.enemies = enemies;
     this.map = map;

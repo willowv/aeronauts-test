@@ -1,22 +1,22 @@
 import Combatant, { initialTokens } from "../simulation/combatants/combatant";
 import { Player, initialPlayerHealth } from "../simulation/combatants/player";
 import { CombatState } from "./state";
-import { GameMap } from "../simulation/map/map";
+import { CombatMap } from "../simulation/map/map";
 import { Action } from "../simulation/combatants/actions/action";
-import { NPCBasicAttack } from "../simulation/combatants/actions/npcActions";
+import { EnemyBasicAttack } from "../simulation/combatants/actions/npcActions";
 import { CombatantType } from "../enum";
 
 export class Scenario {
   enemySetByZone: ScenarioEnemySet[];
   players: ScenarioPlayer[];
   startingFocus: number;
-  map: GameMap;
+  map: CombatMap;
 
   constructor(
     enemySetByZone: ScenarioEnemySet[],
     players: ScenarioPlayer[],
     startingFocus: number,
-    map: GameMap
+    map: CombatMap
   ) {
     this.enemySetByZone = enemySetByZone;
     this.players = players;
@@ -99,7 +99,7 @@ const CreateNormalEnemy = (index: number, zone: number, isCritical: boolean) =>
     zone,
     0,
     isCritical,
-    [NPCBasicAttack],
+    [EnemyBasicAttack],
     CombatantType.Normal
   );
 const CreateDangerousEnemy = (
@@ -115,7 +115,7 @@ const CreateDangerousEnemy = (
     zone,
     0,
     isCritical,
-    [NPCBasicAttack],
+    [EnemyBasicAttack],
     CombatantType.Dangerous
   );
 const CreateToughEnemy = (index: number, zone: number, isCritical: boolean) =>
@@ -127,7 +127,7 @@ const CreateToughEnemy = (index: number, zone: number, isCritical: boolean) =>
     zone,
     0,
     isCritical,
-    [NPCBasicAttack],
+    [EnemyBasicAttack],
     CombatantType.Tough
   );
 const CreateScaryEnemy = (index: number, zone: number, isCritical: boolean) =>
@@ -139,7 +139,7 @@ const CreateScaryEnemy = (index: number, zone: number, isCritical: boolean) =>
     zone,
     0,
     isCritical,
-    [NPCBasicAttack],
+    [EnemyBasicAttack],
     CombatantType.Scary
   );
 

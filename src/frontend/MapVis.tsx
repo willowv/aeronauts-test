@@ -1,12 +1,12 @@
 import * as React from "react";
-import { GameMap } from "../simulation/map/map";
+import { CombatMap } from "../simulation/map/map";
 import { Box, Heading, Card } from "rebass";
 import { Flowpoint, Flowspace } from "flowpoints";
 import { ScenarioPlayer, ScenarioEnemySet } from "../simulation/scenario";
 import { CombatantType } from "../enum";
 
 interface MapVisProps {
-  map: GameMap;
+  map: CombatMap;
   players: ScenarioPlayer[];
   enemySetByZone: ScenarioEnemySet[];
   selectedZone: number;
