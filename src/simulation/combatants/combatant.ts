@@ -56,5 +56,9 @@ export class Combatant {
       this.combatantType
     );
   }
+
+  isPlayer(): boolean {
+    return this.combatantType === CombatantType.Player;
+  }
 }
 export default Combatant;
