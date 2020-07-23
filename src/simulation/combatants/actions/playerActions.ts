@@ -10,13 +10,18 @@ export const Pistol = new Action(
   9,
   15,
   Faction.Enemies,
-  (checkResult, actor, target, state) => {
+  (checkResult, actor, target, initialState) => {
+    let state = initialState.clone();
+    let newActor = state.GetCombatant(actor);
+    let newTarget = state.GetCombatant(target);
     if (checkResult >= 15) {
-      target.health -= 4;
-      actor.tokens[Token.Action][Boost.Positive] += 2;
+      newTarget.health -= 4;
+      newActor.tokens[Token.Action][Boost.Positive] += 2;
     } else if (checkResult >= 9) {
-      target.health -= 2;
+      newTarget.health -= 2;
     }
+    newActor.actionsTaken++;
+    return state;
   }
 );
 
@@ -29,19 +34,24 @@ export const Shotgun = new Action(
   11,
   13,
   Faction.Enemies,
-  (checkResult, actor, target, state) => {
+  (checkResult, actor, target, initialState) => {
+    let state = initialState.clone();
+    let newActor = state.GetCombatant(actor);
+    let newTarget = state.GetCombatant(target);
     if (checkResult >= 13) {
-      target.health -= 3;
+      newTarget.health -= 3;
       // push into first zone that is further away that target, if any
       let pushableZones = state.map
         .ZonesMovableFrom(target.zone)
         .filter((zone: number) => {
-          return zone !== actor.zone;
+          return zone !== newActor.zone;
         });
-      if (pushableZones.length !== 0) target.zone = pushableZones[0];
+      if (pushableZones.length !== 0) newTarget.zone = pushableZones[0];
     } else if (checkResult >= 11) {
-      target.health -= 3;
+      newTarget.health -= 3;
     }
+    newActor.actionsTaken++;
+    return state;
   }
 );
 
@@ -54,13 +64,18 @@ export const Rifle = new Action(
   12,
   17,
   Faction.Enemies,
-  (checkResult, actor, target, state) => {
+  (checkResult, actor, target, initialState) => {
+    let state = initialState.clone();
+    let newActor = state.GetCombatant(actor);
+    let newTarget = state.GetCombatant(target);
     if (checkResult >= 17) {
-      target.health -= 5;
+      newTarget.health -= 5;
       // grant an ally a move (TODO: needs decision logic, which takes in a set of potential states and returns the index of the best one)
     } else if (checkResult >= 12) {
-      target.health -= 4;
+      newTarget.health -= 4;
     }
+    newActor.actionsTaken++;
+    return state;
   }
 );
 
@@ -73,13 +88,18 @@ export const LightMelee = new Action(
   9,
   16,
   Faction.Enemies,
-  (checkResult, actor, target, state) => {
+  (checkResult, actor, target, initialState) => {
+    let state = initialState.clone();
+    let newActor = state.GetCombatant(actor);
+    let newTarget = state.GetCombatant(target);
     if (checkResult >= 16) {
-      target.health -= 6;
-      target.tokens[Token.Defense][Boost.Negative] += 2;
+      newTarget.health -= 6;
+      newTarget.tokens[Token.Defense][Boost.Negative] += 2;
     } else if (checkResult >= 9) {
-      target.health -= 2;
+      newTarget.health -= 2;
     }
+    newActor.actionsTaken++;
+    return state;
   }
 );
 
@@ -92,13 +112,18 @@ export const MediumMelee = new Action(
   10,
   16,
   Faction.Enemies,
-  (checkResult, actor, target, state) => {
+  (checkResult, actor, target, initialState) => {
+    let state = initialState.clone();
+    let newActor = state.GetCombatant(actor);
+    let newTarget = state.GetCombatant(target);
     if (checkResult >= 16) {
-      target.health -= 5;
-      target.tokens[Token.Action][Boost.Negative] += 2;
+      newTarget.health -= 5;
+      newTarget.tokens[Token.Action][Boost.Negative] += 2;
     } else if (checkResult >= 10) {
-      target.health -= 3;
+      newTarget.health -= 3;
     }
+    newActor.actionsTaken++;
+    return state;
   }
 );
 
@@ -111,12 +136,17 @@ export const HeavyMelee = new Action(
   12,
   15,
   Faction.Enemies,
-  (checkResult, actor, target, state) => {
+  (checkResult, actor, target, initialState) => {
+    let state = initialState.clone();
+    let newActor = state.GetCombatant(actor);
+    let newTarget = state.GetCombatant(target);
     if (checkResult >= 15) {
-      target.health -= 6;
+      newTarget.health -= 6;
     } else if (checkResult >= 12) {
-      target.health -= 4;
+      newTarget.health -= 4;
     }
+    newActor.actionsTaken++;
+    return state;
   }
 );
 

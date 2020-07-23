@@ -16,7 +16,7 @@ export class Action {
     actor: Combatant,
     target: Combatant,
     state: CombatState
-  ) => void;
+  ) => CombatState;
 
   constructor(
     name: string,
@@ -32,7 +32,7 @@ export class Action {
       actor: Combatant,
       target: Combatant,
       state: CombatState
-    ) => void
+    ) => CombatState
   ) {
     this.name = name;
     this.minRange = minRange;
@@ -43,5 +43,19 @@ export class Action {
     this.lowThreshold = lowThreshold;
     this.highThreshold = highThreshold;
     this.target = target;
+  }
+
+  GetValidTargets(state: CombatState, attacker: Combatant): Combatant[] {
+    let targets =
+      this.target === Faction.Players ? state.players : state.enemies;
+    let validTargets = targets.filter((target) => {
+      let distance = state.map.distanceBetween[attacker.zone][target.zone];
+      return (
+        !target.isDead() &&
+        distance <= this.maxRange &&
+        distance >= this.minRange
+      );
+    });
+    return validTargets;
   }
 }

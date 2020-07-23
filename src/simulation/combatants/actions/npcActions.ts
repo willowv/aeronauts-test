@@ -1,4 +1,4 @@
-import { AttackType, Ability, Faction } from "../../../enum";
+import { AttackType, Ability, Faction, CombatantType } from "../../../enum";
 import { Action } from "./action";
 
 export const EnemyBasicAttack = new Action(
@@ -10,11 +10,16 @@ export const EnemyBasicAttack = new Action(
   10,
   15,
   Faction.Players,
-  (checkResult, actor, target, state) => {
+  (checkResult, actor, target, initialState) => {
+    let state = initialState.clone();
+    let newActor = state.GetCombatant(actor);
+    let newTarget = state.GetCombatant(target);
     if (checkResult < 10) {
-      target.health -= 5;
+      newTarget.health -= 5;
     } else if (checkResult < 15) {
-      target.health -= 2;
+      newTarget.health -= 2;
     }
+    newActor.actionsTaken++;
+    return state;
   }
 );
