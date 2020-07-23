@@ -16,20 +16,18 @@ export class AI {
   // Returns the state where the best move has been made, or null if no move should be made
   FindBestMove(
     initialState: CombatState,
-    combatant: Combatant
+    initialCombatant: Combatant
   ): CombatState | null {
+    let state = initialState.clone();
+    let combatant = state.GetCombatant(initialCombatant);
     let potentialMoves: number[] = initialState.map.ZonesMovableFrom(
       combatant.zone
     );
     if (potentialMoves.length === 0) return null;
 
-    let isPlayer = combatant.isPlayer();
-    let index = combatant.index;
     let moveStates: CombatState[] = potentialMoves.map((zoneDest) => {
-      let newState = initialState.clone();
-      let newCombatant = isPlayer
-        ? newState.players[index]
-        : newState.enemies[index];
+      let newState = state.clone();
+      let newCombatant = newState.GetCombatant(combatant);
       newCombatant.zone = zoneDest;
       newCombatant.actionsTaken++;
       return newState;
@@ -44,7 +42,7 @@ export class AI {
 
   FindBestActionAndTarget(
     initialState: CombatState,
-    combatant: Combatant
+    initialCombatant: Combatant
   ): { action: Action; target: Combatant } | null {
     // Try each of combatant's actions on each possible target
     // Try an action by scoring it on each of its outcomes, and calculating expected value
@@ -54,6 +52,8 @@ export class AI {
       target: Combatant;
     } | null = null;
     let bestScore: number = 0;
+    let state = initialState.clone();
+    let combatant = state.GetCombatant(initialCombatant);
     combatant.actions.forEach((action) => {
       let targets = action.GetValidTargets(initialState, combatant);
       targets.forEach((target) => {
@@ -92,9 +92,9 @@ export class AI {
       state
     );
     let successProbability = ProbRollGreaterOrEqualToTarget(
-      action.highThreshold,
+      modifier,
       boost,
-      modifier
+      action.highThreshold
     );
     let successScore = this.score(successState);
 
@@ -105,7 +105,7 @@ export class AI {
       state
     );
     let partialSuccessProbability =
-      ProbRollGreaterOrEqualToTarget(action.lowThreshold, boost, modifier) -
+      ProbRollGreaterOrEqualToTarget(modifier, boost, action.lowThreshold) -
       successProbability;
     let partialSuccessScore = this.score(partialSuccessState);
 

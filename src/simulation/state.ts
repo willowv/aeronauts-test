@@ -37,7 +37,7 @@ export class CombatState {
   }
 
   GetCombatantAsPlayer(combatant: Combatant): Player | null {
-    if (combatant.combatantType !== CombatantType.Player) {
+    if (combatant.isPlayer()) {
       return null;
     }
     return this.players[combatant.index];

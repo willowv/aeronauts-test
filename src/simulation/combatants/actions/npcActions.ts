@@ -1,4 +1,4 @@
-import { AttackType, Ability, Faction, CombatantType } from "../../../enum";
+import { AttackType, Ability, Faction } from "../../../enum";
 import { Action } from "./action";
 
 export const EnemyBasicAttack = new Action(
