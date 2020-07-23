@@ -1,5 +1,5 @@
 import { CombatState } from "./state";
-import { Token, Boost, AttackType } from "../enum";
+import { Token, Boost, AttackType, CombatantType, Ability } from "../enum";
 import { Scenario, InitialStateFromScenario } from "./scenario";
 import Combatant from "./combatants/combatant";
 import {
@@ -8,11 +8,11 @@ import {
   CombatReportFromFinalState,
   CombatReport,
 } from "./statistics";
-import {
-  RunPCAction as SimulatePlayerAction,
-  RunNPCAction as SimulateEnemyAction,
-} from "./combatants/ai";
-import { Terrain } from "./map/terrain";
+import { Player } from "./combatants/player";
+import { PlayerAI } from "./combatants/ai/playerAi";
+import { RollDice } from "./dice";
+import { AI } from "./combatants/ai/ai";
+import { EnemyAI } from "./combatants/ai/enemyAi";
 
 const roundLimit = 10;
 
@@ -55,70 +55,103 @@ function SimulateCombat(initialState: CombatState): CombatReport {
 function SimulateRound(initialState: CombatState): CombatState {
   let state = initialState;
   for (let playerIndex = 0; playerIndex < state.players.length; playerIndex++) {
-    //assumes number and index of combatants does not change
-    if (!state.players[playerIndex].isDead())
-      state = SimulatePlayerTurn(playerIndex, state);
+    let player = state.players[playerIndex];
+    if (!player.isDead()) state = SimulateTurn(PlayerAI, state, player);
   }
   for (let enemyIndex = 0; enemyIndex < state.enemies.length; enemyIndex++) {
-    if (!state.enemies[enemyIndex].isDead())
-      state = SimulateEnemyTurn(enemyIndex, state);
+    let enemy = state.enemies[enemyIndex];
+    if (enemy.isDead()) state = SimulateTurn(EnemyAI, state, enemy);
   }
   return state;
 }
 
-function SimulatePlayerTurn(
-  playerIndex: number,
-  initialState: CombatState
+function SimulateTurn(
+  ai: AI,
+  initialState: CombatState,
+  combatant: Combatant
 ): CombatState {
-  let state = initialState; // don't bother cloning, we don't mutate and only call pure functions
-  let player = state.players[playerIndex];
-  for (let action = 0; action < player.actionsPerTurn; action++) {
-    state = SimulatePlayerAction(player.index, state);
+  let state = initialState;
+  for (let actionNum = 0; actionNum < combatant.actionsPerTurn; actionNum++) {
+    let bestActionAndTarget = ai.FindBestActionAndTarget(state, combatant);
+    if (bestActionAndTarget !== null) {
+      let action = bestActionAndTarget.action;
+      let target = bestActionAndTarget.target;
+      let {
+        modifier,
+        boost,
+        state: actionState,
+      } = GetModifierBoostAndStateForPlayerRoll(
+        state,
+        combatant,
+        target,
+        action.ability,
+        action.type
+      );
+      let checkResult = RollDice(modifier, boost);
+      state = action.evaluate(checkResult, combatant, target, actionState);
+    } else {
+      let bestMove = ai.FindBestMove(state, combatant);
+      if (bestMove !== null) state = bestMove;
+    }
   }
   return state;
 }
 
-function SimulateEnemyTurn(
-  enemyIndex: number,
-  initialState: CombatState
-): CombatState {
-  let state = initialState; // don't bother cloning, we don't mutate and only call pure functions
-  let enemy = state.enemies[enemyIndex];
-  for (let action = 0; action < enemy.actionsPerTurn; action++) {
-    state = SimulateEnemyAction(enemy.index, state);
-  }
-  return state;
-}
-
-// mutates state, only pass in clones
-export function ConsumeTokensAndGetAttackerBoost(
-  terrain: Terrain[],
+// does not mutate
+export function GetModifierBoostAndStateForPlayerRoll(
+  initialState: CombatState,
   attacker: Combatant,
   target: Combatant,
+  ability: Ability,
   attackType: AttackType
-): number {
+): { modifier: number; boost: number; state: CombatState } {
+  let state = initialState.clone();
+  let newAttacker = state.GetCombatant(attacker);
+  let newTarget = state.GetCombatant(target);
+  let isPlayerAttacking = newAttacker.combatantType === CombatantType.Player;
+  let isPlayerDefending = newTarget.combatantType === CombatantType.Player;
+
+  let player: Player | null;
+  if (isPlayerAttacking) {
+    player = state.GetCombatantAsPlayer(newAttacker);
+  } else if (isPlayerDefending) {
+    player = state.GetCombatantAsPlayer(newTarget);
+  } else {
+    player = null;
+  }
+  let modifier: number = player?.abilityScores[ability] ?? 0;
+  if (player !== null && player.focus > 0) {
+    player.focus -= 1;
+    modifier += 1;
+  }
+
   // how does source and target terrain affect this?
-  let sourceTerrain = terrain[attacker.zone];
-  let targetTerrain = terrain[target.zone];
+  let sourceTerrain = state.map.terrain[newAttacker.zone];
+  let targetTerrain = state.map.terrain[newTarget.zone];
   let boost =
     sourceTerrain.attackBoost(attackType) +
     targetTerrain.defenseBoost(attackType);
-  if (attacker.tokens[Token.Action][Boost.Negative] > 0) {
-    attacker.tokens[Token.Action][Boost.Negative] -= 1;
+  if (newAttacker.tokens[Token.Action][Boost.Negative] > 0) {
+    newAttacker.tokens[Token.Action][Boost.Negative] -= 1;
     boost -= 1;
   }
-  if (target.tokens[Token.Defense][Boost.Negative] > 0) {
-    target.tokens[Token.Defense][Boost.Negative] -= 1;
+  if (newTarget.tokens[Token.Defense][Boost.Negative] > 0) {
+    newTarget.tokens[Token.Defense][Boost.Negative] -= 1;
     boost += 1;
   }
   // Only use positive tokens if they'd have an effect
-  if (boost > -2 && target.tokens[Token.Defense][Boost.Positive] > 0) {
-    target.tokens[Token.Defense][Boost.Positive] -= 1;
+  if (boost > -2 && newTarget.tokens[Token.Defense][Boost.Positive] > 0) {
+    newTarget.tokens[Token.Defense][Boost.Positive] -= 1;
     boost -= 1;
   }
-  if (boost < 2 && attacker.tokens[Token.Action][Boost.Positive] > 0) {
-    attacker.tokens[Token.Action][Boost.Positive] -= 1;
+  if (boost < 2 && newAttacker.tokens[Token.Action][Boost.Positive] > 0) {
+    newAttacker.tokens[Token.Action][Boost.Positive] -= 1;
     boost += 1;
   }
-  return Math.max(Math.min(boost, 2), -2); // boost has a max magnitude of 2
+  boost = Math.max(Math.min(boost, 2), -2); // boost has a max magnitude of 2
+  return {
+    modifier: modifier,
+    boost: isPlayerAttacking ? boost : -boost,
+    state: state,
+  };
 }
