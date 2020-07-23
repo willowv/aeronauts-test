@@ -1,6 +1,7 @@
 import { Player } from "./combatants/player";
 import { CombatMap } from "./map/map";
 import Combatant from "./combatants/combatant";
+import { CombatantType } from "../enum";
 
 export class CombatState {
   players: Player[];
@@ -27,6 +28,19 @@ export class CombatState {
       if (!enemy.isDead() && enemy.isCritical) defeat = false;
     });
     return defeat;
+  }
+
+  GetCombatant(combatant: Combatant): Combatant {
+    return combatant.combatantType === CombatantType.Player
+      ? this.players[combatant.index]
+      : this.enemies[combatant.index];
+  }
+
+  GetCombatantAsPlayer(combatant: Combatant): Player | null {
+    if (combatant.combatantType !== CombatantType.Player) {
+      return null;
+    }
+    return this.players[combatant.index];
   }
 
   clone(): CombatState {
