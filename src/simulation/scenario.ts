@@ -83,7 +83,8 @@ function PlayersFromScenarioPlayers(
         scenarioPlayer.abilityScores,
         startingFocus,
         [scenarioPlayer.weapon],
-        scenarioPlayer.name
+        scenarioPlayer.name,
+        false
       );
     }
   );
@@ -100,7 +101,8 @@ const CreateNormalEnemy = (index: number, zone: number, isCritical: boolean) =>
     0,
     isCritical,
     [EnemyBasicAttack],
-    CombatantType.Normal
+    CombatantType.Normal,
+    false
   );
 const CreateDangerousEnemy = (
   index: number,
@@ -116,7 +118,8 @@ const CreateDangerousEnemy = (
     0,
     isCritical,
     [EnemyBasicAttack],
-    CombatantType.Dangerous
+    CombatantType.Dangerous,
+    false
   );
 const CreateToughEnemy = (index: number, zone: number, isCritical: boolean) =>
   new Combatant(
@@ -128,7 +131,8 @@ const CreateToughEnemy = (index: number, zone: number, isCritical: boolean) =>
     0,
     isCritical,
     [EnemyBasicAttack],
-    CombatantType.Tough
+    CombatantType.Tough,
+    false
   );
 const CreateScaryEnemy = (index: number, zone: number, isCritical: boolean) =>
   new Combatant(
@@ -140,7 +144,8 @@ const CreateScaryEnemy = (index: number, zone: number, isCritical: boolean) =>
     0,
     isCritical,
     [EnemyBasicAttack],
-    CombatantType.Scary
+    CombatantType.Scary,
+    false
   );
 
 const CreateEnemyByType = [

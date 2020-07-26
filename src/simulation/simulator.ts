@@ -13,6 +13,7 @@ import { PlayerAI } from "./combatants/ai/playerAi";
 import { RollDice } from "./dice";
 import { AI } from "./combatants/ai/ai";
 import { EnemyAI } from "./combatants/ai/enemyAi";
+import { Action } from "./combatants/actions/action";
 
 const roundLimit = 10;
 
@@ -62,7 +63,7 @@ function SimulateRound(initialState: CombatState): CombatState {
     let enemy = state.enemies[enemyIndex];
     if (enemy.isDead()) state = SimulateTurn(EnemyAI, state, enemy);
   }
-  return state;
+  return state.ClearSuppression();
 }
 
 function SimulateTurn(
@@ -76,24 +77,61 @@ function SimulateTurn(
     if (bestActionAndTarget !== null) {
       let action = bestActionAndTarget.action;
       let target = bestActionAndTarget.target;
-      let {
-        modifier,
-        boost,
-        state: actionState,
-      } = GetModifierBoostAndStateForPlayerRoll(
-        state,
-        combatant,
-        target,
-        action.ability,
-        action.type
-      );
-      let checkResult = RollDice(modifier, boost);
-      state = action.evaluate(checkResult, combatant, target, actionState);
+      state = Act(state, combatant, action, target, RollDice);
     } else {
       let bestMove = ai.FindBestMove(state, combatant);
-      if (bestMove !== null) state = bestMove;
+      if (bestMove !== null) state = Move(state, combatant, bestMove, RollDice);
     }
   }
+  return state;
+}
+
+export function Act(
+  initialState: CombatState,
+  combatant: Combatant,
+  action: Action,
+  target: Combatant,
+  checkEvaluator: (modifier: number, boost: number) => number
+) : CombatState {
+  let {
+    modifier,
+    boost,
+    state: actionState,
+  } = GetModifierBoostAndStateForPlayerRoll(
+    initialState,
+    combatant,
+    target,
+    action.ability,
+    action.type
+  );
+  let checkResult = checkEvaluator(modifier, boost);
+  return action.evaluate(checkResult, combatant, target, actionState);
+}
+
+export function Move(
+  initialState: CombatState,
+  combatant: Combatant,
+  zoneDest: number,
+  checkEvaluator: (modifier: number, boost: number) => number
+): CombatState {
+  let state = initialState.clone();
+  let newCombatant = state.GetCombatant(combatant);
+  let freeAttackers = newCombatant.isPlayer() ? state.enemies : state.players;
+  // Filter to living, non-suppressed enemies in the same zone, with a weapon that can target
+  freeAttackers = freeAttackers.filter((attacker) => {
+    let weapon = attacker.actions[0];
+    return !attacker.isDead() && attacker.zone === newCombatant.zone && !attacker.isSuppressed && weapon.minRange === 0;
+  });
+  // Execute attacks
+  freeAttackers.forEach((freeAttacker) => {
+    let weapon = freeAttacker.actions[0];
+    let { modifier, boost, state: freeAttackState } = GetModifierBoostAndStateForPlayerRoll(state, freeAttacker, newCombatant, weapon.ability, weapon.type);
+    let checkResult = checkEvaluator(modifier, boost);
+    state = weapon.evaluate(checkResult, freeAttacker, newCombatant, freeAttackState);
+    newCombatant = state.GetCombatant(newCombatant);
+  });
+  newCombatant.zone = zoneDest;
+  newCombatant.actionsTaken++;
   return state;
 }
 

@@ -16,6 +16,7 @@ export class Combatant {
   actionsTaken: number;
   isCritical: boolean;
   combatantType: CombatantType;
+  isSuppressed: boolean;
 
   constructor(
     index: number,
@@ -26,7 +27,8 @@ export class Combatant {
     actionsTaken: number,
     isCritical: boolean,
     actions: Action[],
-    combatantType: CombatantType
+    combatantType: CombatantType,
+    isSuppressed: boolean
   ) {
     this.index = index;
     this.health = health;
@@ -37,6 +39,7 @@ export class Combatant {
     this.isCritical = isCritical;
     this.actions = actions;
     this.combatantType = combatantType;
+    this.isSuppressed = isSuppressed;
   }
 
   isDead(): boolean {
@@ -53,7 +56,8 @@ export class Combatant {
       this.actionsTaken,
       this.isCritical,
       this.actions,
-      this.combatantType
+      this.combatantType,
+      this.isSuppressed
     );
   }
 

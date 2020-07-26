@@ -16,8 +16,10 @@ export const EnemyBasicAttack = new Action(
     let newTarget = state.GetCombatant(target);
     if (checkResult < 10) {
       newTarget.health -= 5;
+      newTarget.isSuppressed = true;
     } else if (checkResult < 15) {
       newTarget.health -= 2;
+      newTarget.isSuppressed = true;
     }
     newActor.actionsTaken++;
     return state;

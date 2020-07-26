@@ -17,8 +17,10 @@ export const Pistol = new Action(
     if (checkResult >= 15) {
       newTarget.health -= 4;
       newActor.tokens[Token.Action][Boost.Positive] += 2;
+      newTarget.isSuppressed = true;
     } else if (checkResult >= 9) {
       newTarget.health -= 2;
+      newTarget.isSuppressed = true;
     }
     newActor.actionsTaken++;
     return state;
@@ -47,8 +49,10 @@ export const Shotgun = new Action(
           return zone !== newActor.zone;
         });
       if (pushableZones.length !== 0) newTarget.zone = pushableZones[0];
+      newTarget.isSuppressed = true;
     } else if (checkResult >= 11) {
       newTarget.health -= 3;
+      newTarget.isSuppressed = true;
     }
     newActor.actionsTaken++;
     return state;
@@ -70,9 +74,11 @@ export const Rifle = new Action(
     let newTarget = state.GetCombatant(target);
     if (checkResult >= 17) {
       newTarget.health -= 5;
+      newTarget.isSuppressed = true;
       // grant an ally a move (TODO: needs decision logic, which takes in a set of potential states and returns the index of the best one)
     } else if (checkResult >= 12) {
       newTarget.health -= 4;
+      newTarget.isSuppressed = true;
     }
     newActor.actionsTaken++;
     return state;
@@ -95,8 +101,10 @@ export const LightMelee = new Action(
     if (checkResult >= 16) {
       newTarget.health -= 6;
       newTarget.tokens[Token.Defense][Boost.Negative] += 2;
+      newTarget.isSuppressed = true;
     } else if (checkResult >= 9) {
       newTarget.health -= 2;
+      newTarget.isSuppressed = true;
     }
     newActor.actionsTaken++;
     return state;
@@ -119,8 +127,10 @@ export const MediumMelee = new Action(
     if (checkResult >= 16) {
       newTarget.health -= 5;
       newTarget.tokens[Token.Action][Boost.Negative] += 2;
+      newTarget.isSuppressed = true;
     } else if (checkResult >= 10) {
       newTarget.health -= 3;
+      newTarget.isSuppressed = true;
     }
     newActor.actionsTaken++;
     return state;
@@ -142,8 +152,10 @@ export const HeavyMelee = new Action(
     let newTarget = state.GetCombatant(target);
     if (checkResult >= 15) {
       newTarget.health -= 6;
+      newTarget.isSuppressed = true;
     } else if (checkResult >= 12) {
       newTarget.health -= 4;
+      newTarget.isSuppressed = true;
     }
     newActor.actionsTaken++;
     return state;
