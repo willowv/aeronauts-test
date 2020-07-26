@@ -14,21 +14,23 @@ export class AI {
   }
 
   // Returns the best zone destination, or null if the best move is not to move
-  FindBestMove(
-    initialState: CombatState,
-    combatant: Combatant
-  ): number | null {
+  FindBestMove(initialState: CombatState, combatant: Combatant): number | null {
     let bestMove: number | null = null;
     let bestScore: number = this.score(initialState);
     let potentialMoves: number[] = initialState.map.ZonesMovableFrom(
       combatant.zone
     );
     if (potentialMoves.length === 0) return null;
-    
+
     potentialMoves.forEach((zoneDest) => {
-      let expectedState = Move(initialState, combatant, zoneDest, ExpectedValueForBoostAndModifier);
+      let expectedState = Move(
+        initialState,
+        combatant,
+        zoneDest,
+        ExpectedValueForBoostAndModifier
+      );
       let expectedValue = this.score(expectedState);
-      if(expectedValue > bestScore) {
+      if (expectedValue > bestScore) {
         bestMove = zoneDest;
         bestScore = expectedValue;
       }
@@ -51,7 +53,13 @@ export class AI {
     combatant.actions.forEach((action) => {
       let targets = action.GetValidTargets(initialState, combatant);
       targets.forEach((target) => {
-        let expectedState = Act(initialState, combatant, action, target, ExpectedValueForBoostAndModifier);
+        let expectedState = Act(
+          initialState,
+          combatant,
+          action,
+          target,
+          ExpectedValueForBoostAndModifier
+        );
         let expectedValue = this.score(expectedState);
         if (expectedValue > bestScore) {
           bestActionAndTarget = { action, target };

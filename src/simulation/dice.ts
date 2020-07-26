@@ -15,15 +15,17 @@ export function RollDice(modifier: number, boost: number): number {
 
 export function ExpectedValueForBoostAndModifier(
   modifier: number,
-  boost : number
-) : number {
+  boost: number
+): number {
   let boostDirection =
     Math.sign(boost) === -1 ? Boost.Negative : Boost.Positive;
   let boostMagnitude = Math.abs(boost);
-  return Math.round(expectedValueByBoost[boostDirection][boostMagnitude] + modifier);
+  return Math.round(
+    expectedValueByBoost[boostDirection][boostMagnitude] + modifier
+  );
 }
 
-const expectedValueByBoost : number[][] = [[],[]];
+const expectedValueByBoost: number[][] = [[], []];
 expectedValueByBoost[Boost.Negative][2] = 7.57;
 expectedValueByBoost[Boost.Negative][1] = 8.76;
 expectedValueByBoost[Boost.Positive][0] = 10.5;

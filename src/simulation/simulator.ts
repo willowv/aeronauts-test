@@ -92,7 +92,7 @@ export function Act(
   action: Action,
   target: Combatant,
   checkEvaluator: (modifier: number, boost: number) => number
-) : CombatState {
+): CombatState {
   let {
     modifier,
     boost,
@@ -120,14 +120,34 @@ export function Move(
   // Filter to living, non-suppressed enemies in the same zone, with a weapon that can target
   freeAttackers = freeAttackers.filter((attacker) => {
     let weapon = attacker.actions[0];
-    return !attacker.isDead() && attacker.zone === newCombatant.zone && !attacker.isSuppressed && weapon.minRange === 0;
+    return (
+      !attacker.isDead() &&
+      attacker.zone === newCombatant.zone &&
+      !attacker.isSuppressed &&
+      weapon.minRange === 0
+    );
   });
   // Execute attacks
   freeAttackers.forEach((freeAttacker) => {
     let weapon = freeAttacker.actions[0];
-    let { modifier, boost, state: freeAttackState } = GetModifierBoostAndStateForPlayerRoll(state, freeAttacker, newCombatant, weapon.ability, weapon.type);
+    let {
+      modifier,
+      boost,
+      state: freeAttackState,
+    } = GetModifierBoostAndStateForPlayerRoll(
+      state,
+      freeAttacker,
+      newCombatant,
+      weapon.ability,
+      weapon.type
+    );
     let checkResult = checkEvaluator(modifier, boost);
-    state = weapon.evaluate(checkResult, freeAttacker, newCombatant, freeAttackState);
+    state = weapon.evaluate(
+      checkResult,
+      freeAttacker,
+      newCombatant,
+      freeAttackState
+    );
     newCombatant = state.GetCombatant(newCombatant);
   });
   newCombatant.zone = zoneDest;

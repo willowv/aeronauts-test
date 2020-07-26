@@ -20,7 +20,7 @@ export class Player extends Combatant {
     focus: number,
     actions: Action[],
     name: string,
-    isSuppressed : boolean
+    isSuppressed: boolean
   ) {
     super(
       index,

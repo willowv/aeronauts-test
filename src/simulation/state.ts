@@ -49,7 +49,7 @@ export class CombatState {
     return new CombatState(clonePlayers, cloneEnemies, this.map);
   }
 
-  ClearSuppression() : CombatState {
+  ClearSuppression(): CombatState {
     let clonePlayers = this.players.map((player) => {
       let newPlayer = player.clone();
       newPlayer.isSuppressed = false;
