@@ -21,7 +21,6 @@ export const EnemyBasicAttack = new Action(
       newTarget.health -= 2;
       newTarget.isSuppressed = true;
     }
-    newActor.actionsTaken++;
     return state;
   }
 );

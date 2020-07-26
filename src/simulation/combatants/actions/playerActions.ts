@@ -22,7 +22,6 @@ export const Pistol = new Action(
       newTarget.health -= 2;
       newTarget.isSuppressed = true;
     }
-    newActor.actionsTaken++;
     return state;
   }
 );
@@ -54,7 +53,6 @@ export const Shotgun = new Action(
       newTarget.health -= 3;
       newTarget.isSuppressed = true;
     }
-    newActor.actionsTaken++;
     return state;
   }
 );
@@ -80,7 +78,6 @@ export const Rifle = new Action(
       newTarget.health -= 4;
       newTarget.isSuppressed = true;
     }
-    newActor.actionsTaken++;
     return state;
   }
 );
@@ -106,7 +103,6 @@ export const LightMelee = new Action(
       newTarget.health -= 2;
       newTarget.isSuppressed = true;
     }
-    newActor.actionsTaken++;
     return state;
   }
 );
@@ -132,7 +128,6 @@ export const MediumMelee = new Action(
       newTarget.health -= 3;
       newTarget.isSuppressed = true;
     }
-    newActor.actionsTaken++;
     return state;
   }
 );
@@ -157,7 +152,6 @@ export const HeavyMelee = new Action(
       newTarget.health -= 4;
       newTarget.isSuppressed = true;
     }
-    newActor.actionsTaken++;
     return state;
   }
 );

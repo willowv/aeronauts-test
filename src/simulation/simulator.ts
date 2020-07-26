@@ -82,13 +82,15 @@ function SimulateTurn(
       let bestMove = ai.FindBestMove(state, combatant);
       if (bestMove !== null) state = Move(state, combatant, bestMove, RollDice);
     }
+    let newCombatant = state.GetCombatant(combatant);
+    newCombatant.actionsTaken++;
   }
   return state;
 }
 
 export function Act(
   initialState: CombatState,
-  combatant: Combatant,
+  actor: Combatant,
   action: Action,
   target: Combatant,
   checkEvaluator: (modifier: number, boost: number) => number
@@ -99,30 +101,30 @@ export function Act(
     state: actionState,
   } = GetModifierBoostAndStateForPlayerRoll(
     initialState,
-    combatant,
+    actor,
     target,
     action.ability,
     action.type
   );
   let checkResult = checkEvaluator(modifier, boost);
-  return action.evaluate(checkResult, combatant, target, actionState);
+  return action.evaluate(checkResult, actor, target, actionState);
 }
 
 export function Move(
   initialState: CombatState,
-  combatant: Combatant,
+  actor: Combatant,
   zoneDest: number,
   checkEvaluator: (modifier: number, boost: number) => number
 ): CombatState {
   let state = initialState.clone();
-  let newCombatant = state.GetCombatant(combatant);
-  let freeAttackers = newCombatant.isPlayer() ? state.enemies : state.players;
+  let newActor = state.GetCombatant(actor);
+  let freeAttackers = newActor.isPlayer() ? state.enemies : state.players;
   // Filter to living, non-suppressed enemies in the same zone, with a weapon that can target
   freeAttackers = freeAttackers.filter((attacker) => {
     let weapon = attacker.actions[0];
     return (
       !attacker.isDead() &&
-      attacker.zone === newCombatant.zone &&
+      attacker.zone === newActor.zone &&
       !attacker.isSuppressed &&
       weapon.minRange === 0
     );
@@ -130,28 +132,10 @@ export function Move(
   // Execute attacks
   freeAttackers.forEach((freeAttacker) => {
     let weapon = freeAttacker.actions[0];
-    let {
-      modifier,
-      boost,
-      state: freeAttackState,
-    } = GetModifierBoostAndStateForPlayerRoll(
-      state,
-      freeAttacker,
-      newCombatant,
-      weapon.ability,
-      weapon.type
-    );
-    let checkResult = checkEvaluator(modifier, boost);
-    state = weapon.evaluate(
-      checkResult,
-      freeAttacker,
-      newCombatant,
-      freeAttackState
-    );
-    newCombatant = state.GetCombatant(newCombatant);
+    state = Act(state, freeAttacker, weapon, newActor, checkEvaluator);
+    newActor = state.GetCombatant(newActor);
   });
-  newCombatant.zone = zoneDest;
-  newCombatant.actionsTaken++;
+  newActor.zone = zoneDest;
   return state;
 }
 
