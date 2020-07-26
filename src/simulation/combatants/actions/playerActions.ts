@@ -1,5 +1,7 @@
 import { AttackType, Ability, Token, Boost, Faction } from "../../../enum";
 import { Action } from "./action";
+import { Move } from "../../simulator";
+import { RollDice } from "../../dice";
 
 export const Pistol = new Action(
   "Pistol",
@@ -10,7 +12,7 @@ export const Pistol = new Action(
   9,
   15,
   Faction.Enemies,
-  (checkResult, actor, target, initialState) => {
+  (checkResult, actor, target, initialState, ai) => {
     let state = initialState.clone();
     let newActor = state.GetCombatant(actor);
     let newTarget = state.GetCombatant(target);
@@ -35,7 +37,7 @@ export const Shotgun = new Action(
   11,
   13,
   Faction.Enemies,
-  (checkResult, actor, target, initialState) => {
+  (checkResult, actor, target, initialState, ai) => {
     let state = initialState.clone();
     let newActor = state.GetCombatant(actor);
     let newTarget = state.GetCombatant(target);
@@ -47,7 +49,9 @@ export const Shotgun = new Action(
         .filter((zone: number) => {
           return zone !== newActor.zone;
         });
-      if (pushableZones.length !== 0) newTarget.zone = pushableZones[0];
+      let pushZone = ai.FindBestMoveAmong(state, newTarget, pushableZones);
+      if (pushZone !== null) newTarget.zone = pushZone;
+
       newTarget.isSuppressed = true;
     } else if (checkResult >= 11) {
       newTarget.health -= 3;
@@ -66,14 +70,19 @@ export const Rifle = new Action(
   12,
   17,
   Faction.Enemies,
-  (checkResult, actor, target, initialState) => {
+  (checkResult, actor, target, initialState, ai) => {
     let state = initialState.clone();
     let newActor = state.GetCombatant(actor);
     let newTarget = state.GetCombatant(target);
     if (checkResult >= 17) {
       newTarget.health -= 5;
       newTarget.isSuppressed = true;
-      // grant an ally a move (TODO: needs decision logic, which takes in a set of potential states and returns the index of the best one)
+      let bestAllyMove = ai.FindBestAllyMove(state, newActor);
+      if (bestAllyMove !== null) {
+        let ally = bestAllyMove.ally;
+        let zoneDest = bestAllyMove.zoneDest;
+        state = Move(state, ally, zoneDest, RollDice, ai);
+      }
     } else if (checkResult >= 12) {
       newTarget.health -= 4;
       newTarget.isSuppressed = true;
@@ -91,9 +100,8 @@ export const LightMelee = new Action(
   9,
   16,
   Faction.Enemies,
-  (checkResult, actor, target, initialState) => {
+  (checkResult, actor, target, initialState, ai) => {
     let state = initialState.clone();
-    let newActor = state.GetCombatant(actor);
     let newTarget = state.GetCombatant(target);
     if (checkResult >= 16) {
       newTarget.health -= 6;
@@ -116,9 +124,8 @@ export const MediumMelee = new Action(
   10,
   16,
   Faction.Enemies,
-  (checkResult, actor, target, initialState) => {
+  (checkResult, actor, target, initialState, ai) => {
     let state = initialState.clone();
-    let newActor = state.GetCombatant(actor);
     let newTarget = state.GetCombatant(target);
     if (checkResult >= 16) {
       newTarget.health -= 5;
@@ -141,9 +148,8 @@ export const HeavyMelee = new Action(
   12,
   15,
   Faction.Enemies,
-  (checkResult, actor, target, initialState) => {
+  (checkResult, actor, target, initialState, ai) => {
     let state = initialState.clone();
-    let newActor = state.GetCombatant(actor);
     let newTarget = state.GetCombatant(target);
     if (checkResult >= 15) {
       newTarget.health -= 6;

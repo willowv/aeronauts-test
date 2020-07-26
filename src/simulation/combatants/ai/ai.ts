@@ -15,19 +15,27 @@ export class AI {
 
   // Returns the best zone destination, or null if the best move is not to move
   FindBestMove(initialState: CombatState, combatant: Combatant): number | null {
-    let bestMove: number | null = null;
-    let bestScore: number = this.score(initialState);
     let potentialMoves: number[] = initialState.map.ZonesMovableFrom(
       combatant.zone
     );
     if (potentialMoves.length === 0) return null;
+    return this.FindBestMoveAmong(initialState, combatant, potentialMoves);
+  }
 
-    potentialMoves.forEach((zoneDest) => {
+  FindBestMoveAmong(
+    initialState: CombatState,
+    combatant: Combatant,
+    zones: number[]
+  ): number | null {
+    let bestMove: number | null = null;
+    let bestScore: number = this.score(initialState);
+    zones.forEach((zoneDest) => {
       let expectedState = Move(
         initialState,
         combatant,
         zoneDest,
-        ExpectedValueForBoostAndModifier
+        ExpectedValueForBoostAndModifier,
+        this
       );
       let expectedValue = this.score(expectedState);
       if (expectedValue > bestScore) {
@@ -36,6 +44,35 @@ export class AI {
       }
     });
     return bestMove;
+  }
+
+  FindBestAllyMove(
+    initialState: CombatState,
+    combatant: Combatant
+  ): { ally: Combatant; zoneDest: number } | null {
+    let allies = combatant.isPlayer()
+      ? initialState.players
+      : initialState.enemies;
+    let bestAllyMove: { ally: Combatant; zoneDest: number } | null = null;
+    let bestScore = 0;
+    allies.forEach((ally) => {
+      let movableZones = initialState.map.ZonesMovableFrom(ally.zone);
+      movableZones.forEach((zoneDest) => {
+        let expectedState = Move(
+          initialState,
+          combatant,
+          zoneDest,
+          ExpectedValueForBoostAndModifier,
+          this
+        );
+        let expectedValue = this.score(expectedState);
+        if (expectedValue > bestScore) {
+          bestAllyMove = { ally, zoneDest };
+          bestScore = expectedValue;
+        }
+      });
+    });
+    return bestAllyMove;
   }
 
   FindBestActionAndTarget(
@@ -58,7 +95,8 @@ export class AI {
           combatant,
           action,
           target,
-          ExpectedValueForBoostAndModifier
+          ExpectedValueForBoostAndModifier,
+          this
         );
         let expectedValue = this.score(expectedState);
         if (expectedValue > bestScore) {

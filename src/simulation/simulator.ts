@@ -77,10 +77,11 @@ function SimulateTurn(
     if (bestActionAndTarget !== null) {
       let action = bestActionAndTarget.action;
       let target = bestActionAndTarget.target;
-      state = Act(state, combatant, action, target, RollDice);
+      state = Act(state, combatant, action, target, RollDice, ai);
     } else {
       let bestMove = ai.FindBestMove(state, combatant);
-      if (bestMove !== null) state = Move(state, combatant, bestMove, RollDice);
+      if (bestMove !== null)
+        state = Move(state, combatant, bestMove, RollDice, ai);
     }
     let newCombatant = state.GetCombatant(combatant);
     newCombatant.actionsTaken++;
@@ -93,7 +94,8 @@ export function Act(
   actor: Combatant,
   action: Action,
   target: Combatant,
-  checkEvaluator: (modifier: number, boost: number) => number
+  checkEvaluator: (modifier: number, boost: number) => number,
+  ai: AI
 ): CombatState {
   let {
     modifier,
@@ -107,14 +109,15 @@ export function Act(
     action.type
   );
   let checkResult = checkEvaluator(modifier, boost);
-  return action.evaluate(checkResult, actor, target, actionState);
+  return action.evaluate(checkResult, actor, target, actionState, ai);
 }
 
 export function Move(
   initialState: CombatState,
   actor: Combatant,
   zoneDest: number,
-  checkEvaluator: (modifier: number, boost: number) => number
+  checkEvaluator: (modifier: number, boost: number) => number,
+  ai: AI
 ): CombatState {
   let state = initialState.clone();
   let newActor = state.GetCombatant(actor);
@@ -132,7 +135,7 @@ export function Move(
   // Execute attacks
   freeAttackers.forEach((freeAttacker) => {
     let weapon = freeAttacker.actions[0];
-    state = Act(state, freeAttacker, weapon, newActor, checkEvaluator);
+    state = Act(state, freeAttacker, weapon, newActor, checkEvaluator, ai);
     newActor = state.GetCombatant(newActor);
   });
   newActor.zone = zoneDest;

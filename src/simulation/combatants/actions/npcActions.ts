@@ -10,9 +10,8 @@ export const EnemyBasicAttack = new Action(
   10,
   15,
   Faction.Players,
-  (checkResult, actor, target, initialState) => {
+  (checkResult, actor, target, initialState, ai) => {
     let state = initialState.clone();
-    let newActor = state.GetCombatant(actor);
     let newTarget = state.GetCombatant(target);
     if (checkResult < 10) {
       newTarget.health -= 5;
