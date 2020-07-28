@@ -14,10 +14,10 @@ export const EnemyBasicAttack = new Action(
     let state = initialState.clone();
     let newTarget = state.GetCombatant(target);
     if (checkResult < 10) {
-      newTarget.health -= 5;
+      newTarget.takeDamage(5);
       newTarget.isSuppressed = true;
     } else if (checkResult < 15) {
-      newTarget.health -= 2;
+      newTarget.takeDamage(2);
       newTarget.isSuppressed = true;
     }
     return state;

@@ -64,5 +64,9 @@ export class Combatant {
   isPlayer(): boolean {
     return this.combatantType === CombatantType.Player;
   }
+
+  takeDamage(damage: number) {
+    this.health -= damage;
+  }
 }
 export default Combatant;
