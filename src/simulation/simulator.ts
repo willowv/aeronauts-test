@@ -34,32 +34,25 @@ export function SimulateScenario(
 function SimulateCombat(initialState: CombatState): CombatReport {
   let numberOfRounds = 0;
   let state = initialState.clone();
-  while (
-    numberOfRounds < roundLimit
-  ) {
+  while (numberOfRounds < roundLimit) {
     numberOfRounds++;
     state = SimulateRound(state);
-    if(state.AreEnemiesDefeated()) break;
-    if(state.ArePlayersDefeated()) break;
+    if (state.AreEnemiesDefeated()) break;
+    if (state.ArePlayersDefeated()) break;
   }
-  return CombatReportFromFinalState(
-    state,
-    numberOfRounds
-  );
+  return CombatReportFromFinalState(state, numberOfRounds);
 }
 
 function SimulateRound(initialState: CombatState): CombatState {
   let state = initialState;
-  state.players
-    .filter((player) => !player.isDead()) // dead players don't get a turn
-    .forEach((player) => {
-      state = SimulateTurn(PlayerAI, state, player);
-    });
-  state.enemies
-    .filter((enemy) => !enemy.isDead()) // dead enemies don't get a turn
-    .forEach((enemy) => {
-      state = SimulateTurn(EnemyAI, state, enemy);
-    });
+  state.players.forEach((player) => {
+    if (player.isDead()) return; // dead players don't get a turn
+    state = SimulateTurn(PlayerAI, state, player);
+  });
+  state.enemies.forEach((enemy) => {
+    if (enemy.isDead()) return; // dead enemies don't get a turn
+    state = SimulateTurn(EnemyAI, state, enemy);
+  });
   return state.ClearSuppression();
 }
 
