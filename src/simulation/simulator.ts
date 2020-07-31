@@ -1,5 +1,5 @@
 import { CombatState } from "./state";
-import { Token, Boost, AttackType, CombatantType, Ability } from "../enum";
+import { Token, Boost, AttackType, Ability } from "../enum";
 import { Scenario, InitialStateFromScenario } from "./scenario";
 import Combatant from "./combatants/combatant";
 import {
@@ -145,8 +145,8 @@ export function GetModifierBoostAndStateForPlayerRoll(
   let state = initialState.clone();
   let newAttacker = state.GetCombatant(attacker);
   let newTarget = state.GetCombatant(target);
-  let isPlayerAttacking = newAttacker.combatantType === CombatantType.Player;
-  let isPlayerDefending = newTarget.combatantType === CombatantType.Player;
+  let isPlayerAttacking = newAttacker.isPlayer();
+  let isPlayerDefending = newTarget.isPlayer();
 
   let player: Player | null;
   if (isPlayerAttacking) {

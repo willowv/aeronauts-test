@@ -3,12 +3,12 @@ import { Terrain, TerrainOptions } from "../simulation/map/terrain";
 import { Card, Heading, Box, Flex } from "rebass";
 import { Label, Select, Input } from "@rebass/forms";
 import { ScenarioEnemySet } from "../simulation/scenario";
-import { CombatantType } from "../enum";
+import { EnemyType } from "../enum";
 
 interface NpcSpecProps {
   name: string;
   npcs: ScenarioEnemySet;
-  combatantType: CombatantType;
+  combatantType: EnemyType;
   handleNpcsChange: (npcs: ScenarioEnemySet) => void;
 }
 
@@ -83,25 +83,25 @@ export const ZoneSpec = ({
         <NpcSpec
           name="Normal"
           npcs={npcs}
-          combatantType={CombatantType.Normal}
+          combatantType={EnemyType.Normal}
           handleNpcsChange={handleNpcsChange}
         />
         <NpcSpec
           name="Dangerous"
           npcs={npcs}
-          combatantType={CombatantType.Dangerous}
+          combatantType={EnemyType.Dangerous}
           handleNpcsChange={handleNpcsChange}
         />
         <NpcSpec
           name="Tough"
           npcs={npcs}
-          combatantType={CombatantType.Tough}
+          combatantType={EnemyType.Tough}
           handleNpcsChange={handleNpcsChange}
         />
         <NpcSpec
           name="Scary"
           npcs={npcs}
-          combatantType={CombatantType.Scary}
+          combatantType={EnemyType.Scary}
           handleNpcsChange={handleNpcsChange}
         />
       </Flex>

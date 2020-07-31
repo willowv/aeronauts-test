@@ -1,5 +1,5 @@
 import { Action } from "./actions/action";
-import { CombatantType } from "../../enum";
+import { Faction } from "../../enum";
 
 export const initialTokens = () => [
   [0, 0],
@@ -15,8 +15,9 @@ export class Combatant {
   zone: number;
   actionsTaken: number;
   isCritical: boolean;
-  combatantType: CombatantType;
+  faction: Faction;
   isSuppressed: boolean;
+  maxHealth: number;
 
   constructor(
     index: number,
@@ -27,8 +28,9 @@ export class Combatant {
     actionsTaken: number,
     isCritical: boolean,
     actions: Action[],
-    combatantType: CombatantType,
-    isSuppressed: boolean
+    faction: Faction,
+    isSuppressed: boolean,
+    maxHealth: number
   ) {
     this.index = index;
     this.health = health;
@@ -38,8 +40,9 @@ export class Combatant {
     this.actionsTaken = actionsTaken;
     this.isCritical = isCritical;
     this.actions = actions;
-    this.combatantType = combatantType;
+    this.faction = faction;
     this.isSuppressed = isSuppressed;
+    this.maxHealth = maxHealth;
   }
 
   isDead(): boolean {
@@ -56,13 +59,14 @@ export class Combatant {
       this.actionsTaken,
       this.isCritical,
       this.actions,
-      this.combatantType,
-      this.isSuppressed
+      this.faction,
+      this.isSuppressed,
+      this.maxHealth
     );
   }
 
   isPlayer(): boolean {
-    return this.combatantType === CombatantType.Player;
+    return this.faction === Faction.Players;
   }
 
   takeDamage(damage: number) {

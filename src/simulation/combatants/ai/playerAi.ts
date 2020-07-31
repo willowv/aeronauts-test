@@ -1,6 +1,5 @@
 import { AI } from "./ai";
 import Combatant from "../combatant";
-import { CombatantType } from "../../../enum";
 
 const minimum = (array: number[]) => Math.min(...array);
 const sum = (array: number[]) => array.reduce((x, y) => x + y, 0);
@@ -15,23 +14,9 @@ export const PlayerAI = new AI("Player", (state) => {
   playerHealthScore += minimum(playerHealths); // encourage distributing damage
 
   // enemy health and kills - make progress
-  let getMaxHealth = (enemy: Combatant) => {
-    switch (enemy.combatantType) {
-      case CombatantType.Normal:
-        return 4;
-      case CombatantType.Dangerous:
-        return 8;
-      case CombatantType.Tough:
-        return 12;
-      case CombatantType.Scary:
-        return 16;
-      case CombatantType.Player:
-        return 4; // Should be unreachable code, but default to "normal"
-    }
-  };
   let enemyHealthScore = 0;
   enemyHealthScore += sum(
-    state.enemies.map((enemy) => getMaxHealth(enemy) - enemy.health)
+    state.enemies.map((enemy) => enemy.maxHealth - Math.max(enemy.health, 0))
   );
   enemyHealthScore += sum(
     state.enemies

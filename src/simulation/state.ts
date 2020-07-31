@@ -1,7 +1,6 @@
 import { Player } from "./combatants/player";
 import { CombatMap } from "./map/map";
 import Combatant from "./combatants/combatant";
-import { CombatantType } from "../enum";
 
 export class CombatState {
   players: Player[];
@@ -29,7 +28,7 @@ export class CombatState {
   }
 
   GetCombatant(combatant: Combatant): Combatant {
-    return combatant.combatantType === CombatantType.Player
+    return combatant.isPlayer()
       ? this.players[combatant.index]
       : this.enemies[combatant.index];
   }

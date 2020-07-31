@@ -22,12 +22,11 @@ export enum AttackType {
   Special,
 }
 
-export enum CombatantType {
+export enum EnemyType {
   Normal = 0,
   Dangerous,
   Tough,
-  Scary,
-  Player,
+  Scary
 }
 
 export enum Faction {

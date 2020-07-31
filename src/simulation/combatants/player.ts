@@ -1,5 +1,5 @@
 import Combatant from "./combatant";
-import { Token, Boost, CombatantType } from "../../enum";
+import { Token, Boost, Faction } from "../../enum";
 import { Action } from "./actions/action";
 
 export const initialPlayerHealth = 15;
@@ -31,8 +31,9 @@ export class Player extends Combatant {
       actionsTaken,
       true /* players are always critical */,
       actions,
-      CombatantType.Player,
-      isSuppressed
+      Faction.Players,
+      isSuppressed,
+      initialPlayerHealth
     );
     this.abilityScores = [...abilityScores];
     this.focus = focus;

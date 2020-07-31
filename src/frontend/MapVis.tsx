@@ -3,7 +3,7 @@ import { CombatMap } from "../simulation/map/map";
 import { Box, Heading, Card } from "rebass";
 import { Flowpoint, Flowspace } from "flowpoints";
 import { ScenarioPlayer, ScenarioEnemySet } from "../simulation/scenario";
-import { CombatantType } from "../enum";
+import { EnemyType } from "../enum";
 
 interface MapVisProps {
   map: CombatMap;
@@ -67,24 +67,24 @@ export const MapVis = ({
     let enemyBadges = (
       <>
         {/* Render a badge if the count is greater than 0. Otherwise render false (nothing) */}
-        {npcSet.countByCombatantType[CombatantType.Normal] > 0 && (
+        {npcSet.countByCombatantType[EnemyType.Normal] > 0 && (
           <Box sx={NpcBadgeStyle}>
-            {"N: " + npcSet.countByCombatantType[CombatantType.Normal]}
+            {"N: " + npcSet.countByCombatantType[EnemyType.Normal]}
           </Box>
         )}
-        {npcSet.countByCombatantType[CombatantType.Dangerous] > 0 && (
+        {npcSet.countByCombatantType[EnemyType.Dangerous] > 0 && (
           <Box sx={NpcBadgeStyle}>
-            {"D: " + npcSet.countByCombatantType[CombatantType.Dangerous]}
+            {"D: " + npcSet.countByCombatantType[EnemyType.Dangerous]}
           </Box>
         )}
-        {npcSet.countByCombatantType[CombatantType.Tough] > 0 && (
+        {npcSet.countByCombatantType[EnemyType.Tough] > 0 && (
           <Box sx={NpcBadgeStyle}>
-            {"T: " + npcSet.countByCombatantType[CombatantType.Tough]}
+            {"T: " + npcSet.countByCombatantType[EnemyType.Tough]}
           </Box>
         )}
-        {npcSet.countByCombatantType[CombatantType.Scary] > 0 && (
+        {npcSet.countByCombatantType[EnemyType.Scary] > 0 && (
           <Box sx={NpcBadgeStyle}>
-            {"S: " + npcSet.countByCombatantType[CombatantType.Scary]}
+            {"S: " + npcSet.countByCombatantType[EnemyType.Scary]}
           </Box>
         )}
       </>

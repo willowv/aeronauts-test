@@ -4,7 +4,7 @@ import { CombatState } from "./state";
 import { CombatMap } from "../simulation/map/map";
 import { Action } from "../simulation/combatants/actions/action";
 import { EnemyBasicAttack } from "../simulation/combatants/actions/npcActions";
-import { CombatantType } from "../enum";
+import { Faction } from "../enum";
 
 export class Scenario {
   enemySetByZone: ScenarioEnemySet[];
@@ -101,8 +101,9 @@ const CreateNormalEnemy = (index: number, zone: number, isCritical: boolean) =>
     0,
     isCritical,
     [EnemyBasicAttack],
-    CombatantType.Normal,
-    false
+    Faction.Enemies,
+    false,
+    4
   );
 const CreateDangerousEnemy = (
   index: number,
@@ -118,8 +119,9 @@ const CreateDangerousEnemy = (
     0,
     isCritical,
     [EnemyBasicAttack],
-    CombatantType.Dangerous,
-    false
+    Faction.Enemies,
+    false,
+    8
   );
 const CreateToughEnemy = (index: number, zone: number, isCritical: boolean) =>
   new Combatant(
@@ -131,8 +133,9 @@ const CreateToughEnemy = (index: number, zone: number, isCritical: boolean) =>
     0,
     isCritical,
     [EnemyBasicAttack],
-    CombatantType.Tough,
-    false
+    Faction.Enemies,
+    false,
+    12
   );
 const CreateScaryEnemy = (index: number, zone: number, isCritical: boolean) =>
   new Combatant(
@@ -144,8 +147,9 @@ const CreateScaryEnemy = (index: number, zone: number, isCritical: boolean) =>
     0,
     isCritical,
     [EnemyBasicAttack],
-    CombatantType.Scary,
-    false
+    Faction.Enemies,
+    false,
+    16
   );
 
 const CreateEnemyByType = [
