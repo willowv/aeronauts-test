@@ -46,12 +46,14 @@ function SimulateCombat(initialState: CombatState): CombatReport {
 function SimulateRound(initialState: CombatState): CombatState {
   let state = initialState;
   state.players.forEach((player) => {
-    if (player.isDead()) return; // dead players don't get a turn
-    state = SimulateTurn(PlayerAI, state, player);
+    let currentPlayer = state.GetCombatant(player);
+    if (currentPlayer.isDead()) return; // dead players don't get a turn
+    state = SimulateTurn(PlayerAI, state, currentPlayer);
   });
   state.enemies.forEach((enemy) => {
-    if (enemy.isDead()) return; // dead enemies don't get a turn
-    state = SimulateTurn(EnemyAI, state, enemy);
+    let currentEnemy = state.GetCombatant(enemy);
+    if (currentEnemy.isDead()) return; // dead enemies don't get a turn
+    state = SimulateTurn(EnemyAI, state, currentEnemy);
   });
   return state.ClearSuppression();
 }
