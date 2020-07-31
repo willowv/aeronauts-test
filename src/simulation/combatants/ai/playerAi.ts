@@ -46,8 +46,8 @@ export const PlayerAI = new AI("Player", (state) => {
   // Measures potential damage / harm from this position and token set up.
   let positioningScore = sum(
     alivePlayers.map((player) => {
-      // 6 is based on two actions with expected value 3 (from external calculation)
-      let offenseScore = canTargetAny(player) ? 6 + player.tokens[Token.Action][Boost.Positive] - player.tokens[Token.Action][Boost.Negative] : 0;
+      // x3 is based on player actions having expected value 3 (from external calculation)
+      let offenseScore = canTargetAny(player) ? player.actionsPerTurn * 3 + player.tokens[Token.Action][Boost.Positive] - player.tokens[Token.Action][Boost.Negative] : 0;
       // x2 is based on enemy actions having expected value 2 (from external calculation)
       let defenseScore = player.health - threatOn(player) * 2 + player.tokens[Token.Defense][Boost.Positive] - player.tokens[Token.Defense][Boost.Negative];
       return offenseScore + defenseScore;
