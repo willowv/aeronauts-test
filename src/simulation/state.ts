@@ -15,19 +15,17 @@ export class CombatState {
   }
 
   ArePlayersDefeated(): boolean {
-    let defeat = true;
-    this.players.forEach((player: Combatant) => {
-      if (!player.isDead() && player.isCritical) defeat = false;
-    });
-    return defeat;
+    // All critical players are dead
+    return this.players
+      .filter((player) => player.isCritical)
+      .every((player) => player.isDead());
   }
 
   AreEnemiesDefeated(): boolean {
-    let defeat = true;
-    this.enemies.forEach((enemy: Combatant) => {
-      if (!enemy.isDead() && enemy.isCritical) defeat = false;
-    });
-    return defeat;
+    // All critical enemies are dead
+    return this.enemies
+      .filter((enemy) => enemy.isCritical)
+      .every((enemy) => enemy.isDead());
   }
 
   GetCombatant(combatant: Combatant): Combatant {
@@ -37,7 +35,7 @@ export class CombatState {
   }
 
   GetCombatantAsPlayer(combatant: Combatant): Player | null {
-    if (combatant.isPlayer()) {
+    if (!combatant.isPlayer()) {
       return null;
     }
     return this.players[combatant.index];

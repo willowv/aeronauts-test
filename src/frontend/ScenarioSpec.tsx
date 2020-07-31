@@ -64,6 +64,7 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
   render() {
     let playerSpecs = this.state.players.map((player, index) => (
       <PlayerSpec
+        key={index}
         player={player}
         zonesAvailable={this.state.map.terrain.length}
         handlePlayerChange={(newPlayer) => {
@@ -86,6 +87,7 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
       // if we're under the max number of players, include the add player button
       playerSpecs.push(
         <Button
+          key="add-player-button"
           onClick={() => {
             let newPlayers = this.state.players.map((player) => player.clone());
             newPlayers.push(new ScenarioPlayer([0, 0, 0, 0, 0], Pistol, "", 0));

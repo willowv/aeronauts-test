@@ -47,7 +47,6 @@ export interface CombatReport {
 }
 
 export function CombatReportFromFinalState(
-  didPlayersWin: boolean,
   finalState: CombatState,
   numberOfRounds: number
 ): CombatReport {
@@ -61,6 +60,7 @@ export function CombatReportFromFinalState(
   let lowestPlayerFocus = 12;
   let actionsTotal = 0;
   let actionsEnemy = 0;
+  let didPlayersWin = finalState.AreEnemiesDefeated() && !finalState.ArePlayersDefeated()
   finalState.players.forEach((player: Player) => {
     lowestPlayerHealth = Math.min(lowestPlayerHealth, player.health);
     lowestPlayerFocus = Math.min(lowestPlayerFocus, player.focus);
@@ -126,18 +126,11 @@ export function ScenarioReportFromCombatReports(
   combatReports.forEach((stats) => {
     // take each number, subtract the mean, square the result
     // sum these differences
-    avgRoundCountVarianceSquared += Math.pow(
-      stats.cRound - avgRoundCountMean,
-      2
-    );
-    avgActionCountVarianceSquared += Math.pow(
-      stats.actionsTotal - avgActionCountMean,
-      2
-    );
-    avgEnemyActionCountVarianceSquared += Math.pow(
-      stats.actionsEnemy - avgEnemyActionCountMean,
-      2
-    );
+    avgRoundCountVarianceSquared += (stats.cRound - avgRoundCountMean) ** 2;
+    avgActionCountVarianceSquared +=
+      (stats.actionsTotal - avgActionCountMean) ** 2;
+    avgEnemyActionCountVarianceSquared +=
+      (stats.actionsEnemy - avgEnemyActionCountMean) ** 2;
   });
 
   return {

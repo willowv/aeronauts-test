@@ -44,11 +44,11 @@ export const StatsVis = ({ reports, triggerNewSimulation }: StatsVisProps) => {
       .reverse();
     reportVis = reportsToDisplay.map((report, index) => {
       let title = index === 0 ? "Current" : "Current -" + index;
-      return <ScenarioReportVis title={title} report={report} />;
+      return <ScenarioReportVis key={title} title={title} report={report} />;
     });
   } else {
     reportVis = [
-      <Box mx="2">
+      <Box key="empty" mx="2">
         <Heading>None</Heading>
         <p>-</p>
         <p>-</p>

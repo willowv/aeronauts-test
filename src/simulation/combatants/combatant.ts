@@ -1,7 +1,7 @@
 import { Action } from "./actions/action";
 import { CombatantType } from "../../enum";
 
-export const initialTokens = [
+export const initialTokens = () => [
   [0, 0],
   [0, 0],
 ];
@@ -63,6 +63,10 @@ export class Combatant {
 
   isPlayer(): boolean {
     return this.combatantType === CombatantType.Player;
+  }
+
+  takeDamage(damage: number) {
+    this.health -= damage;
   }
 }
 export default Combatant;

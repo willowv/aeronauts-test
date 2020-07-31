@@ -64,31 +64,31 @@ export const MapVis = ({
     let players2 = players.filter((player) => player.zone === zone);
     let npcSet = enemySetByZone[zone];
 
-    let enemyBadges: JSX.Element[] = [];
-    if (npcSet.countByCombatantType[CombatantType.Normal] > 0)
-      enemyBadges.push(
-        <Box sx={NpcBadgeStyle}>
-          {"N: " + npcSet.countByCombatantType[CombatantType.Normal]}
-        </Box>
-      );
-    if (npcSet.countByCombatantType[CombatantType.Dangerous] > 0)
-      enemyBadges.push(
-        <Box sx={NpcBadgeStyle}>
-          {"D: " + npcSet.countByCombatantType[CombatantType.Dangerous]}
-        </Box>
-      );
-    if (npcSet.countByCombatantType[CombatantType.Tough] > 0)
-      enemyBadges.push(
-        <Box sx={NpcBadgeStyle}>
-          {"T: " + npcSet.countByCombatantType[CombatantType.Tough]}
-        </Box>
-      );
-    if (npcSet.countByCombatantType[CombatantType.Scary] > 0)
-      enemyBadges.push(
-        <Box sx={NpcBadgeStyle}>
-          {"S: " + npcSet.countByCombatantType[CombatantType.Scary]}
-        </Box>
-      );
+    let enemyBadges = (
+      <>
+        {/* Render a badge if the count is greater than 0. Otherwise render false (nothing) */}
+        {npcSet.countByCombatantType[CombatantType.Normal] > 0 && (
+          <Box sx={NpcBadgeStyle}>
+            {"N: " + npcSet.countByCombatantType[CombatantType.Normal]}
+          </Box>
+        )}
+        {npcSet.countByCombatantType[CombatantType.Dangerous] > 0 && (
+          <Box sx={NpcBadgeStyle}>
+            {"D: " + npcSet.countByCombatantType[CombatantType.Dangerous]}
+          </Box>
+        )}
+        {npcSet.countByCombatantType[CombatantType.Tough] > 0 && (
+          <Box sx={NpcBadgeStyle}>
+            {"T: " + npcSet.countByCombatantType[CombatantType.Tough]}
+          </Box>
+        )}
+        {npcSet.countByCombatantType[CombatantType.Scary] > 0 && (
+          <Box sx={NpcBadgeStyle}>
+            {"S: " + npcSet.countByCombatantType[CombatantType.Scary]}
+          </Box>
+        )}
+      </>
+    );
 
     let style = selectedZone === zone ? ZoneSelected : ZoneStyle;
     return (
@@ -104,8 +104,10 @@ export const MapVis = ({
         <Card sx={style}>
           <Heading as="h3">{"Zone " + zone}</Heading>
           <p>{"Terrain: " + terrain.name}</p>
-          {players2.map((player) => (
-            <Box sx={PlayerBadgeStyle}>{player.name}</Box>
+          {players2.map((player, index) => (
+            <Box key={index} sx={PlayerBadgeStyle}>
+              {player.name}
+            </Box>
           ))}
           {enemyBadges}
         </Card>
