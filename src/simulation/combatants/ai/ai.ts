@@ -25,7 +25,8 @@ export class AI {
   FindBestMoveAmong(
     initialState: CombatState,
     combatant: Combatant,
-    zones: number[]
+    zones: number[],
+    isForced: boolean = false
   ): number | null {
     let bestMove: number | null = null;
     let bestScore: number = this.score(initialState);
@@ -35,7 +36,8 @@ export class AI {
         combatant,
         zoneDest,
         ExpectedValueForBoostAndModifier,
-        this
+        this,
+        isForced
       );
       let expectedValue = this.score(expectedState);
       if (expectedValue > bestScore) {
