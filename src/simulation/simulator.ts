@@ -70,10 +70,13 @@ function SimulateTurn(
       let action = bestActionAndTarget.action;
       let target = bestActionAndTarget.target;
       state = Act(state, combatant, action, target, RollDice, ai);
-    } else {
+    }
+    else {
+      // move as an action
       let bestMove = ai.FindBestMove(state, combatant);
-      if (bestMove !== null)
+      if (bestMove !== null) {
         state = Move(state, combatant, bestMove, RollDice, ai);
+      }
     }
     let newCombatant = state.GetCombatant(combatant);
     newCombatant.actionsTaken++;
@@ -109,27 +112,30 @@ export function Move(
   actor: Combatant,
   zoneDest: number,
   checkEvaluator: (modifier: number, boost: number) => number,
-  ai: AI
+  ai: AI,
+  isForced: boolean = false
 ): CombatState {
   let state = initialState.clone();
   let newActor = state.GetCombatant(actor);
-  let freeAttackers = newActor.isPlayer() ? state.enemies : state.players;
-  // Filter to living, non-suppressed enemies in the same zone, with a weapon that can target
-  freeAttackers = freeAttackers.filter((attacker) => {
-    let weapon = attacker.actions[0];
-    return (
-      !attacker.isDead() &&
-      attacker.zone === newActor.zone &&
-      !attacker.isSuppressed &&
-      weapon.minRange === 0
-    );
-  });
-  // Execute attacks
-  freeAttackers.forEach((freeAttacker) => {
-    let weapon = freeAttacker.actions[0];
-    state = Act(state, freeAttacker, weapon, newActor, checkEvaluator, ai);
-    newActor = state.GetCombatant(newActor);
-  });
+  if(!isForced) {
+    let freeAttackers = newActor.isPlayer() ? state.enemies : state.players;
+    // Filter to living, non-suppressed enemies in the same zone, with a weapon that can target
+    freeAttackers = freeAttackers.filter((attacker) => {
+      let weapon = attacker.actions[0];
+      return (
+        !attacker.isDead() &&
+        attacker.zone === newActor.zone &&
+        !attacker.isSuppressed &&
+        weapon.minRange === 0
+      );
+    });
+    // Execute attacks
+    freeAttackers.forEach((freeAttacker) => {
+      let weapon = freeAttacker.actions[0];
+      state = Act(state, freeAttacker, weapon, newActor, checkEvaluator, ai);
+      newActor = state.GetCombatant(newActor);
+    });
+  }
   newActor.zone = zoneDest;
   return state;
 }

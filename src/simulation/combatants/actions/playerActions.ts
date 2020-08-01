@@ -49,7 +49,7 @@ export const Shotgun = new Action(
         .filter((zone: number) => {
           return zone !== newActor.zone;
         });
-      let pushZone = ai.FindBestMoveAmong(state, newTarget, pushableZones);
+      let pushZone = ai.FindBestMoveAmong(state, newTarget, pushableZones, true);
       if (pushZone !== null) newTarget.zone = pushZone;
 
       newTarget.isSuppressed = true;
