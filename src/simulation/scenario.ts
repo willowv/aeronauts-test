@@ -3,7 +3,7 @@ import { Player, initialPlayerHealth } from "../simulation/combatants/player";
 import { CombatState } from "./state";
 import { CombatMap } from "../simulation/map/map";
 import { Action } from "../simulation/combatants/actions/action";
-import { EnemyBasicAttack } from "../simulation/combatants/actions/npcActions";
+import { EnemyBasicAttack, EnemyAdvancedAttack } from "../simulation/combatants/actions/npcActions";
 import { Faction } from "../enum";
 
 export class Scenario {
@@ -76,7 +76,7 @@ function PlayersFromScenarioPlayers(
       return new Player(
         index,
         initialPlayerHealth,
-        2,
+        1,
         initialTokens(),
         scenarioPlayer.zone,
         0,
@@ -113,12 +113,12 @@ const CreateDangerousEnemy = (
   new Combatant(
     index,
     8,
-    2,
+    1,
     initialTokens(),
     zone,
     0,
     isCritical,
-    [EnemyBasicAttack],
+    [EnemyAdvancedAttack],
     Faction.Enemies,
     false,
     8
@@ -127,12 +127,12 @@ const CreateToughEnemy = (index: number, zone: number, isCritical: boolean) =>
   new Combatant(
     index,
     12,
-    2,
+    1,
     initialTokens(),
     zone,
     0,
     isCritical,
-    [EnemyBasicAttack],
+    [EnemyAdvancedAttack],
     Faction.Enemies,
     false,
     12
@@ -141,12 +141,12 @@ const CreateScaryEnemy = (index: number, zone: number, isCritical: boolean) =>
   new Combatant(
     index,
     16,
-    4,
+    2,
     initialTokens(),
     zone,
     0,
     isCritical,
-    [EnemyBasicAttack],
+    [EnemyAdvancedAttack],
     Faction.Enemies,
     false,
     16

@@ -64,6 +64,12 @@ function SimulateTurn(
   combatant: Combatant
 ): CombatState {
   let state = initialState;
+  let freeMoveTaken = false;
+  let bestMove = ai.FindBestMove(state, combatant);
+  if (bestMove !== null) {
+    state = Move(state, combatant, bestMove, RollDice, ai);
+    freeMoveTaken = true;
+  }
   for (let actionNum = 0; actionNum < combatant.actionsPerTurn; actionNum++) {
     let bestActionAndTarget = ai.FindBestActionAndTarget(state, combatant);
     if (bestActionAndTarget !== null) {
@@ -76,6 +82,13 @@ function SimulateTurn(
       let bestMove = ai.FindBestMove(state, combatant);
       if (bestMove !== null) {
         state = Move(state, combatant, bestMove, RollDice, ai);
+      }
+    }
+    if(!freeMoveTaken) {
+      let bestMove = ai.FindBestMove(state, combatant);
+      if (bestMove !== null) {
+        state = Move(state, combatant, bestMove, RollDice, ai);
+        freeMoveTaken = true;
       }
     }
     let newCombatant = state.GetCombatant(combatant);
