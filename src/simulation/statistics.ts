@@ -10,20 +10,23 @@ export interface Statistic {
 
 export class ScenarioReport {
   playerWinRate: number;
-  playerInjuryRate: number;
+  avgPlayerKOs: Statistic;
+  avgPlayerInjuries: Statistic;
   avgRoundCount: Statistic;
   avgActionCount: Statistic;
   avgEnemyActionCount: Statistic;
 
   constructor(
     playerWinRate: number,
-    playerInjuryRate: number,
+    avgPlayerKOs: Statistic,
+    avgPlayerInjuries: Statistic,
     avgRoundCount: Statistic,
     avgActionCount: Statistic,
     avgEnemyActionCount: Statistic
   ) {
     this.playerWinRate = playerWinRate;
-    this.playerInjuryRate = playerInjuryRate;
+    this.avgPlayerKOs = avgPlayerKOs;
+    this.avgPlayerInjuries = avgPlayerInjuries;
     this.avgRoundCount = avgRoundCount;
     this.avgActionCount = avgActionCount;
     this.avgEnemyActionCount = avgEnemyActionCount;
@@ -35,6 +38,8 @@ export interface CombatReport {
   didPlayersWin: boolean;
   avgPlayerHealth: number;
   avgPlayerFocus: number;
+  numberOfPlayerKOs: number;
+  numberOfPlayerInjuries: number;
   lowestPlayerHealth: number;
   lowestPlayerFocus: number;
   unspentAdv: number;
@@ -60,7 +65,10 @@ export function CombatReportFromFinalState(
   let lowestPlayerFocus = 12;
   let actionsTotal = 0;
   let actionsEnemy = 0;
-  let didPlayersWin = finalState.AreEnemiesDefeated() && !finalState.ArePlayersDefeated()
+  let numberOfPlayerKOs = 0;
+  let numberOfPlayerInjuries = 0;
+  let didPlayersWin =
+    finalState.AreEnemiesDefeated() && !finalState.ArePlayersDefeated();
   finalState.players.forEach((player: Player) => {
     lowestPlayerHealth = Math.min(lowestPlayerHealth, player.health);
     lowestPlayerFocus = Math.min(lowestPlayerFocus, player.focus);
@@ -71,6 +79,8 @@ export function CombatReportFromFinalState(
     unspentDef += player.tokens[Token.Defense][Boost.Positive];
     unspentExp += player.tokens[Token.Defense][Boost.Negative];
     actionsTotal += player.actionsTaken;
+    if (player.isDead()) numberOfPlayerKOs++;
+    else if (player.health <= 5) numberOfPlayerInjuries++;
   });
 
   finalState.enemies.forEach((enemy: Combatant) => {
@@ -86,6 +96,8 @@ export function CombatReportFromFinalState(
     didPlayersWin: didPlayersWin,
     avgPlayerHealth: totalPlayerHealth / finalState.players.length,
     avgPlayerFocus: totalPlayerFocus / finalState.players.length,
+    numberOfPlayerKOs: numberOfPlayerKOs,
+    numberOfPlayerInjuries: numberOfPlayerInjuries,
     lowestPlayerHealth: lowestPlayerHealth,
     lowestPlayerFocus: lowestPlayerFocus,
     unspentAdv: unspentAdv,
@@ -103,29 +115,38 @@ export function ScenarioReportFromCombatReports(
 ): ScenarioReport {
   let numberOfTrials = combatReports.length;
   let numberOfPlayerWins = 0;
-  let numberOfCombatsWithInjury = 0;
   let totalRounds = 0;
   let totalEnemyActions = 0;
   let totalActions = 0;
+  let totalKOs = 0;
+  let totalInjuries = 0;
   combatReports.forEach((stats) => {
     if (stats.didPlayersWin) numberOfPlayerWins++;
 
-    if (stats.lowestPlayerHealth <= 5) numberOfCombatsWithInjury++;
-
+    totalKOs += stats.numberOfPlayerKOs;
+    totalInjuries += stats.numberOfPlayerInjuries;
     totalRounds += stats.cRound;
     totalEnemyActions += stats.actionsEnemy;
     totalActions += stats.actionsTotal;
   });
 
+  let avgKOCountMean = totalKOs / numberOfTrials;
+  let avgInjuryCountMean = totalInjuries / numberOfTrials;
   let avgRoundCountMean = totalRounds / numberOfTrials;
   let avgActionCountMean = totalActions / numberOfTrials;
   let avgEnemyActionCountMean = totalEnemyActions / numberOfTrials;
+  let avgKOCountVarianceSquared = 0;
+  let avgInjuryCountVarianceSquared = 0;
   let avgRoundCountVarianceSquared = 0;
   let avgActionCountVarianceSquared = 0;
   let avgEnemyActionCountVarianceSquared = 0;
   combatReports.forEach((stats) => {
     // take each number, subtract the mean, square the result
     // sum these differences
+    avgKOCountVarianceSquared +=
+      (stats.numberOfPlayerKOs - avgKOCountMean) ** 2;
+    avgInjuryCountVarianceSquared +=
+      (stats.numberOfPlayerInjuries - avgInjuryCountMean) ** 2;
     avgRoundCountVarianceSquared += (stats.cRound - avgRoundCountMean) ** 2;
     avgActionCountVarianceSquared +=
       (stats.actionsTotal - avgActionCountMean) ** 2;
@@ -135,7 +156,14 @@ export function ScenarioReportFromCombatReports(
 
   return {
     playerWinRate: numberOfPlayerWins / numberOfTrials,
-    playerInjuryRate: numberOfCombatsWithInjury / numberOfTrials,
+    avgPlayerKOs: {
+      mean: avgKOCountMean,
+      sd: Math.sqrt(avgKOCountVarianceSquared / numberOfTrials),
+    },
+    avgPlayerInjuries: {
+      mean: avgInjuryCountMean,
+      sd: Math.sqrt(avgInjuryCountVarianceSquared / numberOfTrials),
+    },
     avgRoundCount: {
       mean: avgRoundCountMean,
       sd: Math.sqrt(avgRoundCountVarianceSquared / numberOfTrials),

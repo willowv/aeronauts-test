@@ -14,7 +14,14 @@ const ScenarioReportVis = ({
   <Box mx="2">
     <Heading>{title}</Heading>
     <p>{(report.playerWinRate * 100).toFixed(0)}%</p>
-    <p>{(report.playerInjuryRate * 100).toFixed(0)}%</p>
+    <p>
+      {report.avgPlayerKOs.mean.toFixed(1)}
+      (sd {report.avgPlayerKOs.sd.toFixed(1)})
+    </p>
+    <p>
+      {report.avgPlayerInjuries.mean.toFixed(1)}
+      (sd {report.avgPlayerInjuries.sd.toFixed(1)})
+    </p>
     <p>
       {report.avgActionCount.mean.toFixed(2)}
       (sd {report.avgActionCount.sd.toFixed(2)})
@@ -71,7 +78,8 @@ export const StatsVis = ({ reports, triggerNewSimulation }: StatsVisProps) => {
         <Box mx="2">
           <Heading>Statistics</Heading>
           <p>Win Rate</p>
-          <p>Injury Rate</p>
+          <p>Player KOs</p>
+          <p>Player Injuries</p>
           <p>Total Actions</p>
           <p>Enemy Actions</p>
           <p>Number of Rounds</p>
