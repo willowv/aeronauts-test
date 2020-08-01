@@ -26,7 +26,7 @@ export enum EnemyType {
   Normal = 0,
   Dangerous,
   Tough,
-  Scary
+  Scary,
 }
 
 export enum Faction {

@@ -31,25 +31,35 @@ export const PlayerAI = new AI("Player", (state) => {
       return targets.length > 0;
     });
 
-  let canTarget = (actor : Combatant, target : Combatant) =>
+  let canTarget = (actor: Combatant, target: Combatant) =>
     actor.actions.some((action) => {
       let targets = action.GetValidTargets(state, actor);
       return targets.some((target2) => target2 === target);
     });
 
-  let threatOn = (player : Combatant) => {
-    return sum(aliveEnemies.map((enemy) => {
-      return canTarget(enemy, player) ? enemy.actionsPerTurn : 0;
-    }))
-  }
+  let threatOn = (player: Combatant) => {
+    return sum(
+      aliveEnemies.map((enemy) => {
+        return canTarget(enemy, player) ? enemy.actionsPerTurn : 0;
+      })
+    );
+  };
 
   // Measures potential damage / harm from this position and token set up.
   let positioningScore = sum(
     alivePlayers.map((player) => {
       // x3 is based on player actions having expected value 3 (from external calculation)
-      let offenseScore = canTargetAny(player) ? player.actionsPerTurn * 3 + player.tokens[Token.Action][Boost.Positive] - player.tokens[Token.Action][Boost.Negative] : 0;
+      let offenseScore = canTargetAny(player)
+        ? player.actionsPerTurn * 3 +
+          player.tokens[Token.Action][Boost.Positive] -
+          player.tokens[Token.Action][Boost.Negative]
+        : 0;
       // x2 is based on enemy actions having expected value 2 (from external calculation)
-      let defenseScore = player.health - threatOn(player) * 2 + player.tokens[Token.Defense][Boost.Positive] - player.tokens[Token.Defense][Boost.Negative];
+      let defenseScore =
+        player.health -
+        threatOn(player) * 2 +
+        player.tokens[Token.Defense][Boost.Positive] -
+        player.tokens[Token.Defense][Boost.Negative];
       return offenseScore + defenseScore;
     })
   );
