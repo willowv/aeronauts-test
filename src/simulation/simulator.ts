@@ -15,7 +15,7 @@ import { AI } from "./combatants/ai/ai";
 import { EnemyAI } from "./combatants/ai/enemyAi";
 import { Action } from "./combatants/actions/action";
 
-const roundLimit = 10;
+const roundLimit = 20;
 
 // Given number of each type of enemy, number of players, assumed focus percentage, and who goes first
 // Return number of total actions and number of threat actions

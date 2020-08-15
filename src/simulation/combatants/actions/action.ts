@@ -9,9 +9,7 @@ export class Action {
   maxRange: number;
   type: AttackType;
   ability: Ability;
-  lowThreshold: number;
-  highThreshold: number;
-  target: Faction;
+  targetFaction: Faction;
   evaluate: (
     checkResult: number,
     actor: Combatant,
@@ -26,8 +24,6 @@ export class Action {
     maxRange: number,
     type: AttackType,
     ability: Ability,
-    lowThreshold: number,
-    highThreshold: number,
     target: Faction,
     evaluate: (
       checkResult: number,
@@ -43,14 +39,12 @@ export class Action {
     this.type = type;
     this.ability = ability;
     this.evaluate = evaluate;
-    this.lowThreshold = lowThreshold;
-    this.highThreshold = highThreshold;
-    this.target = target;
+    this.targetFaction = target;
   }
 
   GetValidTargets(state: CombatState, attacker: Combatant): Combatant[] {
     let targets =
-      this.target === Faction.Players ? state.players : state.enemies;
+      this.targetFaction === Faction.Players ? state.players : state.enemies;
     let validTargets = targets.filter((target) => {
       let distance = state.map.distanceBetween[attacker.zone][target.zone];
       return (

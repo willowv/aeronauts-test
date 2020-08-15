@@ -3,7 +3,7 @@ import { Player, initialPlayerHealth } from "../simulation/combatants/player";
 import { CombatState } from "./state";
 import { CombatMap } from "../simulation/map/map";
 import { Action } from "../simulation/combatants/actions/action";
-import { EnemyAdvancedMeleeAttack, EnemyAdvancedCroakRoar, EnemyBasicMeleeAttack } from "../simulation/combatants/actions/npcActions";
+import { EnemyAdvancedMeleeAttack, EnemyAdvancedCroakRoar, EnemyBasicMeleeAttack, EnemyAdvancedLeap } from "../simulation/combatants/actions/npcActions";
 import { Faction } from "../enum";
 
 export class Scenario {
@@ -118,7 +118,7 @@ const CreateDangerousEnemy = (
     zone,
     0,
     isCritical,
-    [EnemyAdvancedMeleeAttack, EnemyAdvancedCroakRoar],
+    [EnemyAdvancedMeleeAttack, EnemyAdvancedCroakRoar, EnemyAdvancedLeap],
     Faction.Enemies,
     false,
     8
@@ -132,7 +132,7 @@ const CreateToughEnemy = (index: number, zone: number, isCritical: boolean) =>
     zone,
     0,
     isCritical,
-    [EnemyAdvancedMeleeAttack, EnemyAdvancedCroakRoar],
+    [EnemyAdvancedMeleeAttack, EnemyAdvancedCroakRoar, EnemyAdvancedLeap],
     Faction.Enemies,
     false,
     12
@@ -146,7 +146,7 @@ const CreateScaryEnemy = (index: number, zone: number, isCritical: boolean) =>
     zone,
     0,
     isCritical,
-    [EnemyAdvancedMeleeAttack, EnemyAdvancedCroakRoar],
+    [EnemyAdvancedMeleeAttack, EnemyAdvancedCroakRoar, EnemyAdvancedLeap],
     Faction.Enemies,
     false,
     16

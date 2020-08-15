@@ -7,8 +7,6 @@ export const EnemyBasicRangedAttack = new Action(
   1,
   AttackType.Ranged,
   Ability.Agility,
-  10,
-  15,
   Faction.Players,
   (checkResult, actor, target, initialState, ai) => {
     let state = initialState.clone();
@@ -30,8 +28,6 @@ export const EnemyBasicMeleeAttack = new Action(
   0,
   AttackType.Melee,
   Ability.Agility,
-  10,
-  15,
   Faction.Players,
   (checkResult, actor, target, initialState, ai) => {
     let state = initialState.clone();
@@ -54,8 +50,6 @@ export const EnemyAdvancedRangedAttack = new Action(
   1,
   AttackType.Ranged,
   Ability.Agility,
-  10,
-  15,
   Faction.Players,
   (checkResult, actor, target, initialState, ai) => {
     let state = initialState.clone();
@@ -77,8 +71,6 @@ export const EnemyAdvancedMeleeAttack = new Action(
   0,
   AttackType.Melee,
   Ability.Agility,
-  10,
-  15,
   Faction.Players,
   (checkResult, actor, target, initialState, ai) => {
     let state = initialState.clone();
@@ -100,8 +92,6 @@ export const EnemyAdvancedCroakRoar = new Action(
   1,
   AttackType.Special,
   Ability.Conviction,
-  10,
-  15,
   Faction.Players,
   (checkResult, actor, target, initialState, ai) => {
     let state = initialState.clone();
@@ -114,6 +104,30 @@ export const EnemyAdvancedCroakRoar = new Action(
     } else if (checkResult < 15) {
       newTarget.takeDamage(2);
       newTarget.tokens[Token.Action][Boost.Negative]++;
+      newTarget.isSuppressed = true;
+    }
+    return state;
+  }
+);
+
+export const EnemyAdvancedLeap = new Action(
+  "Croak/Roar",
+  1,
+  1,
+  AttackType.Ranged,
+  Ability.Agility,
+  Faction.Players,
+  (checkResult, actor, target, initialState, ai) => {
+    let state = initialState.clone();
+    let newActor = state.GetCombatant(actor);
+    let newTarget = state.GetCombatant(target);
+    if (checkResult < 10) {
+      newTarget.takeDamage(3);
+      newActor.zone = newTarget.zone;
+      newTarget.isSuppressed = true;
+    } else if (checkResult < 15) {
+      newTarget.takeDamage(1);
+      newActor.zone = newTarget.zone;
       newTarget.isSuppressed = true;
     }
     return state;
