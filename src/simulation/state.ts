@@ -1,6 +1,7 @@
 import { Player } from "./combatants/player";
 import { CombatMap } from "./map/map";
 import Combatant from "./combatants/combatant";
+import { Faction } from "../enum";
 
 export class CombatState {
   players: Player[];
@@ -25,6 +26,13 @@ export class CombatState {
     return this.enemies
       .filter((enemy) => enemy.isCritical)
       .every((enemy) => enemy.isDead());
+  }
+
+  GetCombatantsOfFactionInZone(faction: Faction, zone: number) : Combatant[] {
+    let combatants = faction === Faction.Players
+    ? this.players
+    : this.enemies;
+    return combatants.filter((combatant) => combatant.zone === zone);
   }
 
   GetCombatant(combatant: Combatant): Combatant {

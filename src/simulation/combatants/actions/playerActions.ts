@@ -1,7 +1,5 @@
 import { AttackType, Ability, Token, Boost, Faction } from "../../../enum";
 import { Action } from "./action";
-import { Move } from "../../simulator";
-import { RollDice } from "../../dice";
 
 export const Pistol = new Action(
   "Pistol",
@@ -9,19 +7,22 @@ export const Pistol = new Action(
   1,
   AttackType.Ranged,
   Ability.Coordination,
-  9,
-  15,
   Faction.Enemies,
   (checkResult, actor, target, initialState, ai) => {
     let state = initialState.clone();
     let newActor = state.GetCombatant(actor);
     let newTarget = state.GetCombatant(target);
-    if (checkResult >= 15) {
+    if (checkResult >= 16) {
       newTarget.takeDamage(4);
-      newActor.tokens[Token.Action][Boost.Positive] += 2;
+      newTarget.tokens[Token.Action][Boost.Negative] += 1;
+      let alliesInZone = state.GetCombatantsOfFactionInZone(newActor.faction, newTarget.zone);
+      if(alliesInZone.length !== 0)
+        alliesInZone[0].tokens[Token.Defense][Boost.Positive] += 1;
+      
       newTarget.isSuppressed = true;
     } else if (checkResult >= 9) {
       newTarget.takeDamage(2);
+      newTarget.tokens[Token.Action][Boost.Negative] += 1;
       newTarget.isSuppressed = true;
     }
     return state;
@@ -34,26 +35,15 @@ export const Shotgun = new Action(
   1,
   AttackType.Ranged,
   Ability.Coordination,
-  11,
-  13,
   Faction.Enemies,
   (checkResult, actor, target, initialState, ai) => {
     let state = initialState.clone();
-    let newActor = state.GetCombatant(actor);
     let newTarget = state.GetCombatant(target);
-    if (checkResult >= 13) {
-      newTarget.takeDamage(3);
-      // push into first zone that is further away that target, if any
-      let pushableZones = state.map
-        .ZonesMovableFrom(target.zone)
-        .filter((zone: number) => {
-          return zone !== newActor.zone;
-        });
-      let pushZone = ai.FindBestMoveAmong(state, newTarget, pushableZones, true);
-      if (pushZone !== null) newTarget.zone = pushZone;
-
+    if (checkResult >= 16) {
+      newTarget.takeDamage(6);
+      newTarget.tokens[Token.Defense][Boost.Negative] += 1;
       newTarget.isSuppressed = true;
-    } else if (checkResult >= 11) {
+    } else if (checkResult >= 10) {
       newTarget.takeDamage(3);
       newTarget.isSuppressed = true;
     }
@@ -67,24 +57,22 @@ export const Rifle = new Action(
   Infinity,
   AttackType.Ranged,
   Ability.Coordination,
-  12,
-  17,
   Faction.Enemies,
   (checkResult, actor, target, initialState, ai) => {
     let state = initialState.clone();
     let newActor = state.GetCombatant(actor);
     let newTarget = state.GetCombatant(target);
-    if (checkResult >= 17) {
-      newTarget.takeDamage(5);
-      newTarget.isSuppressed = true;
-      let bestAllyMove = ai.FindBestAllyMove(state, newActor);
-      if (bestAllyMove !== null) {
-        let ally = bestAllyMove.ally;
-        let zoneDest = bestAllyMove.zoneDest;
-        state = Move(state, ally, zoneDest, RollDice, ai);
-      }
-    } else if (checkResult >= 12) {
+    if (checkResult >= 15) {
       newTarget.takeDamage(4);
+      newTarget.tokens[Token.Defense][Boost.Negative] += 1;
+      let alliesInZone = state.GetCombatantsOfFactionInZone(newActor.faction, newTarget.zone);
+      if(alliesInZone.length !== 0)
+        alliesInZone[0].tokens[Token.Action][Boost.Positive] += 1;
+      
+      newTarget.isSuppressed = true;
+    } else if (checkResult >= 11) {
+      newTarget.takeDamage(2);
+      newTarget.tokens[Token.Defense][Boost.Negative] += 1;
       newTarget.isSuppressed = true;
     }
     return state;
@@ -97,18 +85,17 @@ export const LightMelee = new Action(
   0,
   AttackType.Melee,
   Ability.Coordination,
-  9,
-  16,
   Faction.Enemies,
   (checkResult, actor, target, initialState, ai) => {
     let state = initialState.clone();
     let newTarget = state.GetCombatant(target);
     if (checkResult >= 16) {
-      newTarget.takeDamage(6);
+      newTarget.takeDamage(4);
       newTarget.tokens[Token.Defense][Boost.Negative] += 2;
       newTarget.isSuppressed = true;
     } else if (checkResult >= 9) {
       newTarget.takeDamage(2);
+      newTarget.tokens[Token.Defense][Boost.Negative] += 1;
       newTarget.isSuppressed = true;
     }
     return state;
@@ -121,18 +108,17 @@ export const MediumMelee = new Action(
   0,
   AttackType.Melee,
   Ability.Coordination,
-  10,
-  16,
   Faction.Enemies,
   (checkResult, actor, target, initialState, ai) => {
     let state = initialState.clone();
     let newTarget = state.GetCombatant(target);
-    if (checkResult >= 16) {
-      newTarget.takeDamage(5);
-      newTarget.tokens[Token.Action][Boost.Negative] += 2;
+    if (checkResult >= 15) {
+      newTarget.takeDamage(4);
+      newTarget.tokens[Token.Action][Boost.Negative] += 1;
       newTarget.isSuppressed = true;
     } else if (checkResult >= 10) {
-      newTarget.takeDamage(3);
+      newTarget.takeDamage(2);
+      newTarget.tokens[Token.Action][Boost.Negative] += 1;
       newTarget.isSuppressed = true;
     }
     return state;
@@ -145,17 +131,15 @@ export const HeavyMelee = new Action(
   0,
   AttackType.Melee,
   Ability.Coordination,
-  12,
-  15,
   Faction.Enemies,
   (checkResult, actor, target, initialState, ai) => {
     let state = initialState.clone();
     let newTarget = state.GetCombatant(target);
-    if (checkResult >= 15) {
-      newTarget.takeDamage(6);
+    if (checkResult >= 13) {
+      newTarget.takeDamage(5);
       newTarget.isSuppressed = true;
-    } else if (checkResult >= 12) {
-      newTarget.takeDamage(4);
+    } else if (checkResult >= 11) {
+      newTarget.takeDamage(3);
       newTarget.isSuppressed = true;
     }
     return state;
