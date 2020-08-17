@@ -101,7 +101,7 @@ export const PlayerSpec = ({
             type="number"
             min="0"
             max={maxPlayerHealth}
-            value={player.focus}
+            value={player.health}
             onChange={(event) => {
               let newHealth = event.target.valueAsNumber;
               let newPlayer = player.clone();
