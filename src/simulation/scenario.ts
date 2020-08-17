@@ -1,26 +1,28 @@
 import Combatant, { initialTokens } from "../simulation/combatants/combatant";
-import { Player, initialPlayerHealth } from "../simulation/combatants/player";
+import { Player } from "../simulation/combatants/player";
 import { CombatState } from "./state";
 import { CombatMap } from "../simulation/map/map";
 import { Action } from "../simulation/combatants/actions/action";
-import { EnemyAdvancedMeleeAttack, EnemyAdvancedCroakRoar, EnemyBasicMeleeAttack, EnemyAdvancedLeap } from "../simulation/combatants/actions/npcActions";
+import {
+  EnemyAdvancedMeleeAttack,
+  EnemyAdvancedCroakRoar,
+  EnemyBasicMeleeAttack,
+  EnemyAdvancedLeap,
+} from "../simulation/combatants/actions/npcActions";
 import { Faction } from "../enum";
 
 export class Scenario {
   enemySetByZone: ScenarioEnemySet[];
   players: ScenarioPlayer[];
-  startingFocus: number;
   map: CombatMap;
 
   constructor(
     enemySetByZone: ScenarioEnemySet[],
     players: ScenarioPlayer[],
-    startingFocus: number,
     map: CombatMap
   ) {
     this.enemySetByZone = enemySetByZone;
     this.players = players;
-    this.startingFocus = startingFocus;
     this.map = map;
   }
 }
@@ -30,17 +32,23 @@ export class ScenarioPlayer {
   weapon: Action;
   name: string;
   zone: number;
+  focus: number;
+  health: number;
 
   constructor(
     abilityScores: number[],
     weapon: Action,
     name: string,
-    zone: number
+    zone: number,
+    focus: number,
+    health: number
   ) {
     this.abilityScores = abilityScores;
     this.weapon = weapon;
     this.name = name;
     this.zone = zone;
+    this.focus = focus;
+    this.health = health;
   }
 
   clone() {
@@ -48,7 +56,9 @@ export class ScenarioPlayer {
       this.abilityScores,
       this.weapon,
       this.name,
-      this.zone
+      this.zone,
+      this.focus,
+      this.health
     );
   }
 }
@@ -68,20 +78,19 @@ export class ScenarioEnemySet {
 export const EmptyEnemySet = () => new ScenarioEnemySet([0, 0, 0, 0]);
 
 function PlayersFromScenarioPlayers(
-  scenarioPlayers: ScenarioPlayer[],
-  startingFocus: number
+  scenarioPlayers: ScenarioPlayer[]
 ): Player[] {
   let players: Player[] = scenarioPlayers.map(
     (scenarioPlayer: ScenarioPlayer, index: number) => {
       return new Player(
         index,
-        initialPlayerHealth,
+        scenarioPlayer.health,
         1,
         initialTokens(),
         scenarioPlayer.zone,
         0,
         scenarioPlayer.abilityScores,
-        startingFocus,
+        scenarioPlayer.focus,
         [scenarioPlayer.weapon],
         scenarioPlayer.name,
         false
@@ -177,11 +186,7 @@ function EnemiesFromScenarioEnemySetByZone(
 }
 
 export function InitialStateFromScenario(scenario: Scenario): CombatState {
-  let players = PlayersFromScenarioPlayers(
-    scenario.players,
-    scenario.startingFocus
-  );
-
+  let players = PlayersFromScenarioPlayers(scenario.players);
   let enemies = EnemiesFromScenarioEnemySetByZone(scenario.enemySetByZone);
 
   return new CombatState(players, enemies, scenario.map);

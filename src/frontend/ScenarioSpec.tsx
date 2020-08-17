@@ -6,7 +6,14 @@ import {
   EmptyEnemySet,
   Scenario,
 } from "../simulation/scenario";
-import { TerrainDefault, TerrainCover, TerrainUneven, TerrainUnstable, TerrainExposed, TerrainVantage } from "../simulation/map/terrain";
+import {
+  TerrainDefault,
+  TerrainCover,
+  TerrainUneven,
+  TerrainUnstable,
+  TerrainExposed,
+  TerrainVantage,
+} from "../simulation/map/terrain";
 import { CombatMap } from "../simulation/map/map";
 import { ZoneSpec } from "./zoneSpec";
 import {
@@ -20,6 +27,10 @@ import { MapVis } from "./MapVis";
 import { StatsVis } from "./StatsVis";
 import { SimulateScenario } from "../simulation/simulator";
 import { ScenarioReport } from "../simulation/statistics";
+import {
+  maxPlayerHealth,
+  maxPlayerFocus,
+} from "../simulation/combatants/player";
 
 // Player specs across the top, w/ plus button for adding more players
 // Zone layout/connections on the left
@@ -38,11 +49,46 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
     super(props);
     this.state = {
       players: [
-        new ScenarioPlayer([1, 1, 0, 0, 2], Pistol, "Captain", 0),
-        new ScenarioPlayer([1, 2, 1, 0, 0], Shotgun, "Tinkerer", 0),
-        new ScenarioPlayer([0, 0, 1, 2, 1], Pistol, "Gunslinger", 0),
-        new ScenarioPlayer([1, 0, 2, 0, 1], HeavyMelee, "Muscle", 0),
-        new ScenarioPlayer([2, 0, 1, 1, 0], LightMelee, "Thief", 0),
+        new ScenarioPlayer(
+          [1, 1, 0, 0, 2],
+          Pistol,
+          "Captain",
+          0,
+          maxPlayerFocus,
+          maxPlayerHealth
+        ),
+        new ScenarioPlayer(
+          [1, 2, 1, 0, 0],
+          Shotgun,
+          "Tinkerer",
+          0,
+          maxPlayerFocus,
+          maxPlayerHealth
+        ),
+        new ScenarioPlayer(
+          [0, 0, 1, 2, 1],
+          Pistol,
+          "Gunslinger",
+          0,
+          maxPlayerFocus,
+          maxPlayerHealth
+        ),
+        new ScenarioPlayer(
+          [1, 0, 2, 0, 1],
+          HeavyMelee,
+          "Muscle",
+          0,
+          maxPlayerFocus,
+          maxPlayerHealth
+        ),
+        new ScenarioPlayer(
+          [2, 0, 1, 1, 0],
+          LightMelee,
+          "Thief",
+          0,
+          maxPlayerFocus,
+          maxPlayerHealth
+        ),
       ],
       npcSetsByZone: [
         EmptyEnemySet(),
@@ -51,10 +97,18 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
         new ScenarioEnemySet([0, 0, 0, 1]),
         new ScenarioEnemySet([2, 0, 0, 0]),
         new ScenarioEnemySet([2, 0, 0, 0]),
-        EmptyEnemySet()
+        EmptyEnemySet(),
       ],
       map: new CombatMap(
-        [TerrainCover, TerrainUneven, TerrainExposed, TerrainUnstable, TerrainDefault, TerrainDefault, TerrainVantage],
+        [
+          TerrainCover,
+          TerrainUneven,
+          TerrainExposed,
+          TerrainUnstable,
+          TerrainDefault,
+          TerrainDefault,
+          TerrainVantage,
+        ],
         [
           [false, true, true, false, true, false, false],
           [true, false, false, true, false, false, false],
@@ -86,7 +140,7 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
         handlePlayerDelete={() => {
           this.setState((state) => {
             let newPlayers = state.players.map((player) => player.clone());
-            newPlayers.splice(index);
+            newPlayers.splice(index, 1);
             return { players: newPlayers };
           });
         }}
@@ -99,7 +153,16 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
           key="add-player-button"
           onClick={() => {
             let newPlayers = this.state.players.map((player) => player.clone());
-            newPlayers.push(new ScenarioPlayer([0, 0, 0, 0, 0], Pistol, "", 0));
+            newPlayers.push(
+              new ScenarioPlayer(
+                [0, 0, 0, 0, 0],
+                Pistol,
+                "",
+                0,
+                maxPlayerFocus,
+                maxPlayerHealth
+              )
+            );
             this.setState({ players: newPlayers });
           }}
           sx={{
@@ -180,7 +243,6 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
               new Scenario(
                 this.state.npcSetsByZone,
                 this.state.players,
-                12,
                 this.state.map
               ),
               10000

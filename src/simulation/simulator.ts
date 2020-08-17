@@ -76,15 +76,14 @@ function SimulateTurn(
       let action = bestActionAndTarget.action;
       let target = bestActionAndTarget.target;
       state = Act(state, combatant, action, target, RollDice, ai);
-    }
-    else {
+    } else {
       // move as an action
       let bestMove = ai.FindBestMove(state, combatant);
       if (bestMove !== null) {
         state = Move(state, combatant, bestMove, RollDice, ai);
       }
     }
-    if(!freeMoveTaken) {
+    if (!freeMoveTaken) {
       let bestMove = ai.FindBestMove(state, combatant);
       if (bestMove !== null) {
         state = Move(state, combatant, bestMove, RollDice, ai);
@@ -130,7 +129,7 @@ export function Move(
 ): CombatState {
   let state = initialState.clone();
   let newActor = state.GetCombatant(actor);
-  if(!isForced) {
+  if (!isForced) {
     let freeAttackers = newActor.isPlayer() ? state.enemies : state.players;
     // Filter to living, non-suppressed enemies in the same zone, with a weapon that can target
     freeAttackers = freeAttackers.filter((attacker) => {

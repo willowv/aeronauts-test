@@ -4,6 +4,10 @@ import { Label, Select, Input } from "@rebass/forms";
 import { WeaponOptions } from "../simulation/combatants/actions/playerActions";
 import { Ability } from "../enum";
 import { ScenarioPlayer } from "../simulation/scenario";
+import {
+  maxPlayerHealth,
+  maxPlayerFocus,
+} from "../simulation/combatants/player";
 
 interface AbilitySpecProps {
   name: string;
@@ -86,6 +90,42 @@ export const PlayerSpec = ({
           >
             X
           </Button>
+        </Box>
+      </Flex>
+      <Flex mx={-2} mb={3}>
+        <Box width={1 / 2} px={2}>
+          <Label>Health</Label>
+          <Input
+            id="health"
+            name="health"
+            type="number"
+            min="0"
+            max={maxPlayerHealth}
+            value={player.focus}
+            onChange={(event) => {
+              let newHealth = event.target.valueAsNumber;
+              let newPlayer = player.clone();
+              newPlayer.health = newHealth;
+              handlePlayerChange(newPlayer);
+            }}
+          />
+        </Box>
+        <Box width={1 / 2} px={2}>
+          <Label>Focus</Label>
+          <Input
+            id="focus"
+            name="focus"
+            type="number"
+            min="0"
+            max={maxPlayerFocus}
+            value={player.focus}
+            onChange={(event) => {
+              let newFocus = event.target.valueAsNumber;
+              let newPlayer = player.clone();
+              newPlayer.focus = newFocus;
+              handlePlayerChange(newPlayer);
+            }}
+          />
         </Box>
       </Flex>
       <Flex mx={-2} mb={3}>

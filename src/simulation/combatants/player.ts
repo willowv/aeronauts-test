@@ -2,7 +2,8 @@ import Combatant from "./combatant";
 import { Token, Boost, Faction } from "../../enum";
 import { Action } from "./actions/action";
 
-export const initialPlayerHealth = 15;
+export const maxPlayerHealth = 15;
+export const maxPlayerFocus = 12;
 
 export class Player extends Combatant {
   abilityScores: number[];
@@ -33,7 +34,7 @@ export class Player extends Combatant {
       actions,
       Faction.Players,
       isSuppressed,
-      initialPlayerHealth
+      maxPlayerHealth
     );
     this.abilityScores = [...abilityScores];
     this.focus = focus;

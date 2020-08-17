@@ -28,10 +28,8 @@ export class CombatState {
       .every((enemy) => enemy.isDead());
   }
 
-  GetCombatantsOfFactionInZone(faction: Faction, zone: number) : Combatant[] {
-    let combatants = faction === Faction.Players
-    ? this.players
-    : this.enemies;
+  GetCombatantsOfFactionInZone(faction: Faction, zone: number): Combatant[] {
+    let combatants = faction === Faction.Players ? this.players : this.enemies;
     return combatants.filter((combatant) => combatant.zone === zone);
   }
 

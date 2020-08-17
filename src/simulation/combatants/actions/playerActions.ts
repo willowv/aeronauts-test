@@ -15,10 +15,13 @@ export const Pistol = new Action(
     if (checkResult >= 16) {
       newTarget.takeDamage(4);
       newTarget.tokens[Token.Action][Boost.Negative] += 1;
-      let alliesInZone = state.GetCombatantsOfFactionInZone(newActor.faction, newTarget.zone);
-      if(alliesInZone.length !== 0)
+      let alliesInZone = state.GetCombatantsOfFactionInZone(
+        newActor.faction,
+        newTarget.zone
+      );
+      if (alliesInZone.length !== 0)
         alliesInZone[0].tokens[Token.Defense][Boost.Positive] += 1;
-      
+
       newTarget.isSuppressed = true;
     } else if (checkResult >= 9) {
       newTarget.takeDamage(2);
@@ -65,10 +68,13 @@ export const Rifle = new Action(
     if (checkResult >= 15) {
       newTarget.takeDamage(4);
       newTarget.tokens[Token.Defense][Boost.Negative] += 1;
-      let alliesInZone = state.GetCombatantsOfFactionInZone(newActor.faction, newTarget.zone);
-      if(alliesInZone.length !== 0)
+      let alliesInZone = state.GetCombatantsOfFactionInZone(
+        newActor.faction,
+        newTarget.zone
+      );
+      if (alliesInZone.length !== 0)
         alliesInZone[0].tokens[Token.Action][Boost.Positive] += 1;
-      
+
       newTarget.isSuppressed = true;
     } else if (checkResult >= 11) {
       newTarget.takeDamage(2);
