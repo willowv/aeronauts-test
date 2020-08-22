@@ -22,8 +22,22 @@ export class CombatMap {
       let dijkstras = Dijkstras(this.moveAdjacency, zone);
       this.distanceBetween[zone] = dijkstras.distances;
       this.nextStepBetween[zone] = dijkstras.nextStepToward;
-      if (zone === 0) this.positioning = dijkstras.positioning;
     }
+    // Starting from start node, get all of the nodes that are distance 1, place them at x + 1, spread across y
+    // Then all of the nodes that are distance 2, place them at x + 2, spread across y, etc.
+    this.positioning[0] = {x: 0, y: 0};
+    let columns : number[][] = [];
+    this.distanceBetween[0].forEach((distance, zone) => {
+      if(columns[distance] === undefined)
+        columns[distance] = [];
+      
+      columns[distance].push(zone);
+    })
+    columns.forEach((zones, x) => {
+      zones.forEach((zone, y) => {
+        this.positioning[zone] = {x: x, y: y};
+      })
+    })
   }
 
   ZonesMovableFrom(zoneStart: number): number[] {
@@ -50,7 +64,6 @@ export function ZonesAdjacentTo(
 interface DijkstrasOutput {
   distances: number[];
   nextStepToward: number[];
-  positioning: XY[];
 }
 
 export function Dijkstras(
@@ -62,7 +75,6 @@ export function Dijkstras(
   let distances: number[] = []; // track distance to each zone
   let prevStep: number[] = []; // track which zone was before this on shortest path
   let zoneVisited: boolean[] = []; // track whether zone has been visited
-  let positioning: XY[] = [];
   adjacencyMatrix.forEach((_, zone) => {
     prevStep[zone] = -1;
     if (zone === zoneStart) distances[zone] = 0;
@@ -73,10 +85,8 @@ export function Dijkstras(
 
   //execute
   let zoneQueue = [zoneStart];
-  positioning[zoneStart] = { x: 0, y: 0 };
   while (zoneQueue.length > 0) {
     let zoneCur = zoneQueue.shift() ?? -1;
-    let y = 0;
     zoneVisited[zoneCur] = true;
     adjacencyMatrix.forEach((_, zone) => {
       if (adjacencyMatrix[zoneCur][zone]) {
@@ -87,10 +97,6 @@ export function Dijkstras(
         }
         if (!zoneVisited[zone]) {
           zoneQueue.push(zone);
-          if (positioning[zone] === undefined) {
-            positioning[zone] = { x: positioning[zoneCur].x + 1, y: y };
-            y++;
-          }
         }
       }
     });
@@ -114,5 +120,5 @@ export function Dijkstras(
     }
   }
 
-  return { distances, nextStepToward, positioning };
+  return { distances, nextStepToward };
 }
