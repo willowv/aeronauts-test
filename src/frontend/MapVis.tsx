@@ -45,8 +45,8 @@ const ZoneSelected = {
 };
 
 const verticalSpacing = 200;
-const horizontalSpacing = 300;
-const margins = 50;
+const horizontalSpacing = 240;
+const margins = 20;
 
 export const MapVis = ({
   map,
@@ -55,7 +55,7 @@ export const MapVis = ({
   setSelectedZone,
   enemySetByZone,
 }: MapVisProps) => {
-  let flowpoints: JSX.Element[] = map.terrain.map((terrain, zone) => {
+  let flowpoints: JSX.Element[] = map.zoneNames.map((name, zone) => {
     let x = map.positioning[zone].x * horizontalSpacing + margins;
     let y = map.positioning[zone].y * verticalSpacing + margins;
     let outputs = map
@@ -102,8 +102,7 @@ export const MapVis = ({
         }}
       >
         <Card sx={style}>
-          <Heading as="h3">{"Zone " + zone}</Heading>
-          <p>{"Terrain: " + terrain.name}</p>
+          <Heading as="h3">{name}</Heading>
           {players2.map((player, index) => (
             <Box key={index} sx={PlayerBadgeStyle}>
               {player.name}

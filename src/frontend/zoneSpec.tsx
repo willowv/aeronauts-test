@@ -1,7 +1,6 @@
 import * as React from "react";
-import { Terrain, TerrainOptions } from "../simulation/map/terrain";
 import { Card, Heading, Box, Flex } from "rebass";
-import { Label, Select, Input } from "@rebass/forms";
+import { Label, Input } from "@rebass/forms";
 import { ScenarioEnemySet } from "../simulation/scenario";
 import { EnemyType } from "../enum";
 
@@ -41,16 +40,12 @@ const NpcSpec = ({
 interface ZoneSpecProps {
   zone: number;
   npcs: ScenarioEnemySet;
-  terrain: Terrain;
-  handleTerrainChange: (newTerrain: Terrain) => void;
   handleNpcsChange: (npcs: ScenarioEnemySet) => void;
 }
 
 export const ZoneSpec = ({
   zone,
   npcs,
-  terrain,
-  handleTerrainChange,
   handleNpcsChange,
 }: ZoneSpecProps) => {
   return (
@@ -64,20 +59,6 @@ export const ZoneSpec = ({
       }}
     >
       <Heading as="h3">{"Zone " + zone}</Heading>
-      <Label>Terrain</Label>
-      <Select
-        id="terrain"
-        name="terrain"
-        value={terrain.name}
-        onChange={(event) => {
-          let newTerrain = TerrainOptions[event.target.selectedIndex];
-          handleTerrainChange(newTerrain);
-        }}
-      >
-        {TerrainOptions.map((terrain, index) => (
-          <option key={index}>{terrain.name}</option>
-        ))}
-      </Select>
       <Heading as="h4">Enemies</Heading>
       <Flex mx={-2} mb={3}>
         <NpcSpec

@@ -1,43 +1,38 @@
-import { Terrain } from "./terrain";
-
 interface XY {
   x: number;
   y: number;
 }
 
 export class CombatMap {
-  terrain: Terrain[];
   moveAdjacency: boolean[][]; // X,Y is true if zone X and zone Y are adjacent, false otherwise
   distanceBetween: number[][]; // X,Y is the number of moves to get between X and Y
   nextStepBetween: number[][]; // X, Y is the next move you would take to go shortest path from X to Y
   positioning: XY[]; // calculate positions of these nodes for visualization
+  zoneNames: string[];
 
-  constructor(terrain: Terrain[], moveAdjacency: boolean[][]) {
-    this.terrain = terrain;
+  constructor(zoneNames: string[], moveAdjacency: boolean[][]) {
     this.moveAdjacency = moveAdjacency;
     this.distanceBetween = [];
     this.nextStepBetween = [];
     this.positioning = [];
-    for (let zone = 0; zone < this.terrain.length; zone++) {
+    this.zoneNames = zoneNames;
+    for (let zone = 0; zone < this.moveAdjacency.length; zone++) {
       let dijkstras = Dijkstras(this.moveAdjacency, zone);
       this.distanceBetween[zone] = dijkstras.distances;
       this.nextStepBetween[zone] = dijkstras.nextStepToward;
     }
-    // Starting from start node, get all of the nodes that are distance 1, place them at x + 1, spread across y
-    // Then all of the nodes that are distance 2, place them at x + 2, spread across y, etc.
-    this.positioning[0] = {x: 0, y: 0};
-    let columns : number[][] = [];
-    this.distanceBetween[0].forEach((distance, zone) => {
-      if(columns[distance] === undefined)
-        columns[distance] = [];
-      
-      columns[distance].push(zone);
-    })
-    columns.forEach((zones, x) => {
-      zones.forEach((zone, y) => {
-        this.positioning[zone] = {x: x, y: y};
-      })
-    })
+    // Hardcode the positioning of zones for air combat
+    this.positioning[0] = {x: 2, y: 1};
+    this.positioning[1] = {x: 1, y: 0};
+    this.positioning[2] = {x: 1, y: 2};
+    this.positioning[3] = {x: 0, y: 1};
+    this.positioning[4] = {x: 4, y: 1};
+    this.positioning[5] = {x: 5, y: 0};
+    this.positioning[6] = {x: 5, y: 2};
+    this.positioning[7] = {x: 6, y: 1};
+    this.positioning[8] = {x: 3, y: 1};
+    this.positioning[9] = {x: 1, y: 1};
+    this.positioning[10] = {x: 5, y: 1};
   }
 
   ZonesMovableFrom(zoneStart: number): number[] {
@@ -45,7 +40,7 @@ export class CombatMap {
   }
 
   clone() {
-    return new CombatMap(this.terrain, this.moveAdjacency);
+    return new CombatMap(this.zoneNames, this.moveAdjacency);
   }
 }
 

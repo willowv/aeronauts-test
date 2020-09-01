@@ -17,7 +17,7 @@ import {
   maxPlayerHealth,
   maxPlayerFocus,
 } from "../simulation/combatants/player";
-import { scenarioGenCon2020 } from "../scenarios/genCon2020";
+import { airTest1 } from "../scenarios/airTest1";
 
 // Player specs across the top, w/ plus button for adding more players
 // Zone layout/connections on the left
@@ -34,7 +34,7 @@ interface ScenarioSpecState {
 export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
   constructor(props: any) {
     super(props);
-    this.state = scenarioGenCon2020();
+    this.state = airTest1();
   }
 
   render() {
@@ -42,7 +42,7 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
       <PlayerSpec
         key={index}
         player={player}
-        zonesAvailable={this.state.map.terrain.length}
+        zonesAvailable={this.state.map.moveAdjacency.length}
         handlePlayerChange={(newPlayer) => {
           this.setState((state) => {
             let newPlayers = state.players.map((player) => player.clone());
@@ -130,7 +130,6 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
           <ZoneSpec
             zone={this.state.selectedZone}
             npcs={this.state.npcSetsByZone[this.state.selectedZone]}
-            terrain={this.state.map.terrain[this.state.selectedZone]}
             handleNpcsChange={(newNpcSet) => {
               this.setState((state: ScenarioSpecState) => {
                 let newNpcSetsByZone = state.npcSetsByZone.map((npcSet) =>
@@ -138,13 +137,6 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
                 );
                 newNpcSetsByZone[state.selectedZone] = newNpcSet;
                 return { npcSetsByZone: newNpcSetsByZone };
-              });
-            }}
-            handleTerrainChange={(newTerrain) => {
-              this.setState((state: ScenarioSpecState) => {
-                let newMap = state.map.clone();
-                newMap.terrain[state.selectedZone] = newTerrain;
-                return { map: newMap };
               });
             }}
           />

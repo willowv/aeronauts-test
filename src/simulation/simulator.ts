@@ -181,11 +181,7 @@ export function GetModifierBoostAndStateForPlayerRoll(
   }
 
   // how does source and target terrain affect this?
-  let sourceTerrain = state.map.terrain[newAttacker.zone];
-  let targetTerrain = state.map.terrain[newTarget.zone];
-  let boost =
-    sourceTerrain.attackBoost(attackType) +
-    targetTerrain.defenseBoost(attackType);
+  let boost = 0;
   if (newAttacker.tokens[Token.Action][Boost.Negative] > 0) {
     newAttacker.tokens[Token.Action][Boost.Negative] -= 1;
     boost -= 1;
