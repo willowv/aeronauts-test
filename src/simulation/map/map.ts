@@ -24,12 +24,12 @@ export class CombatMap {
     // Hardcode the positioning of zones for air combat
     this.positioning[0] = {x: 2, y: 1};
     this.positioning[1] = {x: 1, y: 0};
-    this.positioning[2] = {x: 1, y: 2};
-    this.positioning[3] = {x: 0, y: 1};
+    this.positioning[2] = {x: 0, y: 1};
+    this.positioning[3] = {x: 1, y: 2};
     this.positioning[4] = {x: 4, y: 1};
-    this.positioning[5] = {x: 5, y: 0};
-    this.positioning[6] = {x: 5, y: 2};
-    this.positioning[7] = {x: 6, y: 1};
+    this.positioning[5] = {x: 5, y: 2};
+    this.positioning[6] = {x: 6, y: 1};
+    this.positioning[7] = {x: 5, y: 0};
     this.positioning[8] = {x: 3, y: 1};
     this.positioning[9] = {x: 1, y: 1};
     this.positioning[10] = {x: 5, y: 1};

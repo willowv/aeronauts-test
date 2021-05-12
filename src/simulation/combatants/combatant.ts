@@ -1,76 +1,47 @@
 import { Action } from "./actions/action";
 import { Faction } from "../../enum";
+import Target from "./target";
 
-export const initialTokens = () => [
-  [0, 0],
-  [0, 0],
-];
-
-export class Combatant {
+export class Combatant extends Target {
   index: number;
-  health: number;
+  zone: number;
   actions: Action[];
   actionsPerTurn: number;
-  tokens: number[][];
-  zone: number;
   actionsTaken: number;
-  isCritical: boolean;
-  faction: Faction;
-  isSuppressed: boolean;
-  maxHealth: number;
 
   constructor(
     index: number,
-    health: number,
-    actionsPerTurn: number,
-    tokens: number[][],
     zone: number,
-    actionsTaken: number,
-    isCritical: boolean,
     actions: Action[],
+    actionsPerTurn: number,
+    actionsTaken: number,
+    health: number,
+    maxHealth: number,
+    tokens: number[][],
     faction: Faction,
-    isSuppressed: boolean,
-    maxHealth: number
+    isSuppressed: boolean
   ) {
+    super(health, maxHealth, tokens, faction, isSuppressed);
     this.index = index;
-    this.health = health;
-    this.actionsPerTurn = actionsPerTurn;
-    this.tokens = tokens;
     this.zone = zone;
-    this.actionsTaken = actionsTaken;
-    this.isCritical = isCritical;
     this.actions = actions;
-    this.faction = faction;
-    this.isSuppressed = isSuppressed;
-    this.maxHealth = maxHealth;
-  }
-
-  isDead(): boolean {
-    return this.health <= 0;
+    this.actionsPerTurn = actionsPerTurn;
+    this.actionsTaken = actionsTaken;
   }
 
   clone(): Combatant {
     return new Combatant(
       this.index,
-      this.health,
-      this.actionsPerTurn,
-      this.tokens,
       this.zone,
-      this.actionsTaken,
-      this.isCritical,
       this.actions,
+      this.actionsPerTurn,
+      this.actionsTaken,
+      this.health,
+      this.maxHealth,
+      this.tokens,
       this.faction,
-      this.isSuppressed,
-      this.maxHealth
+      this.isSuppressed
     );
-  }
-
-  isPlayer(): boolean {
-    return this.faction === Faction.Players;
-  }
-
-  takeDamage(damage: number) {
-    this.health -= damage;
   }
 }
 export default Combatant;
