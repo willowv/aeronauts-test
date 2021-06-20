@@ -81,8 +81,7 @@ function PlayersFromScenarioPlayers(
         scenarioPlayer.abilityScores,
         scenarioPlayer.focus,
         [scenarioPlayer.weapon],
-        scenarioPlayer.name,
-        false
+        scenarioPlayer.name
       );
     }
   );
@@ -99,7 +98,6 @@ const CreateNormalEnemy = (index: number, isCritical: boolean) =>
     isCritical,
     [EnemyBasicAttack],
     Faction.Enemies,
-    false,
     4
   );
 const CreateDangerousEnemy = (
@@ -115,7 +113,6 @@ const CreateDangerousEnemy = (
     isCritical,
     [EnemyAdvancedAttack],
     Faction.Enemies,
-    false,
     8
   );
 const CreateToughEnemy = (index: number, isCritical: boolean) =>
@@ -128,7 +125,6 @@ const CreateToughEnemy = (index: number, isCritical: boolean) =>
     isCritical,
     [EnemyAdvancedAttack],
     Faction.Enemies,
-    false,
     12
   );
 const CreateScaryEnemy = (index: number, isCritical: boolean) =>
@@ -141,7 +137,6 @@ const CreateScaryEnemy = (index: number, isCritical: boolean) =>
     isCritical,
     [EnemyAdvancedAttack],
     Faction.Enemies,
-    false,
     16
   );
 

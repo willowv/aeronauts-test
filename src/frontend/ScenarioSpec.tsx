@@ -15,6 +15,7 @@ import {
   maxPlayerFocus,
 } from "../simulation/combatants/player";
 import { scenarioGenCon2020 } from "../scenarios/genCon2020";
+import { EnemySpec } from "./EnemiesSpec";
 
 // Player specs across the top, w/ plus button for adding more players
 
@@ -98,6 +99,16 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
         }}
       >
         <Flex flexWrap="wrap">{playerSpecs}</Flex>
+        <Flex flexWrap="wrap">
+          <EnemySpec
+            npcs={this.state.enemySet}
+            handleNpcsChange={(newEnemySet : ScenarioEnemySet) => {
+              this.setState((prevState) => {
+                return { enemySet: newEnemySet };
+              });
+            }}
+          />
+        </Flex>
         <StatsVis
           reports={this.state.reports}
           triggerNewSimulation={() => {

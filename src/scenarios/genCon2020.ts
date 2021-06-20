@@ -1,11 +1,9 @@
 import {
   ScenarioPlayer,
-  EmptyEnemySet,
   ScenarioEnemySet,
 } from "../simulation/scenario";
 import {
-  Attack,
-  Defend
+  Attack
 } from "../simulation/combatants/actions/playerActions";
 import {
   maxPlayerFocus,
