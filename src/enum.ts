@@ -16,12 +16,6 @@ export enum Ability {
   Conviction,
 }
 
-export enum AttackType {
-  Ranged = 0,
-  Melee,
-  Special,
-}
-
 export enum EnemyType {
   Normal = 0,
   Dangerous,

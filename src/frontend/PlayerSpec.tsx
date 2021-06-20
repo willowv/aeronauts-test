@@ -45,14 +45,12 @@ const AbilitySpec = ({
 
 interface PlayerSpecProps {
   player: ScenarioPlayer;
-  zonesAvailable: number;
   handlePlayerChange: (newPlayer: ScenarioPlayer) => void;
   handlePlayerDelete: () => void;
 }
 
 export const PlayerSpec = ({
   player,
-  zonesAvailable,
   handlePlayerChange,
   handlePlayerDelete,
 }: PlayerSpecProps) => {
@@ -175,21 +173,6 @@ export const PlayerSpec = ({
           <option key={index}>{weapon.name}</option>
         ))}
       </Select>
-      <Label>Zone</Label>
-      <Input
-        id="zone"
-        name="zone"
-        type="number"
-        min="0"
-        max={zonesAvailable - 1}
-        value={player.zone}
-        onChange={(event) => {
-          let newZone = event.target.valueAsNumber;
-          let newPlayer = player.clone();
-          newPlayer.zone = newZone;
-          handlePlayerChange(newPlayer);
-        }}
-      />
     </Card>
   );
 };

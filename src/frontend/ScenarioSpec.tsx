@@ -5,11 +5,8 @@ import {
   ScenarioPlayer,
   Scenario,
 } from "../simulation/scenario";
-import { CombatMap } from "../simulation/map/map";
-import { ZoneSpec } from "./zoneSpec";
-import { Pistol } from "../simulation/combatants/actions/playerActions";
+import { Attack } from "../simulation/combatants/actions/playerActions";
 import { PlayerSpec } from "./PlayerSpec";
-import { MapVis } from "./MapVis";
 import { StatsVis } from "./StatsVis";
 import { SimulateScenario } from "../simulation/simulator";
 import { ScenarioReport } from "../simulation/statistics";
@@ -20,14 +17,10 @@ import {
 import { scenarioGenCon2020 } from "../scenarios/genCon2020";
 
 // Player specs across the top, w/ plus button for adding more players
-// Zone layout/connections on the left
-// Zone spec on the right for the selected zone
 
 interface ScenarioSpecState {
   players: ScenarioPlayer[];
-  npcSetsByZone: ScenarioEnemySet[];
-  map: CombatMap;
-  selectedZone: number;
+  enemySet: ScenarioEnemySet;
   reports: ScenarioReport[];
 }
 
@@ -42,7 +35,6 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
       <PlayerSpec
         key={index}
         player={player}
-        zonesAvailable={this.state.map.terrain.length}
         handlePlayerChange={(newPlayer) => {
           this.setState((state) => {
             let newPlayers = state.players.map((player) => player.clone());
@@ -69,9 +61,8 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
             newPlayers.push(
               new ScenarioPlayer(
                 [0, 0, 0, 0, 0],
-                Pistol,
+                Attack,
                 "",
-                0,
                 maxPlayerFocus,
                 maxPlayerHealth
               )
@@ -107,56 +98,13 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
         }}
       >
         <Flex flexWrap="wrap">{playerSpecs}</Flex>
-        <Flex flexWrap="wrap">
-          <Box
-            flex="1 1 auto"
-            sx={{
-              p: 2,
-              m: 2,
-              borderRadius: 2,
-              boxShadow: "0 0 16px rgba(0, 0, 0, .25)",
-            }}
-          >
-            <MapVis
-              map={this.state.map}
-              players={this.state.players}
-              enemySetByZone={this.state.npcSetsByZone}
-              selectedZone={this.state.selectedZone}
-              setSelectedZone={(zone: number) => {
-                this.setState({ selectedZone: zone });
-              }}
-            />
-          </Box>
-          <ZoneSpec
-            zone={this.state.selectedZone}
-            npcs={this.state.npcSetsByZone[this.state.selectedZone]}
-            terrain={this.state.map.terrain[this.state.selectedZone]}
-            handleNpcsChange={(newNpcSet) => {
-              this.setState((state: ScenarioSpecState) => {
-                let newNpcSetsByZone = state.npcSetsByZone.map((npcSet) =>
-                  npcSet.clone()
-                );
-                newNpcSetsByZone[state.selectedZone] = newNpcSet;
-                return { npcSetsByZone: newNpcSetsByZone };
-              });
-            }}
-            handleTerrainChange={(newTerrain) => {
-              this.setState((state: ScenarioSpecState) => {
-                let newMap = state.map.clone();
-                newMap.terrain[state.selectedZone] = newTerrain;
-                return { map: newMap };
-              });
-            }}
-          />
-        </Flex>
         <StatsVis
           reports={this.state.reports}
           triggerNewSimulation={() => {
             let newReport = SimulateScenario(
               new Scenario(
-                this.state.npcSetsByZone,
-                this.state.players,
-                this.state.map
+                this.state.enemySet,
+                this.state.players
               ),
               10000
             );

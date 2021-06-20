@@ -12,7 +12,6 @@ export class Combatant {
   actions: Action[];
   actionsPerTurn: number;
   tokens: number[][];
-  zone: number;
   actionsTaken: number;
   isCritical: boolean;
   faction: Faction;
@@ -24,7 +23,6 @@ export class Combatant {
     health: number,
     actionsPerTurn: number,
     tokens: number[][],
-    zone: number,
     actionsTaken: number,
     isCritical: boolean,
     actions: Action[],
@@ -36,7 +34,6 @@ export class Combatant {
     this.health = health;
     this.actionsPerTurn = actionsPerTurn;
     this.tokens = tokens;
-    this.zone = zone;
     this.actionsTaken = actionsTaken;
     this.isCritical = isCritical;
     this.actions = actions;
@@ -55,7 +52,6 @@ export class Combatant {
       this.health,
       this.actionsPerTurn,
       this.tokens,
-      this.zone,
       this.actionsTaken,
       this.isCritical,
       this.actions,

@@ -1,17 +1,13 @@
 import { Player } from "./combatants/player";
-import { CombatMap } from "./map/map";
 import Combatant from "./combatants/combatant";
-import { Faction } from "../enum";
 
 export class CombatState {
   players: Player[];
   enemies: Combatant[];
-  map: CombatMap;
 
-  constructor(players: Player[], enemies: Combatant[], map: CombatMap) {
+  constructor(players: Player[], enemies: Combatant[]) {
     this.players = players;
     this.enemies = enemies;
-    this.map = map;
   }
 
   ArePlayersDefeated(): boolean {
@@ -26,11 +22,6 @@ export class CombatState {
     return this.enemies
       .filter((enemy) => enemy.isCritical)
       .every((enemy) => enemy.isDead());
-  }
-
-  GetCombatantsOfFactionInZone(faction: Faction, zone: number): Combatant[] {
-    let combatants = faction === Faction.Players ? this.players : this.enemies;
-    return combatants.filter((combatant) => combatant.zone === zone);
   }
 
   GetCombatant(combatant: Combatant): Combatant {
@@ -49,20 +40,6 @@ export class CombatState {
   clone(): CombatState {
     let clonePlayers = this.players.map((player) => player.clone());
     let cloneEnemies = this.enemies.map((combatant) => combatant.clone());
-    return new CombatState(clonePlayers, cloneEnemies, this.map);
-  }
-
-  ClearSuppression(): CombatState {
-    let clonePlayers = this.players.map((player) => {
-      let newPlayer = player.clone();
-      newPlayer.isSuppressed = false;
-      return newPlayer;
-    });
-    let cloneEnemies = this.enemies.map((combatant) => {
-      let newCombatant = combatant.clone();
-      newCombatant.isSuppressed = false;
-      return newCombatant;
-    });
-    return new CombatState(clonePlayers, cloneEnemies, this.map);
+    return new CombatState(clonePlayers, cloneEnemies);
   }
 }

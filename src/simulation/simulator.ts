@@ -1,5 +1,5 @@
 import { CombatState } from "./state";
-import { Token, Boost, AttackType, Ability } from "../enum";
+import { Token, Boost, Ability } from "../enum";
 import { Scenario, InitialStateFromScenario } from "./scenario";
 import Combatant from "./combatants/combatant";
 import {
@@ -55,7 +55,7 @@ function SimulateRound(initialState: CombatState): CombatState {
     if (currentEnemy.isDead()) return; // dead enemies don't get a turn
     state = SimulateTurn(EnemyAI, state, currentEnemy);
   });
-  return state.ClearSuppression();
+  return state;
 }
 
 function SimulateTurn(
@@ -64,31 +64,12 @@ function SimulateTurn(
   combatant: Combatant
 ): CombatState {
   let state = initialState;
-  let freeMoveTaken = false;
-  let bestMove = ai.FindBestMove(state, combatant);
-  if (bestMove !== null) {
-    state = Move(state, combatant, bestMove, RollDice, ai);
-    freeMoveTaken = true;
-  }
   for (let actionNum = 0; actionNum < combatant.actionsPerTurn; actionNum++) {
     let bestActionAndTarget = ai.FindBestActionAndTarget(state, combatant);
     if (bestActionAndTarget !== null) {
       let action = bestActionAndTarget.action;
       let target = bestActionAndTarget.target;
       state = Act(state, combatant, action, target, RollDice, ai);
-    } else {
-      // move as an action
-      let bestMove = ai.FindBestMove(state, combatant);
-      if (bestMove !== null) {
-        state = Move(state, combatant, bestMove, RollDice, ai);
-      }
-    }
-    if (!freeMoveTaken) {
-      let bestMove = ai.FindBestMove(state, combatant);
-      if (bestMove !== null) {
-        state = Move(state, combatant, bestMove, RollDice, ai);
-        freeMoveTaken = true;
-      }
     }
     let newCombatant = state.GetCombatant(combatant);
     newCombatant.actionsTaken++;
@@ -112,44 +93,10 @@ export function Act(
     initialState,
     actor,
     target,
-    action.ability,
-    action.type
+    action.ability
   );
   let checkResult = checkEvaluator(modifier, boost);
   return action.evaluate(checkResult, actor, target, actionState, ai);
-}
-
-export function Move(
-  initialState: CombatState,
-  actor: Combatant,
-  zoneDest: number,
-  checkEvaluator: (modifier: number, boost: number) => number,
-  ai: AI,
-  isForced: boolean = false
-): CombatState {
-  let state = initialState.clone();
-  let newActor = state.GetCombatant(actor);
-  if (!isForced) {
-    let freeAttackers = newActor.isPlayer() ? state.enemies : state.players;
-    // Filter to living, non-suppressed enemies in the same zone, with a weapon that can target
-    freeAttackers = freeAttackers.filter((attacker) => {
-      let weapon = attacker.actions[0];
-      return (
-        !attacker.isDead() &&
-        attacker.zone === newActor.zone &&
-        !attacker.isSuppressed &&
-        weapon.minRange === 0
-      );
-    });
-    // Execute attacks
-    freeAttackers.forEach((freeAttacker) => {
-      let weapon = freeAttacker.actions[0];
-      state = Act(state, freeAttacker, weapon, newActor, checkEvaluator, ai);
-      newActor = state.GetCombatant(newActor);
-    });
-  }
-  newActor.zone = zoneDest;
-  return state;
 }
 
 // does not mutate
@@ -157,8 +104,7 @@ export function GetModifierBoostAndStateForPlayerRoll(
   initialState: CombatState,
   attacker: Combatant,
   target: Combatant,
-  ability: Ability,
-  attackType: AttackType
+  ability: Ability
 ): { modifier: number; boost: number; state: CombatState } {
   let state = initialState.clone();
   let newAttacker = state.GetCombatant(attacker);
@@ -181,11 +127,7 @@ export function GetModifierBoostAndStateForPlayerRoll(
   }
 
   // how does source and target terrain affect this?
-  let sourceTerrain = state.map.terrain[newAttacker.zone];
-  let targetTerrain = state.map.terrain[newTarget.zone];
-  let boost =
-    sourceTerrain.attackBoost(attackType) +
-    targetTerrain.defenseBoost(attackType);
+  let boost = 0;
   if (newAttacker.tokens[Token.Action][Boost.Negative] > 0) {
     newAttacker.tokens[Token.Action][Boost.Negative] -= 1;
     boost -= 1;
