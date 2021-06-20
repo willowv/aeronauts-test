@@ -20,7 +20,6 @@ export class Player extends Combatant {
     focus: number,
     actions: Action[],
     name: string,
-    isSuppressed: boolean
   ) {
     super(
       index,
@@ -31,7 +30,6 @@ export class Player extends Combatant {
       true /* players are always critical */,
       actions,
       Faction.Players,
-      isSuppressed,
       maxPlayerHealth
     );
     this.abilityScores = [...abilityScores];
@@ -49,8 +47,7 @@ export class Player extends Combatant {
       this.abilityScores,
       this.focus,
       this.actions,
-      this.name,
-      this.isSuppressed
+      this.name
     );
   }
 
