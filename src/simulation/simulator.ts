@@ -9,10 +9,7 @@ import {
   CombatReport,
 } from "./statistics";
 import { Player } from "./combatants/player";
-import { PlayerAI } from "./combatants/ai/playerAi";
 import { RollDice } from "./dice";
-import { AI } from "./combatants/ai/ai";
-import { EnemyAI } from "./combatants/ai/enemyAi";
 import { Action } from "./combatants/actions/action";
 
 const roundLimit = 20;
@@ -48,28 +45,27 @@ function SimulateRound(initialState: CombatState): CombatState {
   state.players.forEach((player) => {
     let currentPlayer = state.GetCombatant(player);
     if (currentPlayer.isDead()) return; // dead players don't get a turn
-    state = SimulateTurn(PlayerAI, state, currentPlayer);
+    state = SimulateTurn(state, currentPlayer);
   });
   state.enemies.forEach((enemy) => {
     let currentEnemy = state.GetCombatant(enemy);
     if (currentEnemy.isDead()) return; // dead enemies don't get a turn
-    state = SimulateTurn(EnemyAI, state, currentEnemy);
+    state = SimulateTurn(state, currentEnemy);
   });
   return state;
 }
 
 function SimulateTurn(
-  ai: AI,
   initialState: CombatState,
   combatant: Combatant
 ): CombatState {
   let state = initialState;
   for (let actionNum = 0; actionNum < combatant.actionsPerTurn; actionNum++) {
-    let bestActionAndTarget = ai.FindBestActionAndTarget(state, combatant);
+    let bestActionAndTarget = combatant.ai.FindBestActionAndTarget(state, combatant);
     if (bestActionAndTarget !== null) {
       let action = bestActionAndTarget.action;
       let target = bestActionAndTarget.target;
-      state = Act(state, combatant, action, target, RollDice, ai);
+      state = Act(state, combatant, action, target, RollDice);
     }
     let newCombatant = state.GetCombatant(combatant);
     newCombatant.actionsTaken++;
@@ -82,8 +78,7 @@ export function Act(
   actor: Combatant,
   action: Action,
   target: Combatant,
-  checkEvaluator: (modifier: number, boost: number) => number,
-  ai: AI
+  checkEvaluator: (modifier: number, boost: number) => number
 ): CombatState {
   let {
     modifier,
@@ -96,7 +91,7 @@ export function Act(
     action.ability
   );
   let checkResult = checkEvaluator(modifier, boost);
-  return action.evaluate(checkResult, actor, target, actionState, ai);
+  return action.evaluate(checkResult, actor, target, actionState);
 }
 
 // does not mutate

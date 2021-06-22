@@ -1,67 +1,68 @@
 import { AI } from "./ai";
 import Combatant from "../combatant";
-import { Token, Boost } from "../../../enum";
+import { Token, Boost, Ability } from "../../../enum";
+import { Action } from "../actions/action";
+import { Attack, Defend } from "../actions/playerActions";
+import { CombatState } from "../../state";
 
-const minimum = (array: number[]) => Math.min(...array);
-const sum = (array: number[]) => array.reduce((x, y) => x + y, 0);
+export class PlayerAI implements AI {
+  primaryTarget: Combatant | null;
 
-export const PlayerAI = new AI("Player", (state) => {
-  // player health and deaths - stay alive
-  let alivePlayers = state.players.filter((player) => !player.isDead());
-  let playerHealths = alivePlayers.map((player) => player.health);
+  constructor() {
+    this.primaryTarget = null;
+  }
 
-  let playerHealthScore = 0;
-  playerHealthScore += minimum(playerHealths); // encourage distributing damage
+  FindBestActionAndTarget(
+    initialState: CombatState,
+    self: Combatant
+  ): { action: Action; target: Combatant } | null {
+    // Filter allies for: doesn't have defense tokens, less than 10 health
+    let alliesNeedingDefense = initialState.players
+      .filter(
+        (ally) =>
+          ally !== self &&
+          ally.tokens[Token.Defense][Boost.Positive] === 0 &&
+          ally.health < 10 &&
+          !ally.isDead()
+      )
+      .sort((allyA, allyB) => allyA.health - allyB.health);
 
-  // enemy health and kills - make progress
-  let aliveEnemies = state.enemies.filter((enemy) => !enemy.isDead());
-  let deadEnemies = state.enemies.filter((enemy) => enemy.isDead());
-  let enemyHealthScore = 0;
-  enemyHealthScore += sum(
-    aliveEnemies.map((enemy) => enemy.maxHealth - enemy.health)
-  );
-  enemyHealthScore += sum(
-    deadEnemies.map((enemy) => enemy.maxHealth + enemy.actionsPerTurn) // encourage kills
-  );
+    if (alliesNeedingDefense.length !== 0) {
+      let allyToDefend = alliesNeedingDefense[0];
+      let playerSelf = initialState.GetCombatantAsPlayer(self);
+      let points = 0;
+      // Figure number of points - 1 for each tier down, 1 for each point of perception
+      if (allyToDefend.health < 10) points++;
+      if (allyToDefend.health <= 5) points++;
+      points += playerSelf?.abilityScores[Ability.Perception] ?? 0;
 
-  // Return true if some action has at least one valid target
-  let canTargetAny = (player: Combatant) =>
-    player.actions.some((action) => {
-      let targets = action.GetValidTargets(state, player);
-      return targets.length > 0;
-    });
+      // Roll to determine whether to defend this ally or attack
+      let threshold = 0.125 * points;
+      let roll = Math.random();
+      if (roll < threshold) return { action: Defend, target: allyToDefend };
+    }
 
-  let canTarget = (actor: Combatant, target: Combatant) =>
-    actor.actions.some((action) => {
-      let targets = action.GetValidTargets(state, actor);
-      return targets.some((target2) => target2 === target);
-    });
+    let effectiveHealth: (enemy: Combatant) => number = (enemy) =>
+      enemy.health -
+      enemy.tokens[Token.Defense][Boost.Negative] +
+      enemy.tokens[Token.Defense][Boost.Positive];
 
-  let threatOn = (player: Combatant) => {
-    return sum(
-      aliveEnemies.map((enemy) => {
-        return canTarget(enemy, player) ? enemy.actionsPerTurn : 0;
-      })
-    );
-  };
+    let enemiesCloseToDeath = initialState.enemies
+      .filter((enemy) => !enemy.isDead() && effectiveHealth(enemy) <= 3)
+      .sort(
+        (enemyA, enemyB) => effectiveHealth(enemyA) - effectiveHealth(enemyB)
+      );
 
-  // Measures potential damage / harm from this position and token set up.
-  let positioningScore = sum(
-    alivePlayers.map((player) => {
-      // x3 is based on player actions having expected value 3 (from external calculation)
-      let offenseScore = canTargetAny(player)
-        ? player.actionsPerTurn * 3 +
-          player.tokens[Token.Action][Boost.Positive] -
-          player.tokens[Token.Action][Boost.Negative]
-        : 0;
-      // x2 is based on enemy actions having expected value 2 (from external calculation)
-      let defenseScore =
-        player.health -
-        threatOn(player) * 2 +
-        player.tokens[Token.Defense][Boost.Positive] -
-        player.tokens[Token.Defense][Boost.Negative];
-      return offenseScore + defenseScore;
-    })
-  );
-  return playerHealthScore + enemyHealthScore + positioningScore;
-});
+    if (enemiesCloseToDeath.length !== 0) {
+      return { action: Attack, target: enemiesCloseToDeath[0] };
+    }
+
+    if (this.primaryTarget === null || this.primaryTarget.isDead()) {
+      let targets = Attack.GetValidTargets(initialState, self);
+      let index = Math.round(Math.random() * (targets.length - 1));
+      this.primaryTarget = targets[index];
+    }
+
+    return { action: Attack, target: this.primaryTarget };
+  }
+}

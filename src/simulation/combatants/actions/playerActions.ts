@@ -1,11 +1,11 @@
-import { Ability, Faction } from "../../../enum";
+import { Ability, Boost, Faction, Token } from "../../../enum";
 import { Action } from "./action";
 
 export const Attack = new Action(
   "Attack",
   Ability.Coordination,
   Faction.Enemies,
-  (checkResult, actor, target, initialState, ai) => {
+  (checkResult, actor, target, initialState) => {
     let state = initialState.clone();
     let newTarget = state.GetCombatant(target);
     if (checkResult >= 15) {
@@ -21,19 +21,17 @@ export const Defend = new Action(
   "Defend",
   Ability.Perception,
   Faction.Players,
-  (checkResult, actor, target, initialState, ai) => {
+  (checkResult, actor, target, initialState) => {
     let state = initialState.clone();
     let newTarget = state.GetCombatant(target);
     if (checkResult >= 15) {
-      newTarget.health += 5;
+      newTarget.tokens[Token.Defense][Boost.Positive] += 3;
+      newTarget.health += 2;
     } else if (checkResult >= 10) {
-      newTarget.health += 3;
+      newTarget.tokens[Token.Defense][Boost.Positive] += 3;
     }
     return state;
   }
 );
 
-export const WeaponOptions = [
-  Attack,
-  Defend
-];
+export const WeaponOptions = [Attack, Defend];

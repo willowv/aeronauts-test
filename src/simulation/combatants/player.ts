@@ -1,6 +1,7 @@
 import Combatant from "./combatant";
 import { Token, Boost, Faction } from "../../enum";
 import { Action } from "./actions/action";
+import { AI } from "./ai/ai";
 
 export const maxPlayerHealth = 15;
 export const maxPlayerFocus = 12;
@@ -20,6 +21,7 @@ export class Player extends Combatant {
     focus: number,
     actions: Action[],
     name: string,
+    ai: AI
   ) {
     super(
       index,
@@ -30,7 +32,8 @@ export class Player extends Combatant {
       true /* players are always critical */,
       actions,
       Faction.Players,
-      maxPlayerHealth
+      maxPlayerHealth,
+      ai
     );
     this.abilityScores = [...abilityScores];
     this.focus = focus;
@@ -47,7 +50,8 @@ export class Player extends Combatant {
       this.abilityScores,
       this.focus,
       this.actions,
-      this.name
+      this.name,
+      this.ai
     );
   }
 

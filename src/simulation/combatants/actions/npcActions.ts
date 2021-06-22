@@ -5,7 +5,7 @@ export const EnemyBasicAttack = new Action(
   "Enemy Basic Attack",
   Ability.Agility,
   Faction.Players,
-  (checkResult, actor, target, initialState, ai) => {
+  (checkResult, actor, target, initialState) => {
     let state = initialState.clone();
     let newTarget = state.GetCombatant(target);
     if (checkResult < 10) {
@@ -21,7 +21,7 @@ export const EnemyAdvancedAttack = new Action(
   "Enemy Advanced Attack",
   Ability.Agility,
   Faction.Players,
-  (checkResult, actor, target, initialState, ai) => {
+  (checkResult, actor, target, initialState) => {
     let state = initialState.clone();
     let newTarget = state.GetCombatant(target);
     if (checkResult < 10) {

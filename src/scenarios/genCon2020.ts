@@ -1,10 +1,5 @@
-import {
-  ScenarioPlayer,
-  ScenarioEnemySet,
-} from "../simulation/scenario";
-import {
-  Attack
-} from "../simulation/combatants/actions/playerActions";
+import { ScenarioPlayer, ScenarioEnemySet } from "../simulation/scenario";
+import { Attack } from "../simulation/combatants/actions/playerActions";
 import {
   maxPlayerFocus,
   maxPlayerHealth,

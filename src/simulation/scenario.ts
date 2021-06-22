@@ -7,15 +7,14 @@ import {
   EnemyBasicAttack,
 } from "../simulation/combatants/actions/npcActions";
 import { Faction } from "../enum";
+import { PlayerAI } from "./combatants/ai/playerAi";
+import { EnemyAI } from "./combatants/ai/enemyAi";
 
 export class Scenario {
   enemySet: ScenarioEnemySet;
   players: ScenarioPlayer[];
 
-  constructor(
-    enemies: ScenarioEnemySet,
-    players: ScenarioPlayer[]
-  ) {
+  constructor(enemies: ScenarioEnemySet, players: ScenarioPlayer[]) {
     this.enemySet = enemies;
     this.players = players;
   }
@@ -81,7 +80,8 @@ function PlayersFromScenarioPlayers(
         scenarioPlayer.abilityScores,
         scenarioPlayer.focus,
         [scenarioPlayer.weapon],
-        scenarioPlayer.name
+        scenarioPlayer.name,
+        new PlayerAI()
       );
     }
   );
@@ -98,12 +98,10 @@ const CreateNormalEnemy = (index: number, isCritical: boolean) =>
     isCritical,
     [EnemyBasicAttack],
     Faction.Enemies,
-    4
+    4,
+    new EnemyAI()
   );
-const CreateDangerousEnemy = (
-  index: number,
-  isCritical: boolean
-) =>
+const CreateDangerousEnemy = (index: number, isCritical: boolean) =>
   new Combatant(
     index,
     8,
@@ -113,7 +111,8 @@ const CreateDangerousEnemy = (
     isCritical,
     [EnemyAdvancedAttack],
     Faction.Enemies,
-    8
+    8,
+    new EnemyAI()
   );
 const CreateToughEnemy = (index: number, isCritical: boolean) =>
   new Combatant(
@@ -125,7 +124,8 @@ const CreateToughEnemy = (index: number, isCritical: boolean) =>
     isCritical,
     [EnemyAdvancedAttack],
     Faction.Enemies,
-    12
+    12,
+    new EnemyAI()
   );
 const CreateScaryEnemy = (index: number, isCritical: boolean) =>
   new Combatant(
@@ -137,7 +137,8 @@ const CreateScaryEnemy = (index: number, isCritical: boolean) =>
     isCritical,
     [EnemyAdvancedAttack],
     Faction.Enemies,
-    16
+    16,
+    new EnemyAI()
   );
 
 const CreateEnemyByType = [
@@ -147,9 +148,7 @@ const CreateEnemyByType = [
   CreateScaryEnemy,
 ];
 
-function EnemiesFromScenarioEnemySet(
-  enemySet: ScenarioEnemySet
-): Combatant[] {
+function EnemiesFromScenarioEnemySet(enemySet: ScenarioEnemySet): Combatant[] {
   let enemyStartingIndex = 0;
   let enemies: Combatant[] = [];
   enemySet.countByCombatantType.forEach((count, combatantType) => {
