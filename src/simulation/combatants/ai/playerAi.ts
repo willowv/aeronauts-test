@@ -6,8 +6,6 @@ import { Attack, Defend } from "../actions/playerActions";
 import { CombatState } from "../../state";
 
 export class PlayerAI implements AI {
-  constructor() {}
-
   FindBestActionAndTarget(
     initialState: CombatState,
     self: Combatant

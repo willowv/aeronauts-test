@@ -5,8 +5,6 @@ import { CombatState } from "../../state";
 import { Faction } from "../../../enum";
 
 export class EnemyAI implements AI {
-  constructor() {}
-
   FindBestActionAndTarget(
     initialState: CombatState,
     self: Combatant

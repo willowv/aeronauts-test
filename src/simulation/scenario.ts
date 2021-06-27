@@ -6,7 +6,7 @@ import {
   EnemyAdvancedAttack,
   EnemyBasicAttack,
 } from "../simulation/combatants/actions/npcActions";
-import { Faction } from "../enum";
+import { CombatantType, Faction } from "../enum";
 import { PlayerAI } from "./combatants/ai/playerAi";
 import { EnemyAI } from "./combatants/ai/enemyAi";
 
@@ -82,7 +82,8 @@ function PlayersFromScenarioPlayers(
         scenarioPlayer.focus,
         [scenarioPlayer.weapon],
         scenarioPlayer.name,
-        new PlayerAI()
+        new PlayerAI(),
+        CombatantType.Ground
       );
     }
   );
@@ -101,7 +102,8 @@ const CreateNormalEnemy = (index: number, isCritical: boolean) =>
     [EnemyBasicAttack],
     Faction.Enemies,
     4,
-    new EnemyAI()
+    new EnemyAI(),
+    CombatantType.Ground
   );
 const CreateDangerousEnemy = (index: number, isCritical: boolean) =>
   new Combatant(
@@ -115,7 +117,8 @@ const CreateDangerousEnemy = (index: number, isCritical: boolean) =>
     [EnemyAdvancedAttack],
     Faction.Enemies,
     8,
-    new EnemyAI()
+    new EnemyAI(),
+    CombatantType.Ground
   );
 const CreateToughEnemy = (index: number, isCritical: boolean) =>
   new Combatant(
@@ -129,7 +132,8 @@ const CreateToughEnemy = (index: number, isCritical: boolean) =>
     [EnemyAdvancedAttack],
     Faction.Enemies,
     12,
-    new EnemyAI()
+    new EnemyAI(),
+    CombatantType.Ground
   );
 const CreateScaryEnemy = (index: number, isCritical: boolean) =>
   new Combatant(
@@ -143,7 +147,8 @@ const CreateScaryEnemy = (index: number, isCritical: boolean) =>
     [EnemyAdvancedAttack],
     Faction.Enemies,
     16,
-    new EnemyAI()
+    new EnemyAI(),
+    CombatantType.Ground
   );
 
 const CreateEnemyByType = [

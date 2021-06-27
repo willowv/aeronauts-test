@@ -1,5 +1,5 @@
 import { Action } from "./actions/action";
-import { Faction } from "../../enum";
+import { CombatantType, Faction } from "../../enum";
 import { AI } from "./ai/ai";
 
 export const initialTokens = () => [
@@ -19,6 +19,7 @@ export class Combatant {
   faction: Faction;
   maxHealth: number;
   ai: AI;
+  type: CombatantType
 
   constructor(
     index: number,
@@ -31,7 +32,8 @@ export class Combatant {
     actions: Action[],
     faction: Faction,
     maxHealth: number,
-    ai: AI
+    ai: AI,
+    type: CombatantType
   ) {
     this.index = index;
     this.indexTarget = indexTarget;
@@ -44,6 +46,7 @@ export class Combatant {
     this.faction = faction;
     this.maxHealth = maxHealth;
     this.ai = ai;
+    this.type = type;
   }
 
   isDead(): boolean {
@@ -62,7 +65,8 @@ export class Combatant {
       this.actions,
       this.faction,
       this.maxHealth,
-      this.ai
+      this.ai,
+      this.type
     );
   }
 

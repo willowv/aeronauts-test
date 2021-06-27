@@ -1,5 +1,5 @@
 import Combatant from "./combatant";
-import { Token, Boost, Faction } from "../../enum";
+import { Token, Boost, Faction, CombatantType } from "../../enum";
 import { Action } from "./actions/action";
 import { AI } from "./ai/ai";
 
@@ -22,7 +22,8 @@ export class Player extends Combatant {
     focus: number,
     actions: Action[],
     name: string,
-    ai: AI
+    ai: AI,
+    type: CombatantType
   ) {
     super(
       index,
@@ -35,7 +36,8 @@ export class Player extends Combatant {
       actions,
       Faction.Players,
       maxPlayerHealth,
-      ai
+      ai,
+      type
     );
     this.abilityScores = [...abilityScores];
     this.focus = focus;
@@ -54,7 +56,8 @@ export class Player extends Combatant {
       this.focus,
       this.actions,
       this.name,
-      this.ai
+      this.ai,
+      this.type
     );
   }
 

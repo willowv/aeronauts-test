@@ -23,6 +23,13 @@ export enum EnemyType {
   Scary,
 }
 
+export enum CombatantType {
+  Ground = 0,
+  Fighter,
+  Crew,
+  Airship
+}
+
 export enum Faction {
   Players,
   Enemies,
