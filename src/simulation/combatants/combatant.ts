@@ -9,6 +9,7 @@ export const initialTokens = () => [
 
 export class Combatant {
   index: number;
+  indexTarget: number | null;
   health: number;
   actions: Action[];
   actionsPerTurn: number;
@@ -21,6 +22,7 @@ export class Combatant {
 
   constructor(
     index: number,
+    indexTarget: number | null,
     health: number,
     actionsPerTurn: number,
     tokens: number[][],
@@ -32,6 +34,7 @@ export class Combatant {
     ai: AI
   ) {
     this.index = index;
+    this.indexTarget = indexTarget;
     this.health = health;
     this.actionsPerTurn = actionsPerTurn;
     this.tokens = tokens;
@@ -50,6 +53,7 @@ export class Combatant {
   clone(): Combatant {
     return new Combatant(
       this.index,
+      this.indexTarget,
       this.health,
       this.actionsPerTurn,
       this.tokens,

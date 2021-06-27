@@ -73,6 +73,7 @@ function PlayersFromScenarioPlayers(
     (scenarioPlayer: ScenarioPlayer, index: number) => {
       return new Player(
         index,
+        null,
         scenarioPlayer.health,
         1,
         initialTokens(),
@@ -91,6 +92,7 @@ function PlayersFromScenarioPlayers(
 const CreateNormalEnemy = (index: number, isCritical: boolean) =>
   new Combatant(
     index,
+    null,
     4,
     1,
     initialTokens(),
@@ -104,6 +106,7 @@ const CreateNormalEnemy = (index: number, isCritical: boolean) =>
 const CreateDangerousEnemy = (index: number, isCritical: boolean) =>
   new Combatant(
     index,
+    null,
     8,
     1,
     initialTokens(),
@@ -117,6 +120,7 @@ const CreateDangerousEnemy = (index: number, isCritical: boolean) =>
 const CreateToughEnemy = (index: number, isCritical: boolean) =>
   new Combatant(
     index,
+    null,
     12,
     1,
     initialTokens(),
@@ -130,6 +134,7 @@ const CreateToughEnemy = (index: number, isCritical: boolean) =>
 const CreateScaryEnemy = (index: number, isCritical: boolean) =>
   new Combatant(
     index,
+    null,
     16,
     2,
     initialTokens(),

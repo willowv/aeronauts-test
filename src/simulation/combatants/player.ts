@@ -13,6 +13,7 @@ export class Player extends Combatant {
 
   constructor(
     index: number,
+    indexTarget: number | null,
     health: number,
     actionsPerTurn: number,
     tokens: number[][],
@@ -25,6 +26,7 @@ export class Player extends Combatant {
   ) {
     super(
       index,
+      indexTarget,
       health,
       actionsPerTurn,
       tokens,
@@ -43,6 +45,7 @@ export class Player extends Combatant {
   clone(): Player {
     return new Player(
       this.index,
+      this.indexTarget,
       this.health,
       this.actionsPerTurn,
       this.tokens,

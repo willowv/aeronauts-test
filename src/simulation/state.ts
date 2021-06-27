@@ -1,5 +1,6 @@
 import { Player } from "./combatants/player";
 import Combatant from "./combatants/combatant";
+import { Faction } from "../enum";
 
 export class CombatState {
   players: Player[];
@@ -24,10 +25,14 @@ export class CombatState {
       .every((enemy) => enemy.isDead());
   }
 
-  GetCombatant(combatant: Combatant): Combatant {
-    return combatant.isPlayer()
-      ? this.players[combatant.index]
-      : this.enemies[combatant.index];
+  GetCombatant(faction: Faction, index: number) {
+    return faction === Faction.Players
+      ? this.players[index]
+      : this.enemies[index];
+  }
+
+  GetCombatantFromSelf(combatant: Combatant): Combatant {
+    return this.GetCombatant(combatant.faction, combatant.index);
   }
 
   GetCombatantAsPlayer(combatant: Combatant): Player | null {

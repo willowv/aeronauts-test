@@ -7,7 +7,7 @@ export const Attack = new Action(
   Faction.Enemies,
   (checkResult, actor, target, initialState) => {
     let state = initialState.clone();
-    let newTarget = state.GetCombatant(target);
+    let newTarget = state.GetCombatantFromSelf(target);
     if (checkResult >= 15) {
       newTarget.takeDamage(5);
     } else if (checkResult >= 10) {
@@ -23,7 +23,7 @@ export const Defend = new Action(
   Faction.Players,
   (checkResult, actor, target, initialState) => {
     let state = initialState.clone();
-    let newTarget = state.GetCombatant(target);
+    let newTarget = state.GetCombatantFromSelf(target);
     if (checkResult >= 15) {
       newTarget.tokens[Token.Defense][Boost.Positive] += 3;
       newTarget.health += 2;

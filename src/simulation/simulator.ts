@@ -43,12 +43,12 @@ function SimulateCombat(initialState: CombatState): CombatReport {
 function SimulateRound(initialState: CombatState): CombatState {
   let state = initialState;
   state.players.forEach((player) => {
-    let currentPlayer = state.GetCombatant(player);
+    let currentPlayer = state.GetCombatantFromSelf(player);
     if (currentPlayer.isDead()) return; // dead players don't get a turn
     state = SimulateTurn(state, currentPlayer);
   });
   state.enemies.forEach((enemy) => {
-    let currentEnemy = state.GetCombatant(enemy);
+    let currentEnemy = state.GetCombatantFromSelf(enemy);
     if (currentEnemy.isDead()) return; // dead enemies don't get a turn
     state = SimulateTurn(state, currentEnemy);
   });
@@ -64,10 +64,10 @@ function SimulateTurn(
     let bestActionAndTarget = combatant.ai.FindBestActionAndTarget(state, combatant);
     if (bestActionAndTarget !== null) {
       let action = bestActionAndTarget.action;
-      let target = bestActionAndTarget.target;
+      let target = state.GetCombatant(bestActionAndTarget.factionTarget, bestActionAndTarget.indexTarget);
       state = Act(state, combatant, action, target, RollDice);
     }
-    let newCombatant = state.GetCombatant(combatant);
+    let newCombatant = state.GetCombatantFromSelf(combatant);
     newCombatant.actionsTaken++;
   }
   return state;
@@ -102,8 +102,8 @@ export function GetModifierBoostAndStateForPlayerRoll(
   ability: Ability
 ): { modifier: number; boost: number; state: CombatState } {
   let state = initialState.clone();
-  let newAttacker = state.GetCombatant(attacker);
-  let newTarget = state.GetCombatant(target);
+  let newAttacker = state.GetCombatantFromSelf(attacker);
+  let newTarget = state.GetCombatantFromSelf(target);
   let isPlayerAttacking = newAttacker.isPlayer();
   let isPlayerDefending = newTarget.isPlayer();
 

@@ -1,21 +1,17 @@
 import { AI } from "./ai";
 import Combatant from "../combatant";
-import { Token, Boost, Ability } from "../../../enum";
+import { Token, Boost, Ability, Faction } from "../../../enum";
 import { Action } from "../actions/action";
 import { Attack, Defend } from "../actions/playerActions";
 import { CombatState } from "../../state";
 
 export class PlayerAI implements AI {
-  primaryTarget: Combatant | null;
-
-  constructor() {
-    this.primaryTarget = null;
-  }
+  constructor() {}
 
   FindBestActionAndTarget(
     initialState: CombatState,
     self: Combatant
-  ): { action: Action; target: Combatant } | null {
+  ): { action: Action; factionTarget: Faction; indexTarget: number } | null {
     // Filter allies for: doesn't have defense tokens, less than 10 health
     let alliesNeedingDefense = initialState.players
       .filter(
@@ -39,7 +35,7 @@ export class PlayerAI implements AI {
       // Roll to determine whether to defend this ally or attack
       let threshold = 0.125 * points;
       let roll = Math.random();
-      if (roll < threshold) return { action: Defend, target: allyToDefend };
+      if (roll < threshold) return { action: Defend, factionTarget: Faction.Players, indexTarget: allyToDefend.index };
     }
 
     let effectiveHealth: (enemy: Combatant) => number = (enemy) =>
@@ -54,15 +50,22 @@ export class PlayerAI implements AI {
       );
 
     if (enemiesCloseToDeath.length !== 0) {
-      return { action: Attack, target: enemiesCloseToDeath[0] };
+      return { action: Attack, factionTarget: Faction.Enemies, indexTarget: enemiesCloseToDeath[0].index };
     }
 
-    if (this.primaryTarget === null || this.primaryTarget.isDead()) {
+    let primaryTarget = null;
+    if(self.indexTarget !== null) {
+      primaryTarget = initialState.enemies[self.indexTarget];
+    }
+    if (primaryTarget === null || primaryTarget.isDead()) {
       let targets = Attack.GetValidTargets(initialState, self);
+      if(targets.length === 0)
+        return null;
+      
       let index = Math.round(Math.random() * (targets.length - 1));
-      this.primaryTarget = targets[index];
+      self.indexTarget = targets[index].index;
     }
 
-    return { action: Attack, target: this.primaryTarget };
+    return { action: Attack, factionTarget: Faction.Enemies, indexTarget: self.indexTarget ?? 0 };
   }
 }
