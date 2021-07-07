@@ -1,44 +1,25 @@
-import Combatant from "./combatant";
-import { Token, Boost, Faction, CombatantType } from "../../enum";
-import { Action } from "./actions/action";
-import { AI } from "./ai/ai";
-
 export const maxPlayerHealth = 15;
 export const maxPlayerFocus = 12;
 
-export class Player extends Combatant {
+export class Player {
+  indexPlayer: number;
+  indexActor: number;
+  indexTargetable: number | null;
   abilityScores: number[];
   focus: number;
   name: string;
 
   constructor(
-    index: number,
-    indexTarget: number | null,
-    health: number,
-    actionsPerTurn: number,
-    tokens: number[][],
-    actionsTaken: number,
+    indexPlayer: number,
+    indexActor: number,
+    indexTargetable: number | null,
     abilityScores: number[],
     focus: number,
-    actions: Action[],
-    name: string,
-    ai: AI,
-    type: CombatantType
+    name: string
   ) {
-    super(
-      index,
-      indexTarget,
-      health,
-      actionsPerTurn,
-      tokens,
-      actionsTaken,
-      true /* players are always critical */,
-      actions,
-      Faction.Players,
-      maxPlayerHealth,
-      ai,
-      type
-    );
+    this.indexPlayer = indexPlayer;
+    this.indexActor = indexActor;
+    this.indexTargetable = indexTargetable;
     this.abilityScores = [...abilityScores];
     this.focus = focus;
     this.name = name;
@@ -46,29 +27,12 @@ export class Player extends Combatant {
 
   clone(): Player {
     return new Player(
-      this.index,
-      this.indexTarget,
-      this.health,
-      this.actionsPerTurn,
-      this.tokens,
-      this.actionsTaken,
+      this.indexPlayer,
+      this.indexActor,
+      this.indexTargetable,
       this.abilityScores,
       this.focus,
-      this.actions,
-      this.name,
-      this.ai,
-      this.type
+      this.name
     );
-  }
-
-  // mutates, handles damage causing tokens to appear
-  takeDamage(damage: number) {
-    if (this.health > 10 && this.health - damage <= 10)
-      this.tokens[Token.Action][Boost.Negative] += 1;
-
-    if (this.health > 5 && this.health - damage <= 5)
-      this.tokens[Token.Action][Boost.Negative] += 1;
-
-    this.health -= damage;
   }
 }

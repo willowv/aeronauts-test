@@ -1,50 +1,50 @@
 import { Player } from "./combatants/player";
 import Combatant from "./combatants/combatant";
 import { Faction } from "../enum";
+import { Targetable } from "./combatants/targetable";
+import { Actor } from "./combatants/actor";
+import { Action } from "./combatants/actions/action";
 
 export class CombatState {
-  players: Player[];
-  enemies: Combatant[];
+  targetsByFaction: Targetable[][]; // targets by faction and index
+  actorsByFaction: Actor[][]; // actors by faction and index
 
-  constructor(players: Player[], enemies: Combatant[]) {
-    this.players = players;
-    this.enemies = enemies;
+  constructor(targetsByFaction: Targetable[][], actorsByFaction: Actor[][]) {
+    this.targetsByFaction = targetsByFaction;
+    this.actorsByFaction = actorsByFaction;
   }
 
-  ArePlayersDefeated(): boolean {
-    // All critical players are dead
-    return this.players
-      .filter((player) => player.isCritical)
-      .every((player) => player.isDead());
+  isFactionDefeated(faction: Faction): boolean {
+    return this.targetsByFaction[faction]
+      .filter((target) => target.isCritical())
+      .every((target) => target.isDead());
   }
 
-  AreEnemiesDefeated(): boolean {
-    // All critical enemies are dead
-    return this.enemies
-      .filter((enemy) => enemy.isCritical)
-      .every((enemy) => enemy.isDead());
+  getTarget(faction: Faction, index: number): Targetable {
+    return this.targetsByFaction[faction][index];
   }
 
-  GetCombatant(faction: Faction, index: number) {
-    return faction === Faction.Players
-      ? this.players[index]
-      : this.enemies[index];
+  getTargetFromSelf(target: Targetable): Targetable {
+    return this.targetsByFaction[target.getFaction()][
+      target.getIndexTargetable()
+    ];
   }
 
-  GetCombatantFromSelf(combatant: Combatant): Combatant {
-    return this.GetCombatant(combatant.faction, combatant.index);
+  getActor(faction: Faction, index: number): Actor {
+    return this.actorsByFaction[faction][index];
   }
 
-  GetCombatantAsPlayer(combatant: Combatant): Player | null {
-    if (!combatant.isPlayer()) {
-      return null;
-    }
-    return this.players[combatant.index];
+  getActorFromSelf(actor: Actor): Actor {
+    return this.actorsByFaction[actor.getFaction()][actor.getIndexActor()];
   }
 
   clone(): CombatState {
-    let clonePlayers = this.players.map((player) => player.clone());
-    let cloneEnemies = this.enemies.map((combatant) => combatant.clone());
+    let clonePlayers = this.targetsByFaction.map((targets) =>
+      targets.map((target) => target.clone())
+    );
+    let cloneEnemies = this.actorsByFaction.map((actors) =>
+      actors.map((actor) => actor.clone())
+    );
     return new CombatState(clonePlayers, cloneEnemies);
   }
 }

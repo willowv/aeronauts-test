@@ -1,6 +1,8 @@
 import { Ability, Faction } from "../../../enum";
 import Combatant from "../combatant";
 import { CombatState } from "../../state";
+import { Targetable } from "../targetable";
+import { Actor } from "../actor";
 
 export class Action {
   name: string;
@@ -8,8 +10,8 @@ export class Action {
   targetFaction: Faction;
   evaluate: (
     checkResult: number,
-    actor: Combatant,
-    target: Combatant,
+    actor: Actor,
+    target: Targetable,
     state: CombatState
   ) => CombatState;
 
@@ -19,8 +21,8 @@ export class Action {
     target: Faction,
     evaluate: (
       checkResult: number,
-      actor: Combatant,
-      target: Combatant,
+      actor: Actor,
+      target: Targetable,
       state: CombatState
     ) => CombatState
   ) {
@@ -30,10 +32,10 @@ export class Action {
     this.targetFaction = target;
   }
 
-  GetValidTargets(state: CombatState, attacker: Combatant): Combatant[] {
-    let targets =
-      this.targetFaction === Faction.Players ? state.players : state.enemies;
-    let validTargets = targets.filter((target) => !target.isDead());
+  GetValidTargets(state: CombatState, attacker: Actor): Targetable[] {
+    let validTargets = state.targetsByFaction[this.targetFaction].filter(
+      (target) => !target.isDead()
+    );
     return validTargets;
   }
 }

@@ -7,7 +7,7 @@ export const EnemyBasicAttack = new Action(
   Faction.Players,
   (checkResult, actor, target, initialState) => {
     let state = initialState.clone();
-    let newTarget = state.GetCombatantFromSelf(target);
+    let newTarget = state.getTargetFromSelf(target);
     if (checkResult < 10) {
       newTarget.takeDamage(3);
     } else if (checkResult < 15) {
@@ -23,7 +23,7 @@ export const EnemyAdvancedAttack = new Action(
   Faction.Players,
   (checkResult, actor, target, initialState) => {
     let state = initialState.clone();
-    let newTarget = state.GetCombatantFromSelf(target);
+    let newTarget = state.getTargetFromSelf(target);
     if (checkResult < 10) {
       newTarget.takeDamage(5);
     } else if (checkResult < 15) {
