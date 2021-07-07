@@ -4,26 +4,26 @@ import { Token, Boost, Ability, Faction } from "../../../enum";
 import { Action } from "../actions/action";
 import { Attack, Defend } from "../actions/playerActions";
 import { CombatState } from "../../state";
-import { Actor } from "../actor";
 
 export class PlayerAI implements AI {
   FindBestActionAndTarget(
-    state: CombatState,
-    self: Actor
+    initialState: CombatState,
+    self: Combatant
   ): { action: Action; factionTarget: Faction; indexTarget: number } | null {
     // Filter allies for: doesn't have defense tokens, less than 10 health
-    let alliesNeedingDefense = state.targetsByFaction[Faction.Players]
+    let alliesNeedingDefense = initialState.players
       .filter(
         (ally) =>
-          !ally.isDead() &&
-          ally.getDefenseTokens(Boost.Positive) === 0 &&
-          ally.getHealth() <= ally.getMaxHealth() - 2
+          ally !== self &&
+          ally.tokens[Token.Defense][Boost.Positive] === 0 &&
+          ally.health < 10 &&
+          !ally.isDead()
       )
-      .sort((allyA, allyB) => allyA.getHealth() - allyB.getHealth());
+      .sort((allyA, allyB) => allyA.health - allyB.health);
 
     if (alliesNeedingDefense.length !== 0) {
       let allyToDefend = alliesNeedingDefense[0];
-      let playerSelf = state.GetCombatantAsPlayer(self);
+      let playerSelf = initialState.GetCombatantAsPlayer(self);
       let points = 0;
       // Figure number of points - 1 for each tier down, 1 for each point of perception
       if (allyToDefend.health < 10) points++;
@@ -33,12 +33,7 @@ export class PlayerAI implements AI {
       // Roll to determine whether to defend this ally or attack
       let threshold = 0.125 * points;
       let roll = Math.random();
-      if (roll < threshold)
-        return {
-          action: Defend,
-          factionTarget: Faction.Players,
-          indexTarget: allyToDefend.index,
-        };
+      if (roll < threshold) return { action: Defend, factionTarget: Faction.Players, indexTarget: allyToDefend.index };
     }
 
     let effectiveHealth: (enemy: Combatant) => number = (enemy) =>
@@ -46,36 +41,29 @@ export class PlayerAI implements AI {
       enemy.tokens[Token.Defense][Boost.Negative] +
       enemy.tokens[Token.Defense][Boost.Positive];
 
-    let enemiesCloseToDeath = state.enemies
+    let enemiesCloseToDeath = initialState.enemies
       .filter((enemy) => !enemy.isDead() && effectiveHealth(enemy) <= 3)
       .sort(
         (enemyA, enemyB) => effectiveHealth(enemyA) - effectiveHealth(enemyB)
       );
 
     if (enemiesCloseToDeath.length !== 0) {
-      return {
-        action: Attack,
-        factionTarget: Faction.Enemies,
-        indexTarget: enemiesCloseToDeath[0].index,
-      };
+      return { action: Attack, factionTarget: Faction.Enemies, indexTarget: enemiesCloseToDeath[0].index };
     }
 
     let primaryTarget = null;
-    if (self.indexTarget !== null) {
-      primaryTarget = state.enemies[self.indexTarget];
+    if(self.indexTarget !== null) {
+      primaryTarget = initialState.enemies[self.indexTarget];
     }
     if (primaryTarget === null || primaryTarget.isDead()) {
-      let targets = Attack.GetValidTargets(state, self);
-      if (targets.length === 0) return null;
-
+      let targets = Attack.GetValidTargets(initialState, self);
+      if(targets.length === 0)
+        return null;
+      
       let index = Math.round(Math.random() * (targets.length - 1));
       self.indexTarget = targets[index].index;
     }
 
-    return {
-      action: Attack,
-      factionTarget: Faction.Enemies,
-      indexTarget: self.indexTarget ?? 0,
-    };
+    return { action: Attack, factionTarget: Faction.Enemies, indexTarget: self.indexTarget ?? 0 };
   }
 }
