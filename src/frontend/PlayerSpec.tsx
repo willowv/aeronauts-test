@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Card, Box, Flex, Button } from "rebass";
-import { Label, Input } from "@rebass/forms";
+import { Label, Input, Select } from "@rebass/forms";
 import { Ability } from "../enum";
-import { ScenarioPlayer } from "../simulation/scenario";
+import { Role, roleStrings, ScenarioPlayer } from "../simulation/scenario";
 import {
   maxPlayerHealth,
   maxPlayerFocus,
@@ -53,6 +53,39 @@ export const PlayerSpec = ({
   handlePlayerChange,
   handlePlayerDelete,
 }: PlayerSpecProps) => {
+  // Only show roles if we're in air combat
+  let roleSpec =
+    player.role === Role.Ground ? null : (
+      <Box>
+        <Label>Role</Label>
+        <Select
+          id="role"
+          name="role"
+          value={roleStrings[player.role]}
+          onChange={(event) => {
+            let newRole = event.target.selectedIndex as Role;
+            let newPlayer = player.clone();
+            newPlayer.role = newRole;
+            handlePlayerChange(newPlayer);
+          }}
+        >
+          {roleStrings.map((roleString, index) => (
+            <option
+              key={index}
+              hidden={
+                roleString === roleStrings[Role.Ground] ||
+                (roleString === roleStrings[Role.Captain] &&
+                  player.role !== Role.Captain) ||
+                (roleString === roleStrings[Role.Engineer] &&
+                  player.role !== Role.Engineer)
+              }
+            >
+              {roleString}
+            </option>
+          ))}
+        </Select>
+      </Box>
+    );
   return (
     <Card
       sx={{
@@ -157,6 +190,7 @@ export const PlayerSpec = ({
           handlePlayerChange={handlePlayerChange}
         />
       </Flex>
+      {roleSpec}
     </Card>
   );
 };

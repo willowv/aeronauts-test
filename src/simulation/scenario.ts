@@ -46,6 +46,14 @@ export enum Role {
   Bomber,
 }
 
+export const roleStrings: string[] = [
+  "Ground",
+  "Captain",
+  "Engineer",
+  "Interceptor",
+  "Bomber",
+];
+
 export class Scenario {
   isAirCombat: boolean;
   enemySet: ScenarioEnemySet;

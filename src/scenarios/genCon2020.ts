@@ -17,7 +17,7 @@ export const scenarioGenCon2020 = () => {
         "Captain",
         maxPlayerFocus,
         maxPlayerHealth,
-        Role.Captain
+        Role.Ground
       ),
       new ScenarioPlayer(
         [1, 2, 1, 0, 0],
@@ -25,7 +25,7 @@ export const scenarioGenCon2020 = () => {
         "Tinkerer",
         maxPlayerFocus,
         maxPlayerHealth,
-        Role.Engineer
+        Role.Ground
       ),
       new ScenarioPlayer(
         [0, 0, 1, 2, 1],
@@ -33,7 +33,7 @@ export const scenarioGenCon2020 = () => {
         "Gunslinger",
         maxPlayerFocus,
         maxPlayerHealth,
-        Role.Interceptor
+        Role.Ground
       ),
       new ScenarioPlayer(
         [1, 0, 2, 0, 1],
@@ -41,7 +41,7 @@ export const scenarioGenCon2020 = () => {
         "Muscle",
         maxPlayerFocus,
         maxPlayerHealth,
-        Role.Bomber
+        Role.Ground
       ),
       new ScenarioPlayer(
         [2, 0, 1, 1, 0],
@@ -49,7 +49,7 @@ export const scenarioGenCon2020 = () => {
         "Thief",
         maxPlayerFocus,
         maxPlayerHealth,
-        Role.Interceptor
+        Role.Ground
       ),
     ],
     enemySet: new ScenarioEnemySet([2, 0, 0, 5]),
