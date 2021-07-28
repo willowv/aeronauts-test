@@ -3,20 +3,194 @@ import { Player } from "../simulation/combatants/player";
 import { CombatState } from "./state";
 import { Action } from "../simulation/combatants/actions/action";
 import {
+  AdvancedAA,
+  AdvancedBombs,
+  AdvancedCannons,
+  AdvancedTorps,
+  BasicAA,
+  BasicBombs,
+  BasicCannons,
+  BasicTorps,
   EnemyAdvancedAttack,
   EnemyBasicAttack,
 } from "../simulation/combatants/actions/npcActions";
 import { CombatantType, Faction } from "../enum";
 import { PlayerAI } from "./combatants/ai/playerAi";
-import { EnemyAI } from "./combatants/ai/enemyAi";
+import { EnemyAI, EnemyFighterAI } from "./combatants/ai/enemyAi";
+import { PlayerAirship } from "./airships/playerAirship";
+import { Quadrant } from "./airships/airship";
+import { EnemyAirship } from "./airships/enemyAirship";
+import {
+  AntiAir,
+  Attack,
+  AugmentSystems,
+  Bombs,
+  Cannons,
+  Defend,
+  FighterGuns,
+  Torpedoes,
+} from "./combatants/actions/playerActions";
+
+export enum EnemyLevel {
+  Normal = 0,
+  Dangerous,
+  Tough,
+  Scary,
+}
+
+export enum Role {
+  Ground = 0,
+  Captain,
+  Engineer,
+  Interceptor,
+  Bomber,
+}
 
 export class Scenario {
+  isAirCombat: boolean;
   enemySet: ScenarioEnemySet;
   players: ScenarioPlayer[];
+  enemyAirship: ScenarioEnemyAirship | null;
+  playerAirship: ScenarioPlayerAirship | null;
 
-  constructor(enemies: ScenarioEnemySet, players: ScenarioPlayer[]) {
+  constructor(
+    isAirCombat: boolean,
+    enemies: ScenarioEnemySet,
+    players: ScenarioPlayer[],
+    enemyAirship: ScenarioEnemyAirship | null,
+    playerAirship: ScenarioPlayerAirship | null
+  ) {
+    this.isAirCombat = isAirCombat;
     this.enemySet = enemies;
     this.players = players;
+    this.enemyAirship = enemyAirship;
+    this.playerAirship = playerAirship;
+  }
+
+  generatePlayers(): Player[] {
+    let outputPlayers: Player[] = this.players.map(
+      (scenarioPlayer: ScenarioPlayer, index: number) => {
+        let actions = [Attack, Defend];
+        let damageResistance = 0;
+        let combatantType = CombatantType.Ground;
+        if (this.isAirCombat && this.playerAirship !== null) {
+          if (this.playerAirship.indexPlayerCaptain === index) {
+            actions = [Cannons, Torpedoes, AntiAir];
+            combatantType = CombatantType.Crew;
+          }
+          if (this.playerAirship.indexPlayerEngineer === index) {
+            actions = [AugmentSystems];
+            combatantType = CombatantType.Crew;
+          } else {
+            actions = [FighterGuns, Bombs];
+            combatantType = CombatantType.Fighter;
+            if (scenarioPlayer.role === Role.Bomber) damageResistance = 1;
+          }
+        }
+        return new Player(
+          index,
+          null,
+          scenarioPlayer.health,
+          1,
+          initialTokens(),
+          0,
+          scenarioPlayer.abilityScores,
+          scenarioPlayer.focus,
+          actions,
+          scenarioPlayer.name,
+          new PlayerAI(),
+          combatantType,
+          damageResistance
+        );
+      }
+    );
+    return outputPlayers;
+  }
+
+  getInitialCombatState(): CombatState {
+    let players = this.generatePlayers();
+    let enemies = this.enemySet.generateEnemies(this.isAirCombat);
+    let playerAirship = this.playerAirship?.generatePlayerAirship() ?? null;
+    let enemyAirship = this.enemyAirship?.generateEnemyAirship() ?? null;
+
+    return new CombatState(
+      players,
+      playerAirship,
+      enemies,
+      enemyAirship,
+      this.isAirCombat
+    );
+  }
+}
+
+export class ScenarioEnemyAirship {
+  level: EnemyLevel;
+
+  constructor(level: EnemyLevel) {
+    this.level = level;
+  }
+
+  generateEnemyAirship(): EnemyAirship {
+    let health, numBasicActions, numAdvancedActions;
+    switch (this.level) {
+      case EnemyLevel.Normal:
+        health = 6;
+        numBasicActions = 1;
+        numAdvancedActions = 1;
+        break;
+      case EnemyLevel.Dangerous:
+        health = 7;
+        numBasicActions = 0;
+        numAdvancedActions = 2;
+        break;
+      case EnemyLevel.Tough:
+        health = 8;
+        numBasicActions = 0;
+        numAdvancedActions = 3;
+        break;
+      case EnemyLevel.Scary:
+        health = 9;
+        numBasicActions = 0;
+        numAdvancedActions = 4;
+        break;
+    }
+    return new EnemyAirship(
+      Quadrant.A,
+      [health, health, health, health],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      numBasicActions,
+      numAdvancedActions,
+      [BasicCannons, BasicTorps, BasicAA],
+      [AdvancedCannons, AdvancedTorps, AdvancedAA]
+    );
+  }
+}
+
+export class ScenarioPlayerAirship {
+  indexPlayerCaptain: number;
+  indexPlayerEngineer: number;
+
+  constructor(indexPlayerCaptain: number, indexPlayerEngineer: number) {
+    this.indexPlayerCaptain = indexPlayerCaptain;
+    this.indexPlayerEngineer = indexPlayerEngineer;
+  }
+
+  generatePlayerAirship(): PlayerAirship {
+    return new PlayerAirship(
+      Quadrant.A,
+      [8, 8, 8, 8],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      this.indexPlayerCaptain,
+      this.indexPlayerEngineer
+    );
   }
 }
 
@@ -26,19 +200,22 @@ export class ScenarioPlayer {
   name: string;
   focus: number;
   health: number;
+  role: Role;
 
   constructor(
     abilityScores: number[],
     weapon: Action,
     name: string,
     focus: number,
-    health: number
+    health: number,
+    role: Role
   ) {
     this.abilityScores = abilityScores;
     this.weapon = weapon;
     this.name = name;
     this.focus = focus;
     this.health = health;
+    this.role = role;
   }
 
   clone() {
@@ -47,7 +224,8 @@ export class ScenarioPlayer {
       this.weapon,
       this.name,
       this.focus,
-      this.health
+      this.health,
+      this.role
     );
   }
 }
@@ -62,118 +240,58 @@ export class ScenarioEnemySet {
   clone() {
     return new ScenarioEnemySet(this.countByCombatantType);
   }
+
+  generateEnemies(isAirCombat: boolean): Combatant[] {
+    let enemyStartingIndex = 0;
+    let enemies: Combatant[] = [];
+    this.countByCombatantType.forEach((count, combatantType) => {
+      for (let i = 0; i < count; i++) {
+        let health;
+        let ai = isAirCombat ? new EnemyFighterAI() : new EnemyAI();
+        let type = isAirCombat ? CombatantType.Fighter : CombatantType.Ground;
+        let actions = isAirCombat
+          ? [AdvancedAA, AdvancedBombs]
+          : [EnemyAdvancedAttack];
+        let actionsPerTurn = 1;
+        switch (combatantType as EnemyLevel) {
+          case EnemyLevel.Normal:
+          default:
+            health = 4;
+            actions = isAirCombat ? [BasicAA, BasicBombs] : [EnemyBasicAttack];
+            break;
+          case EnemyLevel.Dangerous:
+            health = 8;
+            break;
+          case EnemyLevel.Tough:
+            health = 12;
+            break;
+          case EnemyLevel.Scary:
+            health = 16;
+            actionsPerTurn = 2;
+            break;
+        }
+        let enemy = new Combatant(
+          enemyStartingIndex + i,
+          null,
+          health,
+          actionsPerTurn,
+          initialTokens(),
+          0,
+          true,
+          actions,
+          Faction.Enemies,
+          health,
+          ai,
+          type,
+          0
+        );
+        enemies.push(enemy);
+      }
+
+      enemyStartingIndex += count;
+    });
+    return enemies;
+  }
 }
 
 export const EmptyEnemySet = () => new ScenarioEnemySet([0, 0, 0, 0]);
-
-function PlayersFromScenarioPlayers(
-  scenarioPlayers: ScenarioPlayer[]
-): Player[] {
-  let players: Player[] = scenarioPlayers.map(
-    (scenarioPlayer: ScenarioPlayer, index: number) => {
-      return new Player(
-        index,
-        null,
-        scenarioPlayer.health,
-        1,
-        initialTokens(),
-        0,
-        scenarioPlayer.abilityScores,
-        scenarioPlayer.focus,
-        [scenarioPlayer.weapon],
-        scenarioPlayer.name,
-        new PlayerAI(),
-        CombatantType.Ground
-      );
-    }
-  );
-  return players;
-}
-
-const CreateNormalEnemy = (index: number, isCritical: boolean) =>
-  new Combatant(
-    index,
-    null,
-    4,
-    1,
-    initialTokens(),
-    0,
-    isCritical,
-    [EnemyBasicAttack],
-    Faction.Enemies,
-    4,
-    new EnemyAI(),
-    CombatantType.Ground
-  );
-const CreateDangerousEnemy = (index: number, isCritical: boolean) =>
-  new Combatant(
-    index,
-    null,
-    8,
-    1,
-    initialTokens(),
-    0,
-    isCritical,
-    [EnemyAdvancedAttack],
-    Faction.Enemies,
-    8,
-    new EnemyAI(),
-    CombatantType.Ground
-  );
-const CreateToughEnemy = (index: number, isCritical: boolean) =>
-  new Combatant(
-    index,
-    null,
-    12,
-    1,
-    initialTokens(),
-    0,
-    isCritical,
-    [EnemyAdvancedAttack],
-    Faction.Enemies,
-    12,
-    new EnemyAI(),
-    CombatantType.Ground
-  );
-const CreateScaryEnemy = (index: number, isCritical: boolean) =>
-  new Combatant(
-    index,
-    null,
-    16,
-    2,
-    initialTokens(),
-    0,
-    isCritical,
-    [EnemyAdvancedAttack],
-    Faction.Enemies,
-    16,
-    new EnemyAI(),
-    CombatantType.Ground
-  );
-
-const CreateEnemyByType = [
-  CreateNormalEnemy,
-  CreateDangerousEnemy,
-  CreateToughEnemy,
-  CreateScaryEnemy,
-];
-
-function EnemiesFromScenarioEnemySet(enemySet: ScenarioEnemySet): Combatant[] {
-  let enemyStartingIndex = 0;
-  let enemies: Combatant[] = [];
-  enemySet.countByCombatantType.forEach((count, combatantType) => {
-    let createEnemy = CreateEnemyByType[combatantType];
-    for (let i = 0; i < count; i++)
-      enemies.push(createEnemy(enemyStartingIndex + i, true));
-
-    enemyStartingIndex += count;
-  });
-  return enemies;
-}
-
-export function InitialStateFromScenario(scenario: Scenario): CombatState {
-  let players = PlayersFromScenarioPlayers(scenario.players);
-  let enemies = EnemiesFromScenarioEnemySet(scenario.enemySet);
-
-  return new CombatState(players, enemies);
-}
