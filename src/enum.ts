@@ -16,18 +16,11 @@ export enum Ability {
   Conviction,
 }
 
-export enum EnemyType {
-  Normal = 0,
-  Dangerous,
-  Tough,
-  Scary,
-}
-
 export enum CombatantType {
   Ground = 0,
   Fighter,
   Crew,
-  Airship
+  Airship,
 }
 
 export enum Faction {

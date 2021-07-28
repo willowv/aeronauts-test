@@ -38,6 +38,8 @@ export enum EnemyLevel {
   Scary,
 }
 
+export const enemyLevelStrings = ["Normal", "Dangerous", "Tough", "Scary"];
+
 export enum Role {
   Ground = 0,
   Captain,

@@ -218,10 +218,17 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
         <Flex flexWrap="wrap">{playerSpecs}</Flex>
         <Flex flexWrap="wrap">
           <EnemySpec
+            isAirCombat={this.state.isAirCombat}
             npcs={this.state.enemySet}
+            airship={this.state.enemyAirship}
             handleNpcsChange={(newEnemySet: ScenarioEnemySet) => {
               this.setState((prevState) => {
                 return { enemySet: newEnemySet };
+              });
+            }}
+            handleAirshipChange={(airship) => {
+              this.setState((prevState) => {
+                return { enemyAirship: airship };
               });
             }}
           />

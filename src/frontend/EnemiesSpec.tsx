@@ -1,13 +1,17 @@
 import * as React from "react";
 import { Card, Heading, Box, Flex } from "rebass";
-import { Label, Input } from "@rebass/forms";
-import { ScenarioEnemySet } from "../simulation/scenario";
-import { EnemyType } from "../enum";
+import { Label, Input, Select } from "@rebass/forms";
+import {
+  EnemyLevel,
+  enemyLevelStrings,
+  ScenarioEnemyAirship,
+  ScenarioEnemySet,
+} from "../simulation/scenario";
 
 interface NpcSpecProps {
   name: string;
   npcs: ScenarioEnemySet;
-  combatantType: EnemyType;
+  combatantType: EnemyLevel;
   handleNpcsChange: (npcs: ScenarioEnemySet) => void;
 }
 
@@ -38,14 +42,42 @@ const NpcSpec = ({
 };
 
 interface EnemySpecProps {
+  isAirCombat: boolean;
   npcs: ScenarioEnemySet;
+  airship: ScenarioEnemyAirship | null;
   handleNpcsChange: (npcs: ScenarioEnemySet) => void;
+  handleAirshipChange: (airship: ScenarioEnemyAirship | null) => void;
 }
 
 export const EnemySpec = ({
+  isAirCombat,
   npcs,
+  airship,
   handleNpcsChange,
+  handleAirshipChange,
 }: EnemySpecProps) => {
+  let airshipOptions = enemyLevelStrings.map((enemyLevelString, index) => (
+    <option key={index}>{enemyLevelString}</option>
+  ));
+  airshipOptions.push(<option key={4}>None</option>);
+  let airshipSpec = !isAirCombat ? null : (
+    <Box>
+      <Label>Airship</Label>
+      <Select
+        id="enemyAirship"
+        name="enemyAirship"
+        value={airship === null ? "None" : enemyLevelStrings[airship.level]}
+        onChange={(event) => {
+          let newAirship = null;
+          if (event.target.selectedIndex !== 4)
+            newAirship = new ScenarioEnemyAirship(event.target.selectedIndex);
+          handleAirshipChange(newAirship);
+        }}
+      >
+        {airshipOptions}
+      </Select>
+    </Box>
+  );
   return (
     <Card
       width={375}
@@ -61,28 +93,29 @@ export const EnemySpec = ({
         <NpcSpec
           name="Normal"
           npcs={npcs}
-          combatantType={EnemyType.Normal}
+          combatantType={EnemyLevel.Normal}
           handleNpcsChange={handleNpcsChange}
         />
         <NpcSpec
           name="Dangerous"
           npcs={npcs}
-          combatantType={EnemyType.Dangerous}
+          combatantType={EnemyLevel.Dangerous}
           handleNpcsChange={handleNpcsChange}
         />
         <NpcSpec
           name="Tough"
           npcs={npcs}
-          combatantType={EnemyType.Tough}
+          combatantType={EnemyLevel.Tough}
           handleNpcsChange={handleNpcsChange}
         />
         <NpcSpec
           name="Scary"
           npcs={npcs}
-          combatantType={EnemyType.Scary}
+          combatantType={EnemyLevel.Scary}
           handleNpcsChange={handleNpcsChange}
         />
       </Flex>
+      {airshipSpec}
     </Card>
   );
 };
