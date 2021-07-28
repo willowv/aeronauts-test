@@ -1,6 +1,6 @@
 import { CombatState } from "./state";
-import { Token, Boost, Ability } from "../enum";
-import { Scenario, InitialStateFromScenario } from "./scenario";
+import { CombatantType, Faction } from "../enum";
+import { Scenario } from "./scenario";
 import Combatant from "./combatants/combatant";
 import {
   ScenarioReport,
@@ -10,7 +10,8 @@ import {
 } from "./statistics";
 import { Player } from "./combatants/player";
 import { RollDice } from "./dice";
-import { Action } from "./combatants/actions/action";
+import { Action, ActionType, SourceType } from "./combatants/actions/action";
+import { Quadrant } from "./airships/airship";
 
 const roundLimit = 20;
 
@@ -20,7 +21,7 @@ export function SimulateScenario(
   scenario: Scenario,
   numberOfTrials: number
 ): ScenarioReport {
-  let initialState = InitialStateFromScenario(scenario);
+  let initialState = scenario.getInitialCombatState();
   let combatReports = [];
   for (let trial = 0; trial < numberOfTrials; trial++) {
     combatReports.push(SimulateCombat(initialState));
@@ -61,12 +62,11 @@ function SimulateTurn(
 ): CombatState {
   let state = initialState;
   for (let actionNum = 0; actionNum < combatant.actionsPerTurn; actionNum++) {
-    let bestActionAndTarget = combatant.ai.FindBestActionAndTarget(state, combatant);
-    if (bestActionAndTarget !== null) {
-      let action = bestActionAndTarget.action;
-      let target = state.GetCombatant(bestActionAndTarget.factionTarget, bestActionAndTarget.indexTarget);
-      state = Act(state, combatant, action, target, RollDice);
-    }
+    let { action, source, target } = combatant.ai.FindBestActionAndTarget(
+      state,
+      combatant
+    );
+    state = Act(state, combatant, source, action, target, RollDice);
     let newCombatant = state.GetCombatantFromSelf(combatant);
     newCombatant.actionsTaken++;
   }
@@ -75,75 +75,49 @@ function SimulateTurn(
 
 export function Act(
   initialState: CombatState,
-  actor: Combatant,
+  initiator: Combatant,
+  actor: Combatant | Quadrant,
   action: Action,
-  target: Combatant,
+  target: Combatant | Quadrant,
   checkEvaluator: (modifier: number, boost: number) => number
 ): CombatState {
-  let {
-    modifier,
-    boost,
-    state: actionState,
-  } = GetModifierBoostAndStateForPlayerRoll(
-    initialState,
-    actor,
-    target,
-    action.ability
-  );
-  let checkResult = checkEvaluator(modifier, boost);
-  return action.evaluate(checkResult, actor, target, actionState);
-}
+  let state = initialState;
+  if (action.type === ActionType.Uncontested || action.ability === null)
+    return action.evaluate(15, actor, target, state); // Actions that don't have abilities are automatic
 
-// does not mutate
-export function GetModifierBoostAndStateForPlayerRoll(
-  initialState: CombatState,
-  attacker: Combatant,
-  target: Combatant,
-  ability: Ability
-): { modifier: number; boost: number; state: CombatState } {
-  let state = initialState.clone();
-  let newAttacker = state.GetCombatantFromSelf(attacker);
-  let newTarget = state.GetCombatantFromSelf(target);
-  let isPlayerAttacking = newAttacker.isPlayer();
-  let isPlayerDefending = newTarget.isPlayer();
-
-  let player: Player | null;
-  if (isPlayerAttacking) {
-    player = state.GetCombatantAsPlayer(newAttacker);
-  } else if (isPlayerDefending) {
-    player = state.GetCombatantAsPlayer(newTarget);
-  } else {
-    player = null;
-  }
-  let modifier: number = player?.abilityScores[ability] ?? 0;
-  if (player !== null && player.focus > 0) {
-    player.focus -= 1;
-    modifier += 1;
+  let modifier = 0;
+  if (action.actorFaction === Faction.Players)
+    modifier = (initiator as Player).getModifierForRoll(action.ability);
+  else if (action.targetFaction === Faction.Players) {
+    if (action.targetType === CombatantType.Airship)
+      modifier =
+        state.getPlayerCaptain()?.getModifierForRoll(action.ability) ?? 0;
+    else modifier = (target as Player).getModifierForRoll(action.ability);
   }
 
-  // how does source and target terrain affect this?
-  let boost = 0;
-  if (newAttacker.tokens[Token.Action][Boost.Negative] > 0) {
-    newAttacker.tokens[Token.Action][Boost.Negative] -= 1;
-    boost -= 1;
+  let sourceBoost = 0;
+  if (action.sourceType === SourceType.Personal)
+    sourceBoost = (actor as Combatant).getBoostForAttackFromMe();
+  else {
+    let airship =
+      action.actorFaction === Faction.Players
+        ? state.playerAirship
+        : state.enemyAirship;
+    sourceBoost =
+      airship?.getBoostForAttackFromQuadrant(actor as Quadrant) ?? 0;
   }
-  if (newTarget.tokens[Token.Defense][Boost.Negative] > 0) {
-    newTarget.tokens[Token.Defense][Boost.Negative] -= 1;
-    boost += 1;
+
+  let targetBoost = 0;
+  if (action.targetType !== CombatantType.Airship)
+    targetBoost = (target as Combatant).getBoostForAttackOnMe();
+  else {
+    let airship =
+      action.actorFaction === Faction.Players
+        ? state.playerAirship
+        : state.enemyAirship;
+    targetBoost = airship?.getBoostForAttackOnQuadrant(target as Quadrant) ?? 0;
   }
-  // Only use positive tokens if they'd have an effect
-  if (boost > -2 && newTarget.tokens[Token.Defense][Boost.Positive] > 0) {
-    newTarget.tokens[Token.Defense][Boost.Positive] -= 1;
-    boost -= 1;
-  }
-  if (boost < 2 && newAttacker.tokens[Token.Action][Boost.Positive] > 0) {
-    newAttacker.tokens[Token.Action][Boost.Positive] -= 1;
-    boost += 1;
-  }
-  boost = Math.max(Math.min(boost, 2), -2); // boost has a max magnitude of 2
-  return {
-    modifier: modifier,
-    boost: isPlayerAttacking ? boost : -boost,
-    state: state,
-  };
+
+  let checkResult = checkEvaluator(modifier, sourceBoost + targetBoost);
+  return action.evaluate(checkResult, actor, target, state);
 }

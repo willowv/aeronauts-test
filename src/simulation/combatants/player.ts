@@ -1,5 +1,5 @@
 import Combatant from "./combatant";
-import { Token, Boost, Faction, CombatantType } from "../../enum";
+import { Token, Boost, Faction, CombatantType, Ability } from "../../enum";
 import { Action } from "./actions/action";
 import { AI } from "./ai/ai";
 
@@ -23,7 +23,8 @@ export class Player extends Combatant {
     actions: Action[],
     name: string,
     ai: AI,
-    type: CombatantType
+    type: CombatantType,
+    damageResistance: number
   ) {
     super(
       index,
@@ -37,7 +38,8 @@ export class Player extends Combatant {
       Faction.Players,
       maxPlayerHealth,
       ai,
-      type
+      type,
+      damageResistance
     );
     this.abilityScores = [...abilityScores];
     this.focus = focus;
@@ -57,12 +59,15 @@ export class Player extends Combatant {
       this.actions,
       this.name,
       this.ai,
-      this.type
+      this.type,
+      this.damageResistance
     );
   }
 
   // mutates, handles damage causing tokens to appear
-  takeDamage(damage: number) {
+  takeDamage(incomingDamage: number) {
+    let damage = Math.max(0, incomingDamage - this.damageResistance);
+
     if (this.health > 10 && this.health - damage <= 10)
       this.tokens[Token.Action][Boost.Negative] += 1;
 
@@ -70,5 +75,15 @@ export class Player extends Combatant {
       this.tokens[Token.Action][Boost.Negative] += 1;
 
     this.health -= damage;
+  }
+
+  // mutates
+  getModifierForRoll(ability: Ability): number {
+    let modifier: number = this.abilityScores[ability];
+    if (this.focus > 0) {
+      this.focus -= 1;
+      modifier += 1;
+    }
+    return modifier;
   }
 }
