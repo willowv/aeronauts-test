@@ -1,15 +1,21 @@
 import { AI } from "./ai";
 import Combatant from "../combatant";
-import { Token, Boost, Ability, Faction } from "../../../enum";
+import { Token, Boost, Ability } from "../../../enum";
 import { Action } from "../actions/action";
 import { Attack, Defend } from "../actions/playerActions";
 import { CombatState } from "../../state";
+import { Quadrant } from "../../airships/airship";
+import { NoAction } from "../actions/npcActions";
 
 export class PlayerAI implements AI {
   FindBestActionAndTarget(
     initialState: CombatState,
     self: Combatant
-  ): { action: Action; factionTarget: Faction; indexTarget: number } | null {
+  ): {
+    action: Action;
+    source: Combatant | Quadrant;
+    target: Combatant | Quadrant;
+  } {
     // Filter allies for: doesn't have defense tokens, less than 10 health
     let alliesNeedingDefense = initialState.players
       .filter(
@@ -33,7 +39,12 @@ export class PlayerAI implements AI {
       // Roll to determine whether to defend this ally or attack
       let threshold = 0.125 * points;
       let roll = Math.random();
-      if (roll < threshold) return { action: Defend, factionTarget: Faction.Players, indexTarget: allyToDefend.index };
+      if (roll < threshold)
+        return {
+          action: Defend,
+          source: self,
+          target: allyToDefend,
+        };
     }
 
     let effectiveHealth: (enemy: Combatant) => number = (enemy) =>
@@ -48,22 +59,41 @@ export class PlayerAI implements AI {
       );
 
     if (enemiesCloseToDeath.length !== 0) {
-      return { action: Attack, factionTarget: Faction.Enemies, indexTarget: enemiesCloseToDeath[0].index };
+      return {
+        action: Attack,
+        source: self,
+        target: enemiesCloseToDeath[0],
+      };
     }
 
     let primaryTarget = null;
-    if(self.indexTarget !== null) {
+    if (self.indexTarget !== null) {
       primaryTarget = initialState.enemies[self.indexTarget];
     }
     if (primaryTarget === null || primaryTarget.isDead()) {
-      let targets = Attack.GetValidTargets(initialState, self);
-      if(targets.length === 0)
-        return null;
-      
+      let targets = Attack.GetValidTargets(initialState);
+      if (targets.length === 0)
+        return {
+          action: NoAction,
+          source: self,
+          target: self,
+        };
+
       let index = Math.round(Math.random() * (targets.length - 1));
-      self.indexTarget = targets[index].index;
+      self.indexTarget = (targets[index] as Combatant).index;
     }
 
-    return { action: Attack, factionTarget: Faction.Enemies, indexTarget: self.indexTarget ?? 0 };
+    return {
+      action: Attack,
+      source: self,
+      target: initialState.enemies[self.indexTarget ?? 0],
+    };
+
+    // TODO: air combat player AIs, and use them
   }
 }
+
+// Captain AI
+// For attack, determine which quadrant to attack with - B and C will be torps, A will be cannons
+// Attack with whatever has the greatest advantage vs. the enemy's weakest quadrant, then pick a weapon that can do that
+// When to attack fighters? If there's no interceptor on our team, attack an enemy fighter 33% of the time, prioritize enemies with no disadvantage
