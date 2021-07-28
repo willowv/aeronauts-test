@@ -4,6 +4,9 @@ import {
   ScenarioEnemySet,
   ScenarioPlayer,
   Scenario,
+  Role,
+  ScenarioPlayerAirship,
+  ScenarioEnemyAirship,
 } from "../simulation/scenario";
 import { Attack } from "../simulation/combatants/actions/playerActions";
 import { PlayerSpec } from "./PlayerSpec";
@@ -20,6 +23,9 @@ import { EnemySpec } from "./EnemiesSpec";
 // Player specs across the top, w/ plus button for adding more players
 
 interface ScenarioSpecState {
+  isAirCombat: boolean;
+  playerAirship: ScenarioPlayerAirship | null;
+  enemyAirship: ScenarioEnemyAirship | null;
   players: ScenarioPlayer[];
   enemySet: ScenarioEnemySet;
   reports: ScenarioReport[];
@@ -65,7 +71,8 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
                 Attack,
                 "",
                 maxPlayerFocus,
-                maxPlayerHealth
+                maxPlayerHealth,
+                Role.Ground // TODO: Support other roles
               )
             );
             this.setState({ players: newPlayers });
@@ -102,7 +109,7 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
         <Flex flexWrap="wrap">
           <EnemySpec
             npcs={this.state.enemySet}
-            handleNpcsChange={(newEnemySet : ScenarioEnemySet) => {
+            handleNpcsChange={(newEnemySet: ScenarioEnemySet) => {
               this.setState((prevState) => {
                 return { enemySet: newEnemySet };
               });
@@ -114,8 +121,11 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
           triggerNewSimulation={() => {
             let newReport = SimulateScenario(
               new Scenario(
+                false, // TODO: support air combat
                 this.state.enemySet,
-                this.state.players
+                this.state.players,
+                null,
+                null
               ),
               10000
             );

@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Card, Box, Flex, Button } from "rebass";
-import { Label, Select, Input } from "@rebass/forms";
-import { WeaponOptions } from "../simulation/combatants/actions/playerActions";
+import { Label, Input } from "@rebass/forms";
 import { Ability } from "../enum";
 import { ScenarioPlayer } from "../simulation/scenario";
 import {
@@ -158,21 +157,6 @@ export const PlayerSpec = ({
           handlePlayerChange={handlePlayerChange}
         />
       </Flex>
-      <Label>Weapon</Label>
-      <Select
-        id="weapon"
-        name="weapon"
-        value={player.weapon.name}
-        onChange={(event) => {
-          let newPlayer = player.clone();
-          newPlayer.weapon = WeaponOptions[event.target.selectedIndex];
-          handlePlayerChange(newPlayer);
-        }}
-      >
-        {WeaponOptions.map((weapon, index) => (
-          <option key={index}>{weapon.name}</option>
-        ))}
-      </Select>
     </Card>
   );
 };
