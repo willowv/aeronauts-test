@@ -252,6 +252,7 @@ export const Bombs = new Action(
     let freeAttackDamage = 2 + targetAdvantage - targetDisadvantage;
     let newActor = state.GetCombatantFromSelf(actor as Combatant);
     newActor.takeDamage(freeAttackDamage);
+    if (newActor.isDead()) return state;
 
     if (checkResult >= 15) {
       state.enemyAirship.takeDamage(targetQuadrant, 5);

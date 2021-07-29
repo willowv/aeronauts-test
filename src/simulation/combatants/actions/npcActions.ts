@@ -306,6 +306,7 @@ export const BasicBombs = new Action(
     let freeAttackDamage = 2 + targetAdvantage - targetDisadvantage;
     let newActor = state.GetCombatantFromSelf(actor as Combatant);
     newActor.takeDamage(freeAttackDamage);
+    if (newActor.isDead()) return state;
 
     if (checkResult >= 15) {
       state.playerAirship.takeDamage(targetQuadrant, 3);
@@ -352,6 +353,7 @@ export const AdvancedBombs = new Action(
     let freeAttackDamage = 2 + targetAdvantage - targetDisadvantage;
     let newActor = state.GetCombatantFromSelf(actor as Combatant);
     newActor.takeDamage(freeAttackDamage);
+    if (newActor.isDead()) return state;
 
     if (checkResult >= 15) {
       state.playerAirship.takeDamage(targetQuadrant, 5);
