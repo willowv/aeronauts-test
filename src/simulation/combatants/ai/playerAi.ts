@@ -2,9 +2,9 @@ import { AI } from "./ai";
 import Combatant from "../combatant";
 import { Token, Boost, Ability } from "../../../enum";
 import { Action } from "../actions/action";
-import { Attack, Defend } from "../actions/playerActions";
+import { Attack, Bombs, Defend, FighterGuns } from "../actions/playerActions";
 import { CombatState } from "../../state";
-import { Quadrant } from "../../airships/airship";
+import { Quadrant, WeaponType } from "../../airships/airship";
 import { NoAction } from "../actions/npcActions";
 
 export class PlayerAI implements AI {
@@ -88,8 +88,55 @@ export class PlayerAI implements AI {
       source: self,
       target: initialState.enemies[self.indexTarget ?? 0],
     };
+  }
+}
 
-    // TODO: air combat player AIs, and use them
+export class PlayerInterceptorAI implements AI {
+  FindBestActionAndTarget(
+    state: CombatState,
+    self: Combatant
+  ): {
+    action: Action;
+    source: Combatant | Quadrant;
+    target: Combatant | Quadrant;
+  } {
+    // My primary target is whoever attacked me last, or choose randomly
+    let primaryTarget = null;
+    if (self.indexTarget !== null)
+      primaryTarget = state.enemies[self.indexTarget];
+
+    if (primaryTarget === null || primaryTarget.isDead()) {
+      let targets = FighterGuns.GetValidTargets(state);
+      if (targets.length === 0) {
+        self.indexTarget = null;
+        primaryTarget = null;
+      } else {
+        let index = Math.round(Math.random() * (targets.length - 1));
+        self.indexTarget = (targets[index] as Combatant).index;
+        return {
+          action: FighterGuns,
+          source: self,
+          target: state.enemies[self.indexTarget],
+        };
+      }
+    }
+
+    // If we made it here, there was no valid fighter target
+    let enemyAirship = state.enemyAirship;
+    if (enemyAirship !== null && !enemyAirship.isDead()) {
+      return {
+        action: Bombs,
+        source: self,
+        target: enemyAirship.bestTargetQuadrant(WeaponType.Bomb),
+      };
+    }
+
+    // If there were no valid targets, then return No Action
+    return {
+      action: NoAction,
+      source: self,
+      target: self,
+    };
   }
 }
 
