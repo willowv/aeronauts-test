@@ -1,7 +1,6 @@
 import { Player } from "./combatants/player";
 import Combatant from "./combatants/combatant";
 import { Faction } from "../enum";
-import { Airship } from "./airships/airship";
 import { PlayerAirship } from "./airships/playerAirship";
 import { EnemyAirship } from "./airships/enemyAirship";
 
