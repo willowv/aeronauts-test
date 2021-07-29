@@ -8,6 +8,7 @@ export class EnemyAirship extends Airship {
   numAdvancedActions: number;
   basicActions: Action[];
   advancedActions: Action[];
+  actionsTaken: number;
 
   constructor(
     frontQuadrant: Quadrant,
@@ -20,7 +21,8 @@ export class EnemyAirship extends Airship {
     numBasicActions: number,
     numAdvancedActions: number,
     basicActions: Action[],
-    advancedActions: Action[]
+    advancedActions: Action[],
+    actionsTaken: number
   ) {
     super(
       frontQuadrant,
@@ -35,6 +37,7 @@ export class EnemyAirship extends Airship {
     this.numAdvancedActions = numAdvancedActions;
     this.basicActions = basicActions;
     this.advancedActions = advancedActions;
+    this.actionsTaken = actionsTaken;
   }
 
   clone(): EnemyAirship {
@@ -49,7 +52,8 @@ export class EnemyAirship extends Airship {
       this.numBasicActions,
       this.numAdvancedActions,
       this.basicActions,
-      this.advancedActions
+      this.advancedActions,
+      this.actionsTaken
     );
   }
 

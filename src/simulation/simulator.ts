@@ -12,6 +12,7 @@ import { Player } from "./combatants/player";
 import { RollDice } from "./dice";
 import { Action, ActionType, SourceType } from "./combatants/actions/action";
 import { Quadrant } from "./airships/airship";
+import { EnemyAirship } from "./airships/enemyAirship";
 
 const roundLimit = 20;
 
@@ -43,11 +44,14 @@ function SimulateCombat(initialState: CombatState): CombatReport {
 
 function SimulateRound(initialState: CombatState): CombatState {
   let state = initialState;
+  state = SimulatePlayerAirshipTurn(state);
   state.players.forEach((player) => {
     let currentPlayer = state.GetCombatantFromSelf(player);
     if (currentPlayer.isDead()) return; // dead players don't get a turn
     state = SimulateTurn(state, currentPlayer);
   });
+
+  state = SimulateEnemyAirshipTurn(state);
   state.enemies.forEach((enemy) => {
     let currentEnemy = state.GetCombatantFromSelf(enemy);
     if (currentEnemy.isDead()) return; // dead enemies don't get a turn
@@ -73,9 +77,57 @@ function SimulateTurn(
   return state;
 }
 
+function SimulatePlayerAirshipTurn(initialState: CombatState): CombatState {
+  let state = initialState.clone();
+  if (state.playerAirship === null || state.playerAirship.isDead())
+    return initialState;
+
+  state.playerAirship.clearBrace();
+  state.playerAirship.takeBestMoves();
+  state.players[state.playerAirship.indexPlayerCaptain].actionsTaken++;
+  state.players[state.playerAirship.indexPlayerEngineer].actionsTaken++;
+  return state;
+}
+
+function SimulateEnemyAirshipTurn(initialState: CombatState): CombatState {
+  let state = initialState.clone();
+  if (state.enemyAirship === null || state.enemyAirship.isDead())
+    return initialState;
+
+  state.enemyAirship.clearBrace();
+  state.enemyAirship.takeBestMoves();
+  state.enemyAirship.actionsTaken += 2;
+
+  for (
+    let iBasicAction = 0;
+    state.enemyAirship !== null &&
+    iBasicAction < state.enemyAirship.numBasicActions;
+    iBasicAction++
+  ) {
+    let { action, source, target } =
+      state.enemyAirship.getBestBasicActionAndTarget(state);
+    state = Act(state, state.enemyAirship, source, action, target, RollDice);
+
+    if (state.enemyAirship !== null) state.enemyAirship.actionsTaken++;
+  }
+  for (
+    let iAdvancedAction = 0;
+    state.enemyAirship !== null &&
+    iAdvancedAction < state.enemyAirship.numAdvancedActions;
+    iAdvancedAction++
+  ) {
+    let { action, source, target } =
+      state.enemyAirship.getBestAdvancedActionAndTarget(state);
+    state = Act(state, state.enemyAirship, source, action, target, RollDice);
+
+    if (state.enemyAirship !== null) state.enemyAirship.actionsTaken++;
+  }
+  return state;
+}
+
 export function Act(
   initialState: CombatState,
-  initiator: Combatant,
+  initiator: Combatant | EnemyAirship,
   actor: Combatant | Quadrant,
   action: Action,
   target: Combatant | Quadrant,

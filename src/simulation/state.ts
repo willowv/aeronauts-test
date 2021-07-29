@@ -3,19 +3,20 @@ import Combatant from "./combatants/combatant";
 import { Faction } from "../enum";
 import { Airship } from "./airships/airship";
 import { PlayerAirship } from "./airships/playerAirship";
+import { EnemyAirship } from "./airships/enemyAirship";
 
 export class CombatState {
   players: Player[];
   playerAirship: PlayerAirship | null;
   enemies: Combatant[];
-  enemyAirship: Airship | null;
+  enemyAirship: EnemyAirship | null;
   isAirCombat: boolean;
 
   constructor(
     players: Player[],
     playerAirship: PlayerAirship | null,
     enemies: Combatant[],
-    enemyAirship: Airship | null,
+    enemyAirship: EnemyAirship | null,
     isAirCombat: boolean
   ) {
     this.players = players;
