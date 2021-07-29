@@ -13,6 +13,7 @@ import { RollDice } from "./dice";
 import { Action, ActionType, SourceType } from "./combatants/actions/action";
 import { Quadrant } from "./airships/airship";
 import { EnemyAirship } from "./airships/enemyAirship";
+import { NoAction } from "./combatants/actions/npcActions";
 
 const roundLimit = 20;
 
@@ -70,9 +71,11 @@ function SimulateTurn(
       state,
       combatant
     );
-    state = Act(state, combatant, source, action, target, RollDice);
-    let newCombatant = state.GetCombatantFromSelf(combatant);
-    newCombatant.actionsTaken++;
+    if (action !== NoAction) {
+      state = Act(state, combatant, source, action, target, RollDice);
+      let newCombatant = state.GetCombatantFromSelf(combatant);
+      newCombatant.actionsTaken++;
+    }
   }
   return state;
 }
@@ -106,9 +109,10 @@ function SimulateEnemyAirshipTurn(initialState: CombatState): CombatState {
   ) {
     let { action, source, target } =
       state.enemyAirship.getBestBasicActionAndTarget(state);
-    state = Act(state, state.enemyAirship, source, action, target, RollDice);
-
-    if (state.enemyAirship !== null) state.enemyAirship.actionsTaken++;
+    if (action !== NoAction) {
+      state = Act(state, state.enemyAirship, source, action, target, RollDice);
+      if (state.enemyAirship !== null) state.enemyAirship.actionsTaken++;
+    }
   }
   for (
     let iAdvancedAction = 0;
@@ -118,9 +122,10 @@ function SimulateEnemyAirshipTurn(initialState: CombatState): CombatState {
   ) {
     let { action, source, target } =
       state.enemyAirship.getBestAdvancedActionAndTarget(state);
-    state = Act(state, state.enemyAirship, source, action, target, RollDice);
-
-    if (state.enemyAirship !== null) state.enemyAirship.actionsTaken++;
+    if (action !== NoAction) {
+      state = Act(state, state.enemyAirship, source, action, target, RollDice);
+      if (state.enemyAirship !== null) state.enemyAirship.actionsTaken++;
+    }
   }
   return state;
 }
