@@ -57,7 +57,10 @@ export class EnemyFighterAI implements AI {
     let playerAirship = initialState.playerAirship;
     if (playerAirship !== null && !playerAirship.isDead()) {
       let candidateTarget = playerAirship.bestTargetQuadrant(WeaponType.Bomb);
-      if (playerAirship.disadvantageTokensByQuadrant[candidateTarget] >= 1)
+      if (
+        candidateTarget !== null &&
+        playerAirship.disadvantageTokensByQuadrant[candidateTarget] >= 1
+      )
         return {
           action: self.actions[1],
           source: self,

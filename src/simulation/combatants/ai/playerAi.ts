@@ -2,9 +2,17 @@ import { AI } from "./ai";
 import Combatant from "../combatant";
 import { Token, Boost, Ability } from "../../../enum";
 import { Action } from "../actions/action";
-import { Attack, Bombs, Defend, FighterGuns } from "../actions/playerActions";
+import {
+  AntiAir,
+  Attack,
+  Bombs,
+  Cannons,
+  Defend,
+  FighterGuns,
+  Torpedoes,
+} from "../actions/playerActions";
 import { CombatState } from "../../state";
-import { Quadrant, WeaponType } from "../../airships/airship";
+import { AllQuadrants, Quadrant, WeaponType } from "../../airships/airship";
 import { NoAction } from "../actions/npcActions";
 
 export class PlayerAI implements AI {
@@ -124,10 +132,140 @@ export class PlayerInterceptorAI implements AI {
     // If we made it here, there was no valid fighter target
     let enemyAirship = state.enemyAirship;
     if (enemyAirship !== null && !enemyAirship.isDead()) {
+      let target = enemyAirship.bestTargetQuadrant(WeaponType.Bomb);
+      if (target !== null)
+        return {
+          action: Bombs,
+          source: self,
+          target: target,
+        };
+    }
+
+    // If there were no valid targets, then return No Action
+    return {
+      action: NoAction,
+      source: self,
+      target: self,
+    };
+  }
+}
+
+export class PlayerBomberAI implements AI {
+  FindBestActionAndTarget(
+    state: CombatState,
+    self: Combatant
+  ): {
+    action: Action;
+    source: Combatant | Quadrant;
+    target: Combatant | Quadrant;
+  } {
+    // If it's possible to bomb, do bombing
+    let enemyAirship = state.enemyAirship;
+    if (enemyAirship !== null && !enemyAirship.isDead()) {
+      let target = enemyAirship.bestTargetQuadrant(WeaponType.Bomb);
+      if (target !== null)
+        return {
+          action: Bombs,
+          source: self,
+          target: target,
+        };
+    }
+
+    // Otherwise use fighter targeting
+    let primaryTarget = null;
+    if (self.indexTarget !== null)
+      primaryTarget = state.enemies[self.indexTarget];
+
+    if (primaryTarget === null || primaryTarget.isDead()) {
+      let targets = FighterGuns.GetValidTargets(state);
+      if (targets.length === 0) {
+        self.indexTarget = null;
+        primaryTarget = null;
+      } else {
+        let index = Math.round(Math.random() * (targets.length - 1));
+        self.indexTarget = (targets[index] as Combatant).index;
+        return {
+          action: FighterGuns,
+          source: self,
+          target: state.enemies[self.indexTarget],
+        };
+      }
+    }
+
+    // If there were no valid targets, then return No Action
+    return {
+      action: NoAction,
+      source: self,
+      target: self,
+    };
+  }
+}
+
+export class PlayerCaptainAI implements AI {
+  FindBestActionAndTarget(
+    state: CombatState,
+    self: Combatant
+  ): {
+    action: Action;
+    source: Combatant | Quadrant;
+    target: Combatant | Quadrant;
+  } {
+    // What is best target quadrant? What is best attacking quadrant?
+    // Get best attacking quadrant, then choose best target for it
+
+    // If there's no airship or the airship is dead, we cannot act
+    if (state.playerAirship === null || state.playerAirship.isDead())
       return {
-        action: Bombs,
+        action: NoAction,
         source: self,
-        target: enemyAirship.bestTargetQuadrant(WeaponType.Bomb),
+        target: self,
+      };
+
+    // If there's no enemy airship or the airship is dead, target an enemy fighter
+    if (state.enemyAirship === null || state.enemyAirship.isDead()) {
+      let primaryTarget = null;
+      if (self.indexTarget !== null)
+        primaryTarget = state.enemies[self.indexTarget];
+
+      if (primaryTarget === null || primaryTarget.isDead()) {
+        let targets = AntiAir.GetValidTargets(state);
+        if (targets.length === 0) {
+          self.indexTarget = null;
+          primaryTarget = null;
+        } else {
+          let index = Math.round(Math.random() * (targets.length - 1));
+          self.indexTarget = (targets[index] as Combatant).index;
+          return {
+            action: AntiAir,
+            source: state.playerAirship.bestQuadrantOfSetForOffense(
+              AllQuadrants()
+            ),
+            target: state.enemies[self.indexTarget],
+          };
+        }
+      }
+    }
+
+    if (state.enemyAirship !== null && !state.enemyAirship.isDead()) {
+      let attackQuadrant = state.playerAirship.bestAttackingQuadrant(
+        state.enemyAirship
+      );
+      if (attackQuadrant === null)
+        return {
+          action: NoAction,
+          source: self,
+          target: self,
+        };
+
+      let weaponType =
+        attackQuadrant === Quadrant.A ? WeaponType.Cannon : WeaponType.Torpedo;
+      return {
+        action: weaponType === WeaponType.Cannon ? Cannons : Torpedoes,
+        source: attackQuadrant,
+        target: state.playerAirship.bestTargetQuadrantForAttackFrom(
+          attackQuadrant,
+          state.enemyAirship
+        ),
       };
     }
 

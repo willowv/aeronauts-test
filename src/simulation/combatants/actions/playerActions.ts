@@ -181,7 +181,7 @@ function FindBuff(airship: Airship): void {
   if (airship.speedTokens[Boost.Positive] <= 3) {
     airship.speedTokens[Boost.Positive] += 3;
     return;
-  } else {
+  } else if (defenseQuadrant !== null) {
     airship.braceByQuadrant[defenseQuadrant] += 4;
   }
 }

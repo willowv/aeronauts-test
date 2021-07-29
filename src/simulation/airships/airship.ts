@@ -7,7 +7,7 @@ export enum Quadrant {
   D,
 }
 
-function AllQuadrants(): Quadrant[] {
+export function AllQuadrants(): Quadrant[] {
   return [Quadrant.A, Quadrant.B, Quadrant.C, Quadrant.D];
 }
 
@@ -85,11 +85,87 @@ export class Airship {
     );
   }
 
-  bestTargetQuadrant(weaponType: WeaponType): Quadrant {
+  validAttackQuadrants(): Quadrant[] {
+    let quadrants = [];
+    switch (this.frontQuadrant) {
+      case Quadrant.A:
+        quadrants = [Quadrant.A, Quadrant.B, Quadrant.C];
+        break;
+      case Quadrant.B:
+        quadrants = [Quadrant.B];
+        break;
+      case Quadrant.C:
+        quadrants = [Quadrant.C];
+        break;
+      case Quadrant.D:
+        quadrants = [Quadrant.B, Quadrant.C];
+        break;
+    }
+    return quadrants.filter((quadrant) => this.healthByQuadrant[quadrant] > 0);
+  }
+
+  validTargetQuadrants(weaponType: WeaponType): Quadrant[] {
+    let quadrants: Quadrant[] = [];
+    switch (weaponType) {
+      case WeaponType.Cannon:
+        quadrants = [this.frontQuadrant];
+        break;
+      case WeaponType.Torpedo:
+        quadrants = this.frontThreeQuadrants();
+        break;
+      case WeaponType.Bomb:
+        quadrants = AllQuadrants();
+        break;
+    }
+    return quadrants.filter((quadrant) => this.healthByQuadrant[quadrant] > 0);
+  }
+
+  bestAttackingQuadrant(targetAirship: Airship): Quadrant | null {
+    // for each valid attacking quadrant, are there any valid target quadrants?
+    let candidates = this.validAttackQuadrants();
+    candidates = candidates.filter((attackQuadrant) => {
+      let weaponType =
+        attackQuadrant === Quadrant.A ? WeaponType.Cannon : WeaponType.Torpedo;
+      return targetAirship.validTargetQuadrants(weaponType).length > 0;
+    });
+    if (candidates.length === 0) return null;
+
+    let attackValue: (quadrant: Quadrant) => number = (quadrant) => {
+      let target = this.bestTargetQuadrantForAttackFrom(
+        quadrant,
+        targetAirship
+      );
+      return (
+        this.advantageTokensByQuadrant[quadrant] -
+        this.disadvantageTokensByQuadrant[quadrant] -
+        targetAirship.getAdjustedHealthOfQuadrant(target)
+      );
+    };
+    candidates.sort((a, b) => attackValue(b) - attackValue(a));
+    return candidates[0];
+  }
+
+  bestTargetQuadrantForAttackFrom(
+    attackingQuadrant: Quadrant,
+    targetAirship: Airship
+  ): Quadrant {
+    let weaponType =
+      attackingQuadrant === Quadrant.A ? WeaponType.Cannon : WeaponType.Torpedo;
+    let candidates = targetAirship.validTargetQuadrants(weaponType);
+    candidates.sort(
+      (a, b) =>
+        targetAirship.getAdjustedHealthOfQuadrant(a) -
+        targetAirship.getAdjustedHealthOfQuadrant(b)
+    );
+    return candidates[0];
+  }
+
+  bestTargetQuadrant(weaponType: WeaponType): Quadrant | null {
     let candidates: Quadrant[] = [];
     switch (weaponType) {
       case WeaponType.Cannon:
-        return this.frontQuadrant;
+        candidates.push(this.frontQuadrant);
+        break;
       case WeaponType.Torpedo:
         candidates = this.frontThreeQuadrants();
         break;
@@ -101,11 +177,14 @@ export class Airship {
         if (safeCandidates.length > 0) candidates = safeCandidates;
         break;
     }
+    candidates = candidates.filter(
+      (candidate) => this.healthByQuadrant[candidate] > 0
+    ); // only consider targetable quadrants
     return this.worstQuadrantOfSetForDefense(candidates);
   }
 
-  worstQuadrantOfSetForDefense(candidates: Quadrant[]): Quadrant {
-    let worstQuadrant = this.frontQuadrant;
+  worstQuadrantOfSetForDefense(candidates: Quadrant[]): Quadrant | null {
+    let worstQuadrant = null;
     let worstAdjustedHealth = 15;
     candidates.forEach((quadrant) => {
       let adjustedHealth = this.getAdjustedHealthOfQuadrant(quadrant);
@@ -240,7 +319,8 @@ export class Airship {
     this.frontQuadrant = bestQuadrantForMove;
 
     // Brace the weakest quadrant
-    let weakestQuadrant = this.worstQuadrantOfSetForDefense(AllQuadrants());
+    let weakestQuadrant =
+      this.worstQuadrantOfSetForDefense(AllQuadrants()) ?? this.frontQuadrant;
     this.braceByQuadrant[weakestQuadrant] += 2;
   }
 }
