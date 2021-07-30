@@ -238,11 +238,11 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
           triggerNewSimulation={() => {
             let newReport = SimulateScenario(
               new Scenario(
-                false, // TODO: support air combat
+                this.state.isAirCombat,
                 this.state.enemySet,
                 this.state.players,
-                null,
-                null
+                this.state.enemyAirship,
+                this.state.playerAirship
               ),
               10000
             );
