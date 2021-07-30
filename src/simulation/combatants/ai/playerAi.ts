@@ -278,7 +278,4 @@ export class PlayerCaptainAI implements AI {
   }
 }
 
-// Captain AI
-// For attack, determine which quadrant to attack with - B and C will be torps, A will be cannons
-// Attack with whatever has the greatest advantage vs. the enemy's weakest quadrant, then pick a weapon that can do that
-// When to attack fighters? If there's no interceptor on our team, attack an enemy fighter 33% of the time, prioritize enemies with no disadvantage
+// TODO: Engineer AI

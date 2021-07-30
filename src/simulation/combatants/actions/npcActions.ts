@@ -72,6 +72,7 @@ export const BasicCannons = new Action(
     } else if (checkResult < 15) {
       state.playerAirship.takeDamage(targetQuadrant, 2);
     }
+    state.playerAirship.suppressionByQuadrant[targetQuadrant] = true;
     return state;
   }
 );
@@ -104,6 +105,7 @@ export const BasicTorps = new Action(
       state.playerAirship.takeDamage(targetQuadrant, 1);
       state.playerAirship.exposureTokensByQuadrant[targetQuadrant] += 1;
     }
+    state.playerAirship.suppressionByQuadrant[targetQuadrant] = true;
     return state;
   }
 );
@@ -185,6 +187,7 @@ export const AdvancedCannons = new Action(
     } else if (checkResult < 15) {
       state.playerAirship.takeDamage(targetQuadrant, 2);
     }
+    state.playerAirship.suppressionByQuadrant[targetQuadrant] = true;
     return state;
   }
 );
@@ -216,6 +219,7 @@ export const AdvancedTorps = new Action(
     } else if (checkResult < 15) {
       state.playerAirship.takeDamage(targetQuadrant, 2);
     }
+    state.playerAirship.suppressionByQuadrant[targetQuadrant] = true;
     return state;
   }
 );
@@ -291,28 +295,31 @@ export const BasicBombs = new Action(
       return state;
 
     let targetQuadrant = target as Quadrant;
-    let targetAdvantage = Math.max(
-      1,
-      state.playerAirship.advantageTokensByQuadrant[targetQuadrant]
-    );
-    let targetDisadvantage = Math.max(
-      1,
-      state.playerAirship.disadvantageTokensByQuadrant[targetQuadrant]
-    );
-    state.playerAirship.advantageTokensByQuadrant[targetQuadrant] -=
-      targetAdvantage;
-    state.playerAirship.disadvantageTokensByQuadrant[targetQuadrant] -=
-      targetDisadvantage;
-    let freeAttackDamage = 2 + targetAdvantage - targetDisadvantage;
-    let newActor = state.GetCombatantFromSelf(actor as Combatant);
-    newActor.takeDamage(freeAttackDamage);
-    if (newActor.isDead()) return state;
+    if (!state.enemyAirship.suppressionByQuadrant[targetQuadrant]) {
+      let targetAdvantage = Math.max(
+        1,
+        state.playerAirship.advantageTokensByQuadrant[targetQuadrant]
+      );
+      let targetDisadvantage = Math.max(
+        1,
+        state.playerAirship.disadvantageTokensByQuadrant[targetQuadrant]
+      );
+      state.playerAirship.advantageTokensByQuadrant[targetQuadrant] -=
+        targetAdvantage;
+      state.playerAirship.disadvantageTokensByQuadrant[targetQuadrant] -=
+        targetDisadvantage;
+      let freeAttackDamage = 2 + targetAdvantage - targetDisadvantage;
+      let newActor = state.GetCombatantFromSelf(actor as Combatant);
+      newActor.takeDamage(freeAttackDamage);
+      if (newActor.isDead()) return state;
+    }
 
     if (checkResult >= 15) {
       state.playerAirship.takeDamage(targetQuadrant, 3);
     } else if (checkResult >= 10) {
       state.playerAirship.takeDamage(targetQuadrant, 2);
     }
+    state.enemyAirship.suppressionByQuadrant[targetQuadrant] = true;
     return state;
   }
 );
@@ -338,28 +345,31 @@ export const AdvancedBombs = new Action(
       return state;
 
     let targetQuadrant = target as Quadrant;
-    let targetAdvantage = Math.max(
-      1,
-      state.playerAirship.advantageTokensByQuadrant[targetQuadrant]
-    );
-    let targetDisadvantage = Math.max(
-      1,
-      state.playerAirship.disadvantageTokensByQuadrant[targetQuadrant]
-    );
-    state.playerAirship.advantageTokensByQuadrant[targetQuadrant] -=
-      targetAdvantage;
-    state.playerAirship.disadvantageTokensByQuadrant[targetQuadrant] -=
-      targetDisadvantage;
-    let freeAttackDamage = 2 + targetAdvantage - targetDisadvantage;
-    let newActor = state.GetCombatantFromSelf(actor as Combatant);
-    newActor.takeDamage(freeAttackDamage);
-    if (newActor.isDead()) return state;
+    if (!state.playerAirship.suppressionByQuadrant[targetQuadrant]) {
+      let targetAdvantage = Math.max(
+        1,
+        state.playerAirship.advantageTokensByQuadrant[targetQuadrant]
+      );
+      let targetDisadvantage = Math.max(
+        1,
+        state.playerAirship.disadvantageTokensByQuadrant[targetQuadrant]
+      );
+      state.playerAirship.advantageTokensByQuadrant[targetQuadrant] -=
+        targetAdvantage;
+      state.playerAirship.disadvantageTokensByQuadrant[targetQuadrant] -=
+        targetDisadvantage;
+      let freeAttackDamage = 2 + targetAdvantage - targetDisadvantage;
+      let newActor = state.GetCombatantFromSelf(actor as Combatant);
+      newActor.takeDamage(freeAttackDamage);
+      if (newActor.isDead()) return state;
+    }
 
     if (checkResult >= 15) {
       state.playerAirship.takeDamage(targetQuadrant, 5);
     } else if (checkResult >= 10) {
       state.playerAirship.takeDamage(targetQuadrant, 2);
     }
+    state.playerAirship.suppressionByQuadrant[targetQuadrant] = true;
     return state;
   }
 );

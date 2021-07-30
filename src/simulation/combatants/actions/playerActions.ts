@@ -72,6 +72,7 @@ export const Cannons = new Action(
     } else if (checkResult >= 10) {
       state.enemyAirship.takeDamage(targetQuadrant, 3);
     }
+    state.enemyAirship.suppressionByQuadrant[targetQuadrant] = true;
     return state;
   }
 );
@@ -104,6 +105,7 @@ export const Torpedoes = new Action(
       state.enemyAirship.takeDamage(targetQuadrant, 2);
       state.enemyAirship.disadvantageTokensByQuadrant[targetQuadrant] += 1;
     }
+    state.enemyAirship.suppressionByQuadrant[targetQuadrant] = true;
     return state;
   }
 );
@@ -237,28 +239,31 @@ export const Bombs = new Action(
       return state;
 
     let targetQuadrant = target as Quadrant;
-    let targetAdvantage = Math.max(
-      1,
-      state.enemyAirship.advantageTokensByQuadrant[targetQuadrant]
-    );
-    let targetDisadvantage = Math.max(
-      1,
-      state.enemyAirship.disadvantageTokensByQuadrant[targetQuadrant]
-    );
-    state.enemyAirship.advantageTokensByQuadrant[targetQuadrant] -=
-      targetAdvantage;
-    state.enemyAirship.disadvantageTokensByQuadrant[targetQuadrant] -=
-      targetDisadvantage;
-    let freeAttackDamage = 2 + targetAdvantage - targetDisadvantage;
-    let newActor = state.GetCombatantFromSelf(actor as Combatant);
-    newActor.takeDamage(freeAttackDamage);
-    if (newActor.isDead()) return state;
+    if (!state.enemyAirship.suppressionByQuadrant[targetQuadrant]) {
+      let targetAdvantage = Math.max(
+        1,
+        state.enemyAirship.advantageTokensByQuadrant[targetQuadrant]
+      );
+      let targetDisadvantage = Math.max(
+        1,
+        state.enemyAirship.disadvantageTokensByQuadrant[targetQuadrant]
+      );
+      state.enemyAirship.advantageTokensByQuadrant[targetQuadrant] -=
+        targetAdvantage;
+      state.enemyAirship.disadvantageTokensByQuadrant[targetQuadrant] -=
+        targetDisadvantage;
+      let freeAttackDamage = 2 + targetAdvantage - targetDisadvantage;
+      let newActor = state.GetCombatantFromSelf(actor as Combatant);
+      newActor.takeDamage(freeAttackDamage);
+      if (newActor.isDead()) return state;
+    }
 
     if (checkResult >= 15) {
       state.enemyAirship.takeDamage(targetQuadrant, 5);
     } else if (checkResult >= 10) {
       state.enemyAirship.takeDamage(targetQuadrant, 3);
     }
+    state.enemyAirship.suppressionByQuadrant[targetQuadrant] = true;
     return state;
   }
 );

@@ -42,6 +42,7 @@ export class Airship {
   speedTokens: number[];
   advantageTokensByQuadrant: number[];
   disadvantageTokensByQuadrant: number[];
+  suppressionByQuadrant: boolean[];
 
   constructor(
     frontQuadrant: Quadrant,
@@ -50,7 +51,8 @@ export class Airship {
     exposureTokens: number[],
     speedTokens: number[],
     advantageTokensByQuadrant: number[],
-    disadvantageTokensByQuadrant: number[]
+    disadvantageTokensByQuadrant: number[],
+    suppressionByQuadrant: boolean[]
   ) {
     this.frontQuadrant = frontQuadrant;
     this.healthByQuadrant = health;
@@ -59,6 +61,7 @@ export class Airship {
     this.speedTokens = speedTokens;
     this.advantageTokensByQuadrant = advantageTokensByQuadrant;
     this.disadvantageTokensByQuadrant = disadvantageTokensByQuadrant;
+    this.suppressionByQuadrant = suppressionByQuadrant;
   }
 
   clone(): Airship {
@@ -69,12 +72,14 @@ export class Airship {
       [...this.exposureTokensByQuadrant],
       [...this.speedTokens],
       [...this.advantageTokensByQuadrant],
-      [...this.disadvantageTokensByQuadrant]
+      [...this.disadvantageTokensByQuadrant],
+      [...this.suppressionByQuadrant]
     );
   }
 
-  clearBrace(): void {
+  resetBraceAndSuppression(): void {
     this.braceByQuadrant = [0, 0, 0, 0];
+    this.suppressionByQuadrant = [false, false, false, false];
   }
 
   getAdjustedHealthOfQuadrant(quadrant: Quadrant): number {
@@ -172,7 +177,9 @@ export class Airship {
       case WeaponType.Bomb:
         candidates = AllQuadrants();
         let safeCandidates = candidates.filter(
-          (quadrant) => this.disadvantageTokensByQuadrant[quadrant] >= 1
+          (quadrant) =>
+            this.suppressionByQuadrant[quadrant] &&
+            this.healthByQuadrant[quadrant] > 0
         );
         if (safeCandidates.length > 0) candidates = safeCandidates;
         break;

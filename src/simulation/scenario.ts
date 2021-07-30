@@ -172,6 +172,7 @@ export class ScenarioEnemyAirship {
       [0, 0],
       [0, 0, 0, 0],
       [0, 0, 0, 0],
+      [false, false, false, false],
       numBasicActions,
       numAdvancedActions,
       [BasicCannons, BasicTorps, BasicAA],
@@ -199,6 +200,7 @@ export class ScenarioPlayerAirship {
       [0, 0],
       [0, 0, 0, 0],
       [0, 0, 0, 0],
+      [false, false, false, false],
       this.indexPlayerCaptain,
       this.indexPlayerEngineer
     );

@@ -12,6 +12,7 @@ export class PlayerAirship extends Airship {
     speedTokens: number[],
     advantageTokensByQuadrant: number[],
     disadvantageTokensByQuadrant: number[],
+    suppressionByQuadrant: boolean[],
     indexPlayerCaptain: number,
     indexPlayerEngineer: number
   ) {
@@ -22,7 +23,8 @@ export class PlayerAirship extends Airship {
       exposureTokens,
       speedTokens,
       advantageTokensByQuadrant,
-      disadvantageTokensByQuadrant
+      disadvantageTokensByQuadrant,
+      suppressionByQuadrant
     );
     this.indexPlayerCaptain = indexPlayerCaptain;
     this.indexPlayerEngineer = indexPlayerEngineer;
@@ -37,6 +39,7 @@ export class PlayerAirship extends Airship {
       [...this.speedTokens],
       [...this.advantageTokensByQuadrant],
       [...this.disadvantageTokensByQuadrant],
+      [...this.suppressionByQuadrant],
       this.indexPlayerCaptain,
       this.indexPlayerEngineer
     );

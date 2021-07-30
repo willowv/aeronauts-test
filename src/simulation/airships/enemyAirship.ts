@@ -18,6 +18,7 @@ export class EnemyAirship extends Airship {
     speedTokens: number[],
     advantageTokensByQuadrant: number[],
     disadvantageTokensByQuadrant: number[],
+    suppressionByQuadrant: boolean[],
     numBasicActions: number,
     numAdvancedActions: number,
     basicActions: Action[],
@@ -31,7 +32,8 @@ export class EnemyAirship extends Airship {
       exposureTokens,
       speedTokens,
       advantageTokensByQuadrant,
-      disadvantageTokensByQuadrant
+      disadvantageTokensByQuadrant,
+      suppressionByQuadrant
     );
     this.numBasicActions = numBasicActions;
     this.numAdvancedActions = numAdvancedActions;
@@ -49,6 +51,7 @@ export class EnemyAirship extends Airship {
       [...this.speedTokens],
       [...this.advantageTokensByQuadrant],
       [...this.disadvantageTokensByQuadrant],
+      [...this.suppressionByQuadrant],
       this.numBasicActions,
       this.numAdvancedActions,
       this.basicActions,
@@ -57,6 +60,7 @@ export class EnemyAirship extends Airship {
     );
   }
 
+  // TODO: Implement these
   getBestBasicActionAndTarget(state: CombatState): {
     action: Action;
     source: Combatant | Quadrant;

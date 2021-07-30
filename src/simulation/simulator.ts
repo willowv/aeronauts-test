@@ -85,7 +85,7 @@ function SimulatePlayerAirshipTurn(initialState: CombatState): CombatState {
   if (state.playerAirship === null || state.playerAirship.isDead())
     return initialState;
 
-  state.playerAirship.clearBrace();
+  state.playerAirship.resetBraceAndSuppression();
   state.playerAirship.takeBestMoves();
   state.players[state.playerAirship.indexPlayerCaptain].actionsTaken++;
   state.players[state.playerAirship.indexPlayerEngineer].actionsTaken++;
@@ -97,7 +97,7 @@ function SimulateEnemyAirshipTurn(initialState: CombatState): CombatState {
   if (state.enemyAirship === null || state.enemyAirship.isDead())
     return initialState;
 
-  state.enemyAirship.clearBrace();
+  state.enemyAirship.resetBraceAndSuppression();
   state.enemyAirship.takeBestMoves();
   state.enemyAirship.actionsTaken += 2;
 
