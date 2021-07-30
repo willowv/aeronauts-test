@@ -1,7 +1,16 @@
 import { Action } from "../combatants/actions/action";
+import {
+  AdvancedAA,
+  AdvancedCannons,
+  AdvancedTorps,
+  BasicAA,
+  BasicCannons,
+  BasicTorps,
+  NoAction,
+} from "../combatants/actions/npcActions";
 import Combatant from "../combatants/combatant";
 import { CombatState } from "../state";
-import { Airship, Quadrant } from "./airship";
+import { Airship, AllQuadrants, Quadrant, WeaponType } from "./airship";
 
 export class EnemyAirship extends Airship {
   numBasicActions: number;
@@ -9,6 +18,7 @@ export class EnemyAirship extends Airship {
   basicActions: Action[];
   advancedActions: Action[];
   actionsTaken: number;
+  indexTarget: number | null;
 
   constructor(
     frontQuadrant: Quadrant,
@@ -23,7 +33,8 @@ export class EnemyAirship extends Airship {
     numAdvancedActions: number,
     basicActions: Action[],
     advancedActions: Action[],
-    actionsTaken: number
+    actionsTaken: number,
+    indexTarget: number | null
   ) {
     super(
       frontQuadrant,
@@ -40,6 +51,7 @@ export class EnemyAirship extends Airship {
     this.basicActions = basicActions;
     this.advancedActions = advancedActions;
     this.actionsTaken = actionsTaken;
+    this.indexTarget = indexTarget;
   }
 
   clone(): EnemyAirship {
@@ -56,20 +68,22 @@ export class EnemyAirship extends Airship {
       this.numAdvancedActions,
       this.basicActions,
       this.advancedActions,
-      this.actionsTaken
+      this.actionsTaken,
+      this.indexTarget
     );
   }
 
-  // TODO: Implement these
   getBestBasicActionAndTarget(state: CombatState): {
     action: Action;
     source: Combatant | Quadrant;
     target: Combatant | Quadrant;
   } {
-    // Attack with cannons, torpedoes, or anti-air?
-    let action = this.basicActions[0];
-    let targets = action.GetValidTargets(state);
-    return { action: action, source: this.frontQuadrant, target: targets[0] }; // TODO: use correct quadrant
+    return this.getBestActionAndTarget(
+      state,
+      BasicCannons,
+      BasicTorps,
+      BasicAA
+    );
   }
 
   getBestAdvancedActionAndTarget(state: CombatState): {
@@ -77,8 +91,80 @@ export class EnemyAirship extends Airship {
     source: Combatant | Quadrant;
     target: Combatant | Quadrant;
   } {
-    let action = this.advancedActions[0];
-    let targets = action.GetValidTargets(state);
-    return { action: action, source: this.frontQuadrant, target: targets[0] }; // TODO: use correct quadrant
+    return this.getBestActionAndTarget(
+      state,
+      AdvancedCannons,
+      AdvancedTorps,
+      AdvancedAA
+    );
+  }
+
+  getBestActionAndTarget(
+    state: CombatState,
+    cannons: Action,
+    torpedoes: Action,
+    aa: Action
+  ): {
+    action: Action;
+    source: Combatant | Quadrant;
+    target: Combatant | Quadrant;
+  } {
+    // If there's no airship or the airship is dead, we cannot act
+    if (this.isDead())
+      return {
+        action: NoAction,
+        source: Quadrant.A,
+        target: Quadrant.A,
+      };
+
+    // If there's no enemy airship or the airship is dead, target an enemy fighter
+    if (state.playerAirship === null || state.playerAirship.isDead()) {
+      let primaryTarget = null;
+      if (this.indexTarget !== null)
+        primaryTarget = state.players[this.indexTarget];
+
+      if (primaryTarget === null || primaryTarget.isDead()) {
+        let targets = aa.GetValidTargets(state);
+        if (targets.length === 0) {
+          this.indexTarget = null;
+          primaryTarget = null;
+        } else {
+          let index = Math.round(Math.random() * (targets.length - 1));
+          this.indexTarget = (targets[index] as Combatant).index;
+          return {
+            action: aa,
+            source: this.bestQuadrantOfSetForOffense(AllQuadrants()),
+            target: state.players[this.indexTarget],
+          };
+        }
+      }
+    }
+
+    if (state.playerAirship !== null && !state.playerAirship.isDead()) {
+      let attackQuadrant = this.bestAttackingQuadrant(state.playerAirship);
+      if (attackQuadrant === null)
+        return {
+          action: NoAction,
+          source: Quadrant.A,
+          target: Quadrant.A,
+        };
+
+      let weaponType =
+        attackQuadrant === Quadrant.A ? WeaponType.Cannon : WeaponType.Torpedo;
+      return {
+        action: weaponType === WeaponType.Cannon ? cannons : torpedoes,
+        source: attackQuadrant,
+        target: this.bestTargetQuadrantForAttackFrom(
+          attackQuadrant,
+          state.playerAirship
+        ),
+      };
+    }
+
+    return {
+      action: NoAction,
+      source: Quadrant.A,
+      target: Quadrant.A,
+    };
   }
 }

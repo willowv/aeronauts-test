@@ -177,7 +177,8 @@ export class ScenarioEnemyAirship {
       numAdvancedActions,
       [BasicCannons, BasicTorps, BasicAA],
       [AdvancedCannons, AdvancedTorps, AdvancedAA],
-      0
+      0,
+      null
     );
   }
 }
