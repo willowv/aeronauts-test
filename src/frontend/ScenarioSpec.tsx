@@ -121,6 +121,7 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
     if (this.state.isAirCombat) {
       playerSpecs.unshift(
         <PlayerAirshipSpec
+          key="airship-spec"
           players={this.state.players}
           handleCaptainChange={(indexNewCaptain) =>
             this.setState((prevState) => {
@@ -130,18 +131,26 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
               let indexCurEngineer = prevState.players.findIndex(
                 (player) => player.role === Role.Engineer
               );
+              let indexNewEngineer = indexCurEngineer;
               let newPlayers = prevState.players.map((player, index) => {
                 let newPlayer = player.clone();
                 if (index === indexCurCaptain) {
-                  if (indexCurEngineer === indexNewCaptain)
+                  if (indexCurEngineer === indexNewCaptain) {
+                    indexNewEngineer = index;
                     newPlayer.role = Role.Engineer;
-                  else newPlayer.role = Role.Interceptor;
+                  } else newPlayer.role = Role.Interceptor;
                 } else if (indexNewCaptain === index)
                   newPlayer.role = Role.Captain;
 
                 return newPlayer;
               });
-              return { players: newPlayers };
+              return {
+                players: newPlayers,
+                playerAirship: new ScenarioPlayerAirship(
+                  indexNewCaptain,
+                  indexNewEngineer
+                ),
+              };
             })
           }
           handleEngineerChange={(indexNewEngineer) =>
@@ -152,18 +161,26 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
               let indexCurEngineer = prevState.players.findIndex(
                 (player) => player.role === Role.Engineer
               );
+              let indexNewCaptain = indexCurCaptain;
               let newPlayers = prevState.players.map((player, index) => {
                 let newPlayer = player.clone();
                 if (index === indexCurEngineer) {
-                  if (indexCurCaptain === indexNewEngineer)
+                  if (indexCurCaptain === indexNewEngineer) {
+                    indexNewCaptain = index;
                     newPlayer.role = Role.Captain;
-                  else newPlayer.role = Role.Bomber;
+                  } else newPlayer.role = Role.Bomber;
                 } else if (indexNewEngineer === index)
                   newPlayer.role = Role.Engineer;
 
                 return newPlayer;
               });
-              return { players: newPlayers };
+              return {
+                players: newPlayers,
+                playerAirship: new ScenarioPlayerAirship(
+                  indexNewCaptain,
+                  indexNewEngineer
+                ),
+              };
             })
           }
         />
@@ -189,6 +206,7 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
                 // if we have entered air combat, set players 0 and 1 as Captain and Engineer and others as Interceptor
                 // if we have exited air combat, set all players to Ground role
                 let newPlayers = [];
+                let airship = null;
                 if (prevState.isAirCombat) {
                   newPlayers = prevState.players.map((player, index) => {
                     let newPlayer = player.clone();
@@ -204,10 +222,12 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
 
                     return newPlayer;
                   });
+                  airship = new ScenarioPlayerAirship(0, 1);
                 }
                 return {
                   isAirCombat: !prevState.isAirCombat,
                   players: newPlayers,
+                  playerAirship: airship,
                 };
               });
             }}

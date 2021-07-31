@@ -6,16 +6,24 @@ import {
   AdvancedAA,
   AdvancedBombs,
   AdvancedCannons,
+  AdvancedFighterGuns,
   AdvancedTorps,
   BasicAA,
   BasicBombs,
   BasicCannons,
+  BasicFighterGuns,
   BasicTorps,
   EnemyAdvancedAttack,
   EnemyBasicAttack,
 } from "../simulation/combatants/actions/npcActions";
 import { CombatantType, Faction } from "../enum";
-import { PlayerAI } from "./combatants/ai/playerAi";
+import {
+  PlayerAI,
+  PlayerBomberAI,
+  PlayerCaptainAI,
+  PlayerEngineerAI,
+  PlayerInterceptorAI,
+} from "./combatants/ai/playerAi";
 import { EnemyAI, EnemyFighterAI } from "./combatants/ai/enemyAi";
 import { PlayerAirship } from "./airships/playerAirship";
 import { Quadrant } from "./airships/airship";
@@ -83,18 +91,23 @@ export class Scenario {
         let actions = [Attack, Defend];
         let damageResistance = 0;
         let combatantType = CombatantType.Ground;
+        let ai = new PlayerAI();
         if (this.isAirCombat && this.playerAirship !== null) {
           if (this.playerAirship.indexPlayerCaptain === index) {
             actions = [Cannons, Torpedoes, AntiAir];
             combatantType = CombatantType.Crew;
-          }
-          if (this.playerAirship.indexPlayerEngineer === index) {
+            ai = new PlayerCaptainAI();
+          } else if (this.playerAirship.indexPlayerEngineer === index) {
             actions = [AugmentSystems];
             combatantType = CombatantType.Crew;
+            ai = new PlayerEngineerAI();
           } else {
             actions = [FighterGuns, Bombs];
             combatantType = CombatantType.Fighter;
-            if (scenarioPlayer.role === Role.Bomber) damageResistance = 1;
+            if (scenarioPlayer.role === Role.Bomber) {
+              damageResistance = 1;
+              ai = new PlayerBomberAI();
+            } else ai = new PlayerInterceptorAI();
           }
         }
         return new Player(
@@ -108,7 +121,7 @@ export class Scenario {
           scenarioPlayer.focus,
           actions,
           scenarioPlayer.name,
-          new PlayerAI(),
+          ai,
           combatantType,
           damageResistance
         );
@@ -264,14 +277,16 @@ export class ScenarioEnemySet {
         let ai = isAirCombat ? new EnemyFighterAI() : new EnemyAI();
         let type = isAirCombat ? CombatantType.Fighter : CombatantType.Ground;
         let actions = isAirCombat
-          ? [AdvancedAA, AdvancedBombs]
+          ? [AdvancedFighterGuns, AdvancedBombs]
           : [EnemyAdvancedAttack];
         let actionsPerTurn = 1;
         switch (combatantType as EnemyLevel) {
           case EnemyLevel.Normal:
           default:
             health = 4;
-            actions = isAirCombat ? [BasicAA, BasicBombs] : [EnemyBasicAttack];
+            actions = isAirCombat
+              ? [BasicFighterGuns, BasicBombs]
+              : [EnemyBasicAttack];
             break;
           case EnemyLevel.Dangerous:
             health = 8;

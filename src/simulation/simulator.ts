@@ -165,16 +165,18 @@ export function Act(
   }
 
   let targetBoost = 0;
-  if (action.targetType !== CombatantType.Airship)
-    targetBoost = (target as Combatant).getBoostForAttackOnMe();
-  else {
-    let airship =
-      action.actorFaction === Faction.Players
-        ? state.playerAirship
-        : state.enemyAirship;
-    targetBoost = airship?.getBoostForAttackOnQuadrant(target as Quadrant) ?? 0;
+  if (action.type === ActionType.Contested) {
+    if (action.targetType !== CombatantType.Airship)
+      targetBoost = (target as Combatant).getBoostForAttackOnMe();
+    else {
+      let airship =
+        action.actorFaction === Faction.Players
+          ? state.playerAirship
+          : state.enemyAirship;
+      targetBoost =
+        airship?.getBoostForAttackOnQuadrant(target as Quadrant) ?? 0;
+    }
   }
-
   let checkResult = checkEvaluator(modifier, sourceBoost + targetBoost);
   return action.evaluate(checkResult, actor, target, state);
 }

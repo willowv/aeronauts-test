@@ -275,7 +275,7 @@ export class Airship {
   isDead(): boolean {
     let quadrantsRemaining = 0;
     this.healthByQuadrant.forEach((health) => {
-      if (health <= 0) quadrantsRemaining++;
+      if (health > 0) quadrantsRemaining++;
     });
     return quadrantsRemaining <= 1;
   }

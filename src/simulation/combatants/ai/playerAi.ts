@@ -5,6 +5,7 @@ import { Action } from "../actions/action";
 import {
   AntiAir,
   Attack,
+  AugmentSystems,
   Bombs,
   Cannons,
   Defend,
@@ -278,4 +279,19 @@ export class PlayerCaptainAI implements AI {
   }
 }
 
-// TODO: Engineer AI
+export class PlayerEngineerAI implements AI {
+  FindBestActionAndTarget(
+    state: CombatState,
+    self: Combatant
+  ): {
+    action: Action;
+    source: Quadrant | Combatant;
+    target: Quadrant | Combatant;
+  } {
+    return {
+      action: AugmentSystems,
+      source: self,
+      target: self, // not really, but this action doesn't care anyway
+    };
+  }
+}
