@@ -44,17 +44,18 @@ interface StatsVisProps {
 
 export const StatsVis = ({ reports, triggerNewSimulation }: StatsVisProps) => {
   // Grab the last 10 reports
-  let reportVis: JSX.Element[];
+  let reportVis: JSX.Element;
   if (reports.length > 0) {
-    let reportsToDisplay = reports
-      .slice(Math.max(reports.length - 10, 0))
-      .reverse();
-    reportVis = reportsToDisplay.map((report, index) => {
-      let title = index === 0 ? "Current" : "Current -" + index;
-      return <ScenarioReportVis key={title} title={title} report={report} />;
-    });
+    let index = reports.length - 1;
+    reportVis = (
+      <ScenarioReportVis
+        key="current"
+        title="Current"
+        report={reports[index]}
+      />
+    );
   } else {
-    reportVis = [
+    reportVis = (
       <Box key="empty" mx="2">
         <Heading>None</Heading>
         <p>-</p>
@@ -62,8 +63,8 @@ export const StatsVis = ({ reports, triggerNewSimulation }: StatsVisProps) => {
         <p>-</p>
         <p>-</p>
         <p>-</p>
-      </Box>,
-    ];
+      </Box>
+    );
   }
   return (
     <Card
