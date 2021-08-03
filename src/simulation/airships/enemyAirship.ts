@@ -93,13 +93,15 @@ export class EnemyAirship extends Airship {
         } else {
           let index = Math.round(Math.random() * (targets.length - 1));
           this.indexTarget = (targets[index] as Combatant).index;
-          return {
-            action: EnemyAA,
-            source: this.bestQuadrantOfSetForOffense(AllQuadrants()),
-            target: state.players[this.indexTarget],
-          };
         }
       }
+
+      if (this.indexTarget !== null)
+        return {
+          action: EnemyAA,
+          source: this.bestQuadrantOfSetForOffense(AllQuadrants()),
+          target: state.players[this.indexTarget],
+        };
     }
 
     if (state.playerAirship !== null && !state.playerAirship.isDead()) {

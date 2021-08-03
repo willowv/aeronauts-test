@@ -67,7 +67,9 @@ export class PlayerAI implements AI {
       enemy.tokens[Token.Defense][Boost.Positive];
 
     let enemiesCloseToDeath = initialState.enemies
-      .filter((enemy) => !enemy.isDead() && effectiveHealth(enemy) <= 3)
+      .filter(
+        (enemy) => !enemy.isDead() && effectiveHealth(enemy) <= self.fullDamage
+      )
       .sort(
         (enemyA, enemyB) => effectiveHealth(enemyA) - effectiveHealth(enemyB)
       );
@@ -86,21 +88,26 @@ export class PlayerAI implements AI {
     }
     if (primaryTarget === null || primaryTarget.isDead()) {
       let targets = Attack.GetValidTargets(initialState);
-      if (targets.length === 0)
-        return {
-          action: NoAction,
-          source: self,
-          target: self,
-        };
-
-      let index = Math.round(Math.random() * (targets.length - 1));
-      self.indexTarget = (targets[index] as Combatant).index;
+      if (targets.length === 0) {
+        primaryTarget = null;
+        self.indexTarget = null;
+      } else {
+        let index = Math.round(Math.random() * (targets.length - 1));
+        self.indexTarget = (targets[index] as Combatant).index;
+      }
     }
 
+    if (self.indexTarget !== null)
+      return {
+        action: Attack,
+        source: self,
+        target: initialState.enemies[self.indexTarget],
+      };
+
     return {
-      action: Attack,
+      action: NoAction,
       source: self,
-      target: initialState.enemies[self.indexTarget ?? 0],
+      target: self,
     };
   }
 }
@@ -127,12 +134,16 @@ export class PlayerInterceptorAI implements AI {
       } else {
         let index = Math.round(Math.random() * (targets.length - 1));
         self.indexTarget = (targets[index] as Combatant).index;
-        return {
-          action: FighterGuns,
-          source: self,
-          target: state.enemies[self.indexTarget],
-        };
       }
+    }
+
+    // We just made sure this target is valid
+    if (self.indexTarget !== null) {
+      return {
+        action: FighterGuns,
+        source: self,
+        target: state.enemies[self.indexTarget],
+      };
     }
 
     // If we made it here, there was no valid fighter target
@@ -190,12 +201,16 @@ export class PlayerBomberAI implements AI {
       } else {
         let index = Math.round(Math.random() * (targets.length - 1));
         self.indexTarget = (targets[index] as Combatant).index;
-        return {
-          action: FighterGuns,
-          source: self,
-          target: state.enemies[self.indexTarget],
-        };
       }
+    }
+
+    // We just made sure this target is valid
+    if (self.indexTarget !== null) {
+      return {
+        action: FighterGuns,
+        source: self,
+        target: state.enemies[self.indexTarget],
+      };
     }
 
     // If there were no valid targets, then return No Action

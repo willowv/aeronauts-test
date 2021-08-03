@@ -3,7 +3,12 @@ import Combatant from "../combatant";
 import { Action } from "../actions/action";
 import { CombatState } from "../../state";
 import { Quadrant, WeaponType } from "../../airships/airship";
-import { EnemyBombs, EnemyFighterGuns, NoAction } from "../actions/npcActions";
+import {
+  EnemyAttack,
+  EnemyBombs,
+  EnemyFighterGuns,
+  NoAction,
+} from "../actions/npcActions";
 
 export class EnemyAI implements AI {
   FindBestActionAndTarget(
@@ -14,30 +19,32 @@ export class EnemyAI implements AI {
     source: Combatant | Quadrant;
     target: Combatant | Quadrant;
   } {
-    // My primary target is whoever attacked me last, or choose randomly
-    let action = self.actions[0]; // enemies only have 1 attack at the moment
-
     let primaryTarget = null;
     if (self.indexTarget !== null) {
       primaryTarget = initialState.players[self.indexTarget];
     }
     if (primaryTarget === null || primaryTarget.isDead()) {
-      let targets = action.GetValidTargets(initialState);
-      if (targets.length === 0)
-        return {
-          action: NoAction,
-          source: self,
-          target: self,
-        };
-
-      let index = Math.round(Math.random() * (targets.length - 1));
-      self.indexTarget = (targets[index] as Combatant).index;
+      let targets = EnemyAttack.GetValidTargets(initialState);
+      if (targets.length === 0) {
+        primaryTarget = null;
+        self.indexTarget = null;
+      } else {
+        let index = Math.round(Math.random() * (targets.length - 1));
+        self.indexTarget = (targets[index] as Combatant).index;
+      }
     }
 
+    if (self.indexTarget !== null)
+      return {
+        action: EnemyAttack,
+        source: self,
+        target: initialState.players[self.indexTarget],
+      };
+
     return {
-      action: action,
+      action: NoAction,
       source: self,
-      target: initialState.players[self.indexTarget ?? 0],
+      target: self,
     };
   }
 }
@@ -75,30 +82,32 @@ export class EnemyFighterAI implements AI {
       }
     }
 
-    // My primary target is whoever attacked me last, or choose randomly
-    let action = self.actions[0]; // enemies only have 1 attack at the moment
-
     let primaryTarget = null;
     if (self.indexTarget !== null) {
       primaryTarget = initialState.players[self.indexTarget];
     }
     if (primaryTarget === null || primaryTarget.isDead()) {
-      let targets = action.GetValidTargets(initialState);
-      if (targets.length === 0)
-        return {
-          action: NoAction,
-          source: self,
-          target: self,
-        };
-
-      let index = Math.round(Math.random() * (targets.length - 1));
-      self.indexTarget = (targets[index] as Combatant).index;
+      let targets = EnemyFighterGuns.GetValidTargets(initialState);
+      if (targets.length === 0) {
+        primaryTarget = null;
+        self.indexTarget = null;
+      } else {
+        let index = Math.round(Math.random() * (targets.length - 1));
+        self.indexTarget = (targets[index] as Combatant).index;
+      }
     }
 
+    if (self.indexTarget !== null)
+      return {
+        action: EnemyFighterGuns,
+        source: self,
+        target: initialState.players[self.indexTarget],
+      };
+
     return {
-      action: action,
+      action: NoAction,
       source: self,
-      target: initialState.players[self.indexTarget ?? 0],
+      target: self,
     };
   }
 }
