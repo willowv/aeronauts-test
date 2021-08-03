@@ -15,10 +15,11 @@ export const Attack = new Action(
   (checkResult, actor, target, initialState) => {
     let state = initialState.clone();
     let newTarget = state.GetCombatantFromSelf(target as Combatant);
+    let newActor = state.GetCombatantFromSelf(actor as Combatant);
     if (checkResult >= 15) {
-      newTarget.takeDamage(5);
+      newTarget.takeDamage(newActor.fullDamage);
     } else if (checkResult >= 10) {
-      newTarget.takeDamage(3);
+      newTarget.takeDamage(newActor.partialDamage);
     }
     return state;
   }
@@ -123,8 +124,6 @@ export const AntiAir = new Action(
     let state = initialState.clone();
     if (
       !state.isAirCombat ||
-      state.enemyAirship === null ||
-      state.enemyAirship.isDead() ||
       state.playerAirship === null ||
       state.playerAirship.isDead()
     )
@@ -155,8 +154,6 @@ export const AugmentSystems = new Action(
     let state = initialState.clone();
     if (
       !state.isAirCombat ||
-      state.enemyAirship === null ||
-      state.enemyAirship.isDead() ||
       state.playerAirship === null ||
       state.playerAirship.isDead()
     )
@@ -199,14 +196,7 @@ export const FighterGuns = new Action(
   SourceType.Personal,
   (checkResult, actor, target, initialState) => {
     let state = initialState.clone();
-    if (
-      !state.isAirCombat ||
-      state.enemyAirship === null ||
-      state.enemyAirship.isDead() ||
-      state.playerAirship === null ||
-      state.playerAirship.isDead()
-    )
-      return state;
+    if (!state.isAirCombat) return state;
 
     let newTarget = state.GetCombatantFromSelf(target as Combatant);
     if (checkResult < 10) {
@@ -232,9 +222,7 @@ export const Bombs = new Action(
     if (
       !state.isAirCombat ||
       state.enemyAirship === null ||
-      state.enemyAirship.isDead() ||
-      state.playerAirship === null ||
-      state.playerAirship.isDead()
+      state.enemyAirship.isDead()
     )
       return state;
 
@@ -252,7 +240,8 @@ export const Bombs = new Action(
         targetAdvantage;
       state.enemyAirship.disadvantageTokensByQuadrant[targetQuadrant] -=
         targetDisadvantage;
-      let freeAttackDamage = 2 + targetAdvantage - targetDisadvantage;
+      let freeAttackDamage =
+        state.enemyAirship.partialDamage + targetAdvantage - targetDisadvantage;
       let newActor = state.GetCombatantFromSelf(actor as Combatant);
       newActor.takeDamage(freeAttackDamage);
       if (newActor.isDead()) return state;
