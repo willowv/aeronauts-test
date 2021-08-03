@@ -87,8 +87,8 @@ function SimulatePlayerAirshipTurn(initialState: CombatState): CombatState {
 
   state.playerAirship.resetBraceAndSuppression();
   state.playerAirship.takeBestMoves();
-  state.players[state.playerAirship.indexPlayerCaptain].actionsTaken++;
-  state.players[state.playerAirship.indexPlayerEngineer].actionsTaken++;
+  state.players[state.playerAirship.indexPlayerCaptain].actionsTaken += 0.5;
+  state.players[state.playerAirship.indexPlayerEngineer].actionsTaken += 0.5;
   return state;
 }
 
@@ -99,7 +99,7 @@ function SimulateEnemyAirshipTurn(initialState: CombatState): CombatState {
 
   state.enemyAirship.resetBraceAndSuppression();
   state.enemyAirship.takeBestMoves();
-  state.enemyAirship.actionsTaken += 2;
+  state.enemyAirship.actionsTaken += 1;
 
   for (
     let iAction = 0;
@@ -163,6 +163,7 @@ export function Act(
         airship?.getBoostForAttackOnQuadrant(target as Quadrant) ?? 0;
     }
   }
+
   let checkResult = checkEvaluator(modifier, sourceBoost + targetBoost);
   return action.evaluate(checkResult, actor, target, state);
 }

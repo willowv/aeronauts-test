@@ -23,16 +23,24 @@ const ScenarioReportVis = ({
       (sd {report.avgPlayerInjuries.sd.toFixed(1)})
     </p>
     <p>
-      {report.avgActionCount.mean.toFixed(2)}
-      (sd {report.avgActionCount.sd.toFixed(2)})
+      {Math.round(
+        report.avgActionCount.mean - 1.285 * report.avgActionCount.sd
+      ).toFixed(0)}
+      {" - "}
+      {Math.round(
+        report.avgActionCount.mean + 1.285 * report.avgActionCount.sd
+      ).toFixed(0)}
+      {" min"}
     </p>
     <p>
-      {report.avgEnemyActionCount.mean.toFixed(2)}
-      (sd {report.avgEnemyActionCount.sd.toFixed(2)})
-    </p>
-    <p>
-      {report.avgRoundCount.mean.toFixed(2)}
-      (sd {report.avgRoundCount.sd.toFixed(2)})
+      {Math.round(
+        report.avgRoundCount.mean - 1.285 * report.avgRoundCount.sd
+      ).toFixed(0)}
+      {" - "}
+      {Math.round(
+        report.avgRoundCount.mean + 1.285 * report.avgRoundCount.sd
+      ).toFixed(0)}
+      {" rounds"}
     </p>
   </Box>
 );
@@ -81,8 +89,7 @@ export const StatsVis = ({ reports, triggerNewSimulation }: StatsVisProps) => {
           <p>Win Rate</p>
           <p>Player KOs</p>
           <p>Player Injuries</p>
-          <p>Total Actions</p>
-          <p>Enemy Actions</p>
+          <p>Estimated Time</p>
           <p>Number of Rounds</p>
         </Box>
         {reportVis}
