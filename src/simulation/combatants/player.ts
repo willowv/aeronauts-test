@@ -24,7 +24,9 @@ export class Player extends Combatant {
     name: string,
     ai: AI,
     type: CombatantType,
-    damageResistance: number
+    damageResistance: number,
+    partialDamage: number,
+    fullDamage: number
   ) {
     super(
       index,
@@ -39,7 +41,9 @@ export class Player extends Combatant {
       maxPlayerHealth,
       ai,
       type,
-      damageResistance
+      damageResistance,
+      partialDamage,
+      fullDamage
     );
     this.abilityScores = [...abilityScores];
     this.focus = focus;
@@ -60,7 +64,9 @@ export class Player extends Combatant {
       this.name,
       this.ai,
       this.type,
-      this.damageResistance
+      this.damageResistance,
+      this.partialDamage,
+      this.fullDamage
     );
   }
 

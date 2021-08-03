@@ -1,11 +1,8 @@
 import { Action } from "../combatants/actions/action";
 import {
-  AdvancedAA,
-  AdvancedCannons,
-  AdvancedTorps,
-  BasicAA,
-  BasicCannons,
-  BasicTorps,
+  EnemyAA,
+  EnemyCannons,
+  EnemyTorps,
   NoAction,
 } from "../combatants/actions/npcActions";
 import Combatant from "../combatants/combatant";
@@ -13,12 +10,11 @@ import { CombatState } from "../state";
 import { Airship, AllQuadrants, Quadrant, WeaponType } from "./airship";
 
 export class EnemyAirship extends Airship {
-  numBasicActions: number;
-  numAdvancedActions: number;
-  basicActions: Action[];
-  advancedActions: Action[];
+  numActions: number;
   actionsTaken: number;
   indexTarget: number | null;
+  partialDamage: number;
+  fullDamage: number;
 
   constructor(
     frontQuadrant: Quadrant,
@@ -29,12 +25,11 @@ export class EnemyAirship extends Airship {
     advantageTokensByQuadrant: number[],
     disadvantageTokensByQuadrant: number[],
     suppressionByQuadrant: boolean[],
-    numBasicActions: number,
-    numAdvancedActions: number,
-    basicActions: Action[],
-    advancedActions: Action[],
+    numActions: number,
     actionsTaken: number,
-    indexTarget: number | null
+    indexTarget: number | null,
+    partialDamage: number,
+    fullDamage: number
   ) {
     super(
       frontQuadrant,
@@ -46,12 +41,11 @@ export class EnemyAirship extends Airship {
       disadvantageTokensByQuadrant,
       suppressionByQuadrant
     );
-    this.numBasicActions = numBasicActions;
-    this.numAdvancedActions = numAdvancedActions;
-    this.basicActions = basicActions;
-    this.advancedActions = advancedActions;
+    this.numActions = numActions;
     this.actionsTaken = actionsTaken;
     this.indexTarget = indexTarget;
+    this.partialDamage = partialDamage;
+    this.fullDamage = fullDamage;
   }
 
   clone(): EnemyAirship {
@@ -64,47 +58,15 @@ export class EnemyAirship extends Airship {
       [...this.advantageTokensByQuadrant],
       [...this.disadvantageTokensByQuadrant],
       [...this.suppressionByQuadrant],
-      this.numBasicActions,
-      this.numAdvancedActions,
-      this.basicActions,
-      this.advancedActions,
+      this.numActions,
       this.actionsTaken,
-      this.indexTarget
+      this.indexTarget,
+      this.partialDamage,
+      this.fullDamage
     );
   }
 
-  getBestBasicActionAndTarget(state: CombatState): {
-    action: Action;
-    source: Combatant | Quadrant;
-    target: Combatant | Quadrant;
-  } {
-    return this.getBestActionAndTarget(
-      state,
-      BasicCannons,
-      BasicTorps,
-      BasicAA
-    );
-  }
-
-  getBestAdvancedActionAndTarget(state: CombatState): {
-    action: Action;
-    source: Combatant | Quadrant;
-    target: Combatant | Quadrant;
-  } {
-    return this.getBestActionAndTarget(
-      state,
-      AdvancedCannons,
-      AdvancedTorps,
-      AdvancedAA
-    );
-  }
-
-  getBestActionAndTarget(
-    state: CombatState,
-    cannons: Action,
-    torpedoes: Action,
-    aa: Action
-  ): {
+  getBestActionAndTarget(state: CombatState): {
     action: Action;
     source: Combatant | Quadrant;
     target: Combatant | Quadrant;
@@ -124,7 +86,7 @@ export class EnemyAirship extends Airship {
         primaryTarget = state.players[this.indexTarget];
 
       if (primaryTarget === null || primaryTarget.isDead()) {
-        let targets = aa.GetValidTargets(state);
+        let targets = EnemyAA.GetValidTargets(state);
         if (targets.length === 0) {
           this.indexTarget = null;
           primaryTarget = null;
@@ -132,7 +94,7 @@ export class EnemyAirship extends Airship {
           let index = Math.round(Math.random() * (targets.length - 1));
           this.indexTarget = (targets[index] as Combatant).index;
           return {
-            action: aa,
+            action: EnemyAA,
             source: this.bestQuadrantOfSetForOffense(AllQuadrants()),
             target: state.players[this.indexTarget],
           };
@@ -152,7 +114,7 @@ export class EnemyAirship extends Airship {
       let weaponType =
         attackQuadrant === Quadrant.A ? WeaponType.Cannon : WeaponType.Torpedo;
       return {
-        action: weaponType === WeaponType.Cannon ? cannons : torpedoes,
+        action: weaponType === WeaponType.Cannon ? EnemyCannons : EnemyTorps,
         source: attackQuadrant,
         target: this.bestTargetQuadrantForAttackFrom(
           attackQuadrant,

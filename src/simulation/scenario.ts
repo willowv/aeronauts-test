@@ -3,18 +3,9 @@ import { Player } from "../simulation/combatants/player";
 import { CombatState } from "./state";
 import { Action } from "../simulation/combatants/actions/action";
 import {
-  AdvancedAA,
-  AdvancedBombs,
-  AdvancedCannons,
-  AdvancedFighterGuns,
-  AdvancedTorps,
-  BasicAA,
-  BasicBombs,
-  BasicCannons,
-  BasicFighterGuns,
-  BasicTorps,
-  EnemyAdvancedAttack,
-  EnemyBasicAttack,
+  EnemyBombs,
+  EnemyFighterGuns,
+  EnemyAttack,
 } from "../simulation/combatants/actions/npcActions";
 import { CombatantType, Faction } from "../enum";
 import {
@@ -123,7 +114,9 @@ export class Scenario {
           scenarioPlayer.name,
           ai,
           combatantType,
-          damageResistance
+          damageResistance,
+          3,
+          5
         );
       }
     );
@@ -154,27 +147,31 @@ export class ScenarioEnemyAirship {
   }
 
   generateEnemyAirship(): EnemyAirship {
-    let health, numBasicActions, numAdvancedActions;
+    let health, numActions, partialDamage, fullDamage;
     switch (this.level) {
       case EnemyLevel.Normal:
-        health = 6;
-        numBasicActions = 1;
-        numAdvancedActions = 1;
+        health = 10;
+        numActions = 2;
+        partialDamage = 2;
+        fullDamage = 5;
         break;
       case EnemyLevel.Dangerous:
-        health = 7;
-        numBasicActions = 0;
-        numAdvancedActions = 2;
+        health = 11;
+        numActions = 2;
+        partialDamage = 3;
+        fullDamage = 5;
         break;
       case EnemyLevel.Tough:
-        health = 8;
-        numBasicActions = 0;
-        numAdvancedActions = 3;
+        health = 12;
+        numActions = 3;
+        partialDamage = 2;
+        fullDamage = 5;
         break;
       case EnemyLevel.Scary:
-        health = 9;
-        numBasicActions = 0;
-        numAdvancedActions = 4;
+        health = 15;
+        numActions = 3;
+        partialDamage = 2;
+        fullDamage = 5;
         break;
     }
     return new EnemyAirship(
@@ -186,12 +183,11 @@ export class ScenarioEnemyAirship {
       [0, 0, 0, 0],
       [0, 0, 0, 0],
       [false, false, false, false],
-      numBasicActions,
-      numAdvancedActions,
-      [BasicCannons, BasicTorps, BasicAA],
-      [AdvancedCannons, AdvancedTorps, AdvancedAA],
+      numActions,
       0,
-      null
+      null,
+      partialDamage,
+      fullDamage
     );
   }
 }
@@ -273,30 +269,37 @@ export class ScenarioEnemySet {
     let enemies: Combatant[] = [];
     this.countByCombatantType.forEach((count, combatantType) => {
       for (let i = 0; i < count; i++) {
-        let health;
+        let health, actionsPerTurn, partialDamage, fullDamage;
         let ai = isAirCombat ? new EnemyFighterAI() : new EnemyAI();
         let type = isAirCombat ? CombatantType.Fighter : CombatantType.Ground;
         let actions = isAirCombat
-          ? [AdvancedFighterGuns, AdvancedBombs]
-          : [EnemyAdvancedAttack];
-        let actionsPerTurn = 1;
+          ? [EnemyFighterGuns, EnemyBombs]
+          : [EnemyAttack];
         switch (combatantType as EnemyLevel) {
           case EnemyLevel.Normal:
           default:
-            health = 4;
-            actions = isAirCombat
-              ? [BasicFighterGuns, BasicBombs]
-              : [EnemyBasicAttack];
+            health = 7;
+            actionsPerTurn = 1;
+            partialDamage = 2;
+            fullDamage = 4;
             break;
           case EnemyLevel.Dangerous:
-            health = 8;
+            health = 10;
+            actionsPerTurn = 1;
+            partialDamage = 3;
+            fullDamage = 6;
             break;
           case EnemyLevel.Tough:
-            health = 12;
+            health = 15;
+            actionsPerTurn = 3;
+            partialDamage = 2;
+            fullDamage = 5;
             break;
           case EnemyLevel.Scary:
-            health = 16;
-            actionsPerTurn = 2;
+            health = 26;
+            actionsPerTurn = 4;
+            partialDamage = 4;
+            fullDamage = 6;
             break;
         }
         let enemy = new Combatant(
@@ -312,7 +315,9 @@ export class ScenarioEnemySet {
           health,
           ai,
           type,
-          0
+          0,
+          partialDamage,
+          fullDamage
         );
         enemies.push(enemy);
       }

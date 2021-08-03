@@ -15,7 +15,7 @@ import { Quadrant } from "./airships/airship";
 import { EnemyAirship } from "./airships/enemyAirship";
 import { NoAction } from "./combatants/actions/npcActions";
 
-const roundLimit = 20;
+const roundLimit = 30;
 
 // Given number of each type of enemy, number of players, assumed focus percentage, and who goes first
 // Return number of total actions and number of threat actions
@@ -102,26 +102,12 @@ function SimulateEnemyAirshipTurn(initialState: CombatState): CombatState {
   state.enemyAirship.actionsTaken += 2;
 
   for (
-    let iBasicAction = 0;
-    state.enemyAirship !== null &&
-    iBasicAction < state.enemyAirship.numBasicActions;
-    iBasicAction++
+    let iAction = 0;
+    state.enemyAirship !== null && iAction < state.enemyAirship.numActions;
+    iAction++
   ) {
     let { action, source, target } =
-      state.enemyAirship.getBestBasicActionAndTarget(state);
-    if (action !== NoAction) {
-      state = Act(state, state.enemyAirship, source, action, target, RollDice);
-      if (state.enemyAirship !== null) state.enemyAirship.actionsTaken++;
-    }
-  }
-  for (
-    let iAdvancedAction = 0;
-    state.enemyAirship !== null &&
-    iAdvancedAction < state.enemyAirship.numAdvancedActions;
-    iAdvancedAction++
-  ) {
-    let { action, source, target } =
-      state.enemyAirship.getBestAdvancedActionAndTarget(state);
+      state.enemyAirship.getBestActionAndTarget(state);
     if (action !== NoAction) {
       state = Act(state, state.enemyAirship, source, action, target, RollDice);
       if (state.enemyAirship !== null) state.enemyAirship.actionsTaken++;

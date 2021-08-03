@@ -21,6 +21,8 @@ export class Combatant {
   ai: AI;
   type: CombatantType;
   damageResistance: number;
+  partialDamage: number;
+  fullDamage: number;
 
   constructor(
     index: number,
@@ -35,7 +37,9 @@ export class Combatant {
     maxHealth: number,
     ai: AI,
     type: CombatantType,
-    damageResistance: number
+    damageResistance: number,
+    basicDamage: number,
+    advancedDamage: number
   ) {
     this.index = index;
     this.indexTarget = indexTarget;
@@ -50,6 +54,8 @@ export class Combatant {
     this.ai = ai;
     this.type = type;
     this.damageResistance = damageResistance;
+    this.partialDamage = basicDamage;
+    this.fullDamage = advancedDamage;
   }
 
   isDead(): boolean {
@@ -70,7 +76,9 @@ export class Combatant {
       this.maxHealth,
       this.ai,
       this.type,
-      this.damageResistance
+      this.damageResistance,
+      this.partialDamage,
+      this.fullDamage
     );
   }
 
