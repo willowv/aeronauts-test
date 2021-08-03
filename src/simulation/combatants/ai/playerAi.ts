@@ -13,12 +13,7 @@ import {
   Torpedoes,
 } from "../actions/playerActions";
 import { CombatState } from "../../state";
-import {
-  Airship,
-  AllQuadrants,
-  Quadrant,
-  WeaponType,
-} from "../../airships/airship";
+import { AllQuadrants, Quadrant, WeaponType } from "../../airships/airship";
 import { NoAction } from "../actions/npcActions";
 
 export class PlayerAI implements AI {
@@ -293,7 +288,9 @@ export class PlayerCaptainAI implements AI {
       if (enemiesCloseToDeath.length !== 0) {
         return {
           action: AntiAir,
-          source: self,
+          source: state.playerAirship.bestQuadrantOfSetForOffense(
+            AllQuadrants()
+          ),
           target: enemiesCloseToDeath[0],
         };
       }
