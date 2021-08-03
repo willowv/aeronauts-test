@@ -58,10 +58,6 @@ export class Combatant {
     this.fullDamage = advancedDamage;
   }
 
-  isDead(): boolean {
-    return this.health <= 0;
-  }
-
   clone(): Combatant {
     return new Combatant(
       this.index,
@@ -80,6 +76,19 @@ export class Combatant {
       this.partialDamage,
       this.fullDamage
     );
+  }
+
+  effectiveHealth(): number {
+    return (
+      this.health -
+      this.tokens[Token.Defense][Boost.Negative] -
+      this.tokens[Token.Action][Boost.Negative]
+    );
+  }
+
+  isDead(): boolean {
+    if (this.isPlayer()) return this.health <= 0;
+    else return this.effectiveHealth() <= 0; // enemies are dead when they have more negative tokens than health
   }
 
   isPlayer(): boolean {
