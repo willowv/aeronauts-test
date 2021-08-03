@@ -61,17 +61,15 @@ export class PlayerAI implements AI {
         };
     }
 
-    let effectiveHealth: (enemy: Combatant) => number = (enemy) =>
-      enemy.health -
-      enemy.tokens[Token.Defense][Boost.Negative] +
-      enemy.tokens[Token.Defense][Boost.Positive];
-
-    let enemiesCloseToDeath = initialState.enemies
+    let enemiesCloseToDeath = (
+      Attack.GetValidTargets(initialState) as Combatant[]
+    )
       .filter(
-        (enemy) => !enemy.isDead() && effectiveHealth(enemy) <= self.fullDamage
+        (enemy) =>
+          !enemy.isDead() && enemy.effectiveHealth() <= self.partialDamage
       )
       .sort(
-        (enemyA, enemyB) => effectiveHealth(enemyA) - effectiveHealth(enemyB)
+        (enemyA, enemyB) => enemyA.effectiveHealth() - enemyB.effectiveHealth()
       );
 
     if (enemiesCloseToDeath.length !== 0) {
@@ -121,7 +119,26 @@ export class PlayerInterceptorAI implements AI {
     source: Combatant | Quadrant;
     target: Combatant | Quadrant;
   } {
-    // My primary target is whoever attacked me last, or choose randomly
+    // If there's an enemy close to death, go after them first
+    let enemiesCloseToDeath = (
+      FighterGuns.GetValidTargets(state) as Combatant[]
+    )
+      .filter(
+        (enemy) =>
+          !enemy.isDead() && enemy.effectiveHealth() <= self.partialDamage
+      )
+      .sort(
+        (enemyA, enemyB) => enemyA.effectiveHealth() - enemyB.effectiveHealth()
+      );
+
+    if (enemiesCloseToDeath.length !== 0) {
+      return {
+        action: FighterGuns,
+        source: self,
+        target: enemiesCloseToDeath[0],
+      };
+    }
+
     let primaryTarget = null;
     if (self.indexTarget !== null)
       primaryTarget = state.enemies[self.indexTarget];
@@ -189,6 +206,25 @@ export class PlayerBomberAI implements AI {
     }
 
     // Otherwise use fighter targeting
+    let enemiesCloseToDeath = (
+      FighterGuns.GetValidTargets(state) as Combatant[]
+    )
+      .filter(
+        (enemy) =>
+          !enemy.isDead() && enemy.effectiveHealth() <= self.partialDamage
+      )
+      .sort(
+        (enemyA, enemyB) => enemyA.effectiveHealth() - enemyB.effectiveHealth()
+      );
+
+    if (enemiesCloseToDeath.length !== 0) {
+      return {
+        action: FighterGuns,
+        source: self,
+        target: enemiesCloseToDeath[0],
+      };
+    }
+
     let primaryTarget = null;
     if (self.indexTarget !== null)
       primaryTarget = state.enemies[self.indexTarget];
@@ -244,6 +280,24 @@ export class PlayerCaptainAI implements AI {
 
     // If there's no enemy airship or the airship is dead, target an enemy fighter
     if (state.enemyAirship === null || state.enemyAirship.isDead()) {
+      let enemiesCloseToDeath = (AntiAir.GetValidTargets(state) as Combatant[])
+        .filter(
+          (enemy) =>
+            !enemy.isDead() && enemy.effectiveHealth() <= self.partialDamage
+        )
+        .sort(
+          (enemyA, enemyB) =>
+            enemyA.effectiveHealth() - enemyB.effectiveHealth()
+        );
+
+      if (enemiesCloseToDeath.length !== 0) {
+        return {
+          action: AntiAir,
+          source: self,
+          target: enemiesCloseToDeath[0],
+        };
+      }
+
       let primaryTarget = null;
       if (self.indexTarget !== null)
         primaryTarget = state.enemies[self.indexTarget];
