@@ -228,11 +228,11 @@ export const Bombs = new Action(
 
     let targetQuadrant = target as Quadrant;
     if (!state.enemyAirship.suppressionByQuadrant[targetQuadrant]) {
-      let targetAdvantage = Math.max(
+      let targetAdvantage = Math.min(
         1,
         state.enemyAirship.advantageTokensByQuadrant[targetQuadrant]
       );
-      let targetDisadvantage = Math.max(
+      let targetDisadvantage = Math.min(
         1,
         state.enemyAirship.disadvantageTokensByQuadrant[targetQuadrant]
       );

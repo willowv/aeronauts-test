@@ -124,15 +124,14 @@ export const EnemyAA = new Action(
       newTarget.takeDamage(state.enemyAirship.fullDamage - 1);
       newTarget.tokens[Token.Action][Boost.Negative] += 1;
     } else if (checkResult < 15) {
-      newTarget.takeDamage(state.enemyAirship.partialDamage - 1);
-      newTarget.tokens[Token.Action][Boost.Negative] += 1;
+      newTarget.takeDamage(state.enemyAirship.partialDamage);
     }
     return state;
   }
 );
 
 export const EnemyFighterGuns = new Action(
-  "Enemy Basic Fighter Guns",
+  "Enemy Fighter Guns",
   Ability.Perception,
   Faction.Enemies,
   Faction.Players,
@@ -150,8 +149,7 @@ export const EnemyFighterGuns = new Action(
       newTarget.takeDamage(newActor.fullDamage - 1);
       newTarget.tokens[Token.Action][Boost.Negative] += 1;
     } else if (checkResult < 15) {
-      newTarget.takeDamage(newActor.partialDamage - 1);
-      newTarget.tokens[Token.Action][Boost.Negative] += 1;
+      newTarget.takeDamage(newActor.partialDamage);
     }
     return state;
   }
@@ -178,11 +176,11 @@ export const EnemyBombs = new Action(
     let targetQuadrant = target as Quadrant;
     let newActor = state.GetCombatantFromSelf(actor as Combatant);
     if (!state.playerAirship.suppressionByQuadrant[targetQuadrant]) {
-      let targetAdvantage = Math.max(
+      let targetAdvantage = Math.min(
         1,
         state.playerAirship.advantageTokensByQuadrant[targetQuadrant]
       );
-      let targetDisadvantage = Math.max(
+      let targetDisadvantage = Math.min(
         1,
         state.playerAirship.disadvantageTokensByQuadrant[targetQuadrant]
       );
