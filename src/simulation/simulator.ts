@@ -156,7 +156,7 @@ export function Act(
       targetBoost = (target as Combatant).getBoostForAttackOnMe();
     else {
       let airship =
-        action.actorFaction === Faction.Players
+        action.targetFaction === Faction.Players
           ? state.playerAirship
           : state.enemyAirship;
       targetBoost =
