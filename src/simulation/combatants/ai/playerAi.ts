@@ -13,7 +13,12 @@ import {
   Torpedoes,
 } from "../actions/playerActions";
 import { CombatState } from "../../state";
-import { AllQuadrants, Quadrant, WeaponType } from "../../airships/airship";
+import {
+  Airship,
+  AllQuadrants,
+  Quadrant,
+  WeaponType,
+} from "../../airships/airship";
 import { NoAction } from "../actions/npcActions";
 
 export class PlayerAI implements AI {
@@ -236,14 +241,17 @@ export class PlayerCaptainAI implements AI {
         } else {
           let index = Math.round(Math.random() * (targets.length - 1));
           self.indexTarget = (targets[index] as Combatant).index;
-          return {
-            action: AntiAir,
-            source: state.playerAirship.bestQuadrantOfSetForOffense(
-              AllQuadrants()
-            ),
-            target: state.enemies[self.indexTarget],
-          };
         }
+      }
+
+      if (self.indexTarget !== null) {
+        return {
+          action: AntiAir,
+          source: state.playerAirship.bestQuadrantOfSetForOffense(
+            AllQuadrants()
+          ),
+          target: state.enemies[self.indexTarget],
+        };
       }
     }
 
@@ -288,6 +296,32 @@ export class PlayerEngineerAI implements AI {
     source: Quadrant | Combatant;
     target: Quadrant | Combatant;
   } {
+    // If there's no airship or the airship is dead, we cannot act
+    if (state.playerAirship === null || state.playerAirship.isDead())
+      return {
+        action: NoAction,
+        source: self,
+        target: self,
+      };
+
+    let bestOffenseQuadrant = state.playerAirship.bestQuadrantOfSetForOffense(
+      AllQuadrants()
+    );
+    let worstDefenseQuadrant = state.playerAirship.worstQuadrantOfSetForDefense(
+      AllQuadrants()
+    );
+    let isShipFast = state.playerAirship.speedTokens[Boost.Positive] > 0;
+    let isShipSafe =
+      worstDefenseQuadrant !== null &&
+      state.playerAirship.getAdjustedHealthOfQuadrant(worstDefenseQuadrant) >=
+        8;
+    let isShipBuffed =
+      bestOffenseQuadrant !== null &&
+      state.playerAirship.advantageTokensByQuadrant[bestOffenseQuadrant] > 0;
+    if (isShipFast && isShipSafe && isShipBuffed) {
+      let deputized = new PlayerCaptainAI();
+      return deputized.FindBestActionAndTarget(state, self);
+    }
     return {
       action: AugmentSystems,
       source: self,
