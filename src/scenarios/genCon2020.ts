@@ -1,4 +1,11 @@
-import { ScenarioPlayer, ScenarioEnemySet, Role } from "../simulation/scenario";
+import {
+  ScenarioPlayer,
+  ScenarioEnemySet,
+  Role,
+  ScenarioPlayerAirship,
+  ScenarioEnemyAirship,
+  EnemyLevel,
+} from "../simulation/scenario";
 import { Attack } from "../simulation/combatants/actions/playerActions";
 import {
   maxPlayerFocus,
@@ -7,9 +14,8 @@ import {
 
 export const scenarioGenCon2020 = () => {
   return {
-    isAirCombat: false,
-    playerAirship: null,
-    enemyAirship: null,
+    isAirCombat: true,
+    playerAirship: new ScenarioPlayerAirship(0, 1),
     players: [
       new ScenarioPlayer(
         [1, 1, 0, 0, 2],
@@ -17,7 +23,7 @@ export const scenarioGenCon2020 = () => {
         "Captain",
         maxPlayerFocus,
         maxPlayerHealth,
-        Role.Ground
+        Role.Captain
       ),
       new ScenarioPlayer(
         [1, 2, 1, 0, 0],
@@ -25,7 +31,7 @@ export const scenarioGenCon2020 = () => {
         "Tinkerer",
         maxPlayerFocus,
         maxPlayerHealth,
-        Role.Ground
+        Role.Engineer
       ),
       new ScenarioPlayer(
         [0, 0, 1, 2, 1],
@@ -33,7 +39,7 @@ export const scenarioGenCon2020 = () => {
         "Gunslinger",
         maxPlayerFocus,
         maxPlayerHealth,
-        Role.Ground
+        Role.Interceptor
       ),
       new ScenarioPlayer(
         [1, 0, 2, 0, 1],
@@ -41,18 +47,11 @@ export const scenarioGenCon2020 = () => {
         "Muscle",
         maxPlayerFocus,
         maxPlayerHealth,
-        Role.Ground
-      ),
-      new ScenarioPlayer(
-        [2, 0, 1, 1, 0],
-        Attack,
-        "Thief",
-        maxPlayerFocus,
-        maxPlayerHealth,
-        Role.Ground
+        Role.Bomber
       ),
     ],
-    enemySet: new ScenarioEnemySet([2, 0, 0, 5]),
+    enemyAirship: null, // new ScenarioEnemyAirship(EnemyLevel.Scary),
+    enemySet: new ScenarioEnemySet([0, 0, 0, 0]),
     reports: [],
   };
 };
