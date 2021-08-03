@@ -1,3 +1,4 @@
+import { Faction } from "../../enum";
 import { Airship, Quadrant } from "./airship";
 
 export class PlayerAirship extends Airship {
@@ -24,7 +25,8 @@ export class PlayerAirship extends Airship {
       speedTokens,
       advantageTokensByQuadrant,
       disadvantageTokensByQuadrant,
-      suppressionByQuadrant
+      suppressionByQuadrant,
+      Faction.Players
     );
     this.indexPlayerCaptain = indexPlayerCaptain;
     this.indexPlayerEngineer = indexPlayerEngineer;

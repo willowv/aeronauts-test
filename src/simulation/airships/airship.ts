@@ -1,4 +1,4 @@
-import { Boost } from "../../enum";
+import { Boost, Faction } from "../../enum";
 
 export enum Quadrant {
   A = 0,
@@ -43,6 +43,7 @@ export class Airship {
   advantageTokensByQuadrant: number[];
   disadvantageTokensByQuadrant: number[];
   suppressionByQuadrant: boolean[];
+  faction: Faction;
 
   constructor(
     frontQuadrant: Quadrant,
@@ -52,7 +53,8 @@ export class Airship {
     speedTokens: number[],
     advantageTokensByQuadrant: number[],
     disadvantageTokensByQuadrant: number[],
-    suppressionByQuadrant: boolean[]
+    suppressionByQuadrant: boolean[],
+    faction: Faction
   ) {
     this.frontQuadrant = frontQuadrant;
     this.healthByQuadrant = health;
@@ -62,6 +64,7 @@ export class Airship {
     this.advantageTokensByQuadrant = advantageTokensByQuadrant;
     this.disadvantageTokensByQuadrant = disadvantageTokensByQuadrant;
     this.suppressionByQuadrant = suppressionByQuadrant;
+    this.faction = faction;
   }
 
   clone(): Airship {
@@ -73,7 +76,8 @@ export class Airship {
       [...this.speedTokens],
       [...this.advantageTokensByQuadrant],
       [...this.disadvantageTokensByQuadrant],
-      [...this.suppressionByQuadrant]
+      [...this.suppressionByQuadrant],
+      this.faction
     );
   }
 
@@ -272,10 +276,14 @@ export class Airship {
       this.speedTokens[Boost.Negative] += 3;
   }
 
+  isQuadrantDead(quadrant: Quadrant): boolean {
+    return this.healthByQuadrant[quadrant] <= 0;
+  }
+
   isDead(): boolean {
     let quadrantsRemaining = 0;
-    this.healthByQuadrant.forEach((health) => {
-      if (health > 0) quadrantsRemaining++;
+    AllQuadrants().forEach((quadrant) => {
+      if (!this.isQuadrantDead(quadrant)) quadrantsRemaining++;
     });
     return quadrantsRemaining <= 1;
   }

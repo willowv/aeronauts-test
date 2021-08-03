@@ -1,3 +1,4 @@
+import { Faction } from "../../enum";
 import { Action } from "../combatants/actions/action";
 import {
   EnemyAA,
@@ -39,7 +40,8 @@ export class EnemyAirship extends Airship {
       speedTokens,
       advantageTokensByQuadrant,
       disadvantageTokensByQuadrant,
-      suppressionByQuadrant
+      suppressionByQuadrant,
+      Faction.Enemies
     );
     this.numActions = numActions;
     this.actionsTaken = actionsTaken;
