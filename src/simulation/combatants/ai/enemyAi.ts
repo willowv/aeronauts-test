@@ -3,7 +3,7 @@ import Combatant from "../combatant";
 import { Action } from "../actions/action";
 import { CombatState } from "../../state";
 import { Quadrant, WeaponType } from "../../airships/airship";
-import { NoAction } from "../actions/npcActions";
+import { EnemyBombs, EnemyFighterGuns, NoAction } from "../actions/npcActions";
 
 export class EnemyAI implements AI {
   FindBestActionAndTarget(
@@ -57,15 +57,22 @@ export class EnemyFighterAI implements AI {
     let playerAirship = initialState.playerAirship;
     if (playerAirship !== null && !playerAirship.isDead()) {
       let candidateTarget = playerAirship.bestTargetQuadrant(WeaponType.Bomb);
-      if (
-        candidateTarget !== null &&
-        playerAirship.disadvantageTokensByQuadrant[candidateTarget] >= 1
-      )
-        return {
-          action: self.actions[1],
-          source: self,
-          target: candidateTarget,
-        };
+      if (candidateTarget !== null) {
+        let isTargetOpen =
+          playerAirship.suppressionByQuadrant[candidateTarget] ||
+          playerAirship.disadvantageTokensByQuadrant[candidateTarget] > 0;
+        let isTargetJuicy =
+          playerAirship.getAdjustedHealthOfQuadrant(candidateTarget) <
+          self.fullDamage;
+        let isTargetUndefended =
+          EnemyFighterGuns.GetValidTargets(initialState).length === 0;
+        if ((isTargetOpen && isTargetJuicy) || isTargetUndefended)
+          return {
+            action: EnemyBombs,
+            source: self,
+            target: candidateTarget,
+          };
+      }
     }
 
     // My primary target is whoever attacked me last, or choose randomly
