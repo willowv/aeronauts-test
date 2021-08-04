@@ -153,28 +153,28 @@ export class ScenarioEnemyAirship {
     let health, numActions, partialDamage, fullDamage;
     switch (this.level) {
       case EnemyLevel.Normal:
-        health = 7;
-        numActions = 2;
+        health = 6;
+        numActions = 3;
         partialDamage = 2;
         fullDamage = 4;
         break;
       case EnemyLevel.Dangerous:
-        health = 10;
-        numActions = 2;
-        partialDamage = 2;
+        health = 6;
+        numActions = 3;
+        partialDamage = 3;
         fullDamage = 5;
         break;
       case EnemyLevel.Tough:
-        health = 14;
-        numActions = 2;
-        partialDamage = 2;
-        fullDamage = 5;
-        break;
-      case EnemyLevel.Scary:
-        health = 15;
+        health = 7;
         numActions = 3;
         partialDamage = 2;
-        fullDamage = 5;
+        fullDamage = 4;
+        break;
+      case EnemyLevel.Scary:
+        health = 11;
+        numActions = 4;
+        partialDamage = 2;
+        fullDamage = 4;
         break;
     }
     return new EnemyAirship(
@@ -293,15 +293,15 @@ export class ScenarioEnemySet {
             fullDamage = 6;
             break;
           case EnemyLevel.Tough:
-            health = 15;
-            actionsPerTurn = 3;
-            partialDamage = 2;
-            fullDamage = 5;
+            health = 17;
+            actionsPerTurn = 2;
+            partialDamage = 3;
+            fullDamage = 6;
             break;
           case EnemyLevel.Scary:
-            health = 26;
+            health = 30;
             actionsPerTurn = 4;
-            partialDamage = 4;
+            partialDamage = 3;
             fullDamage = 6;
             break;
         }
