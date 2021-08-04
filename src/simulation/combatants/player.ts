@@ -1,5 +1,5 @@
 import Combatant from "./combatant";
-import { Token, Boost, Faction, CombatantType, Ability } from "../../enum";
+import { Faction, CombatantType, Ability } from "../../enum";
 import { Action } from "./actions/action";
 import { AI } from "./ai/ai";
 
@@ -16,7 +16,10 @@ export class Player extends Combatant {
     indexTarget: number | null,
     health: number,
     actionsPerTurn: number,
-    tokens: number[][],
+    advTokens: number,
+    disadvTokens: number,
+    defTokens: number,
+    expTokens: number,
     actionsTaken: number,
     abilityScores: number[],
     focus: number,
@@ -33,7 +36,10 @@ export class Player extends Combatant {
       indexTarget,
       health,
       actionsPerTurn,
-      tokens,
+      advTokens,
+      disadvTokens,
+      defTokens,
+      expTokens,
       actionsTaken,
       true /* players are always critical */,
       actions,
@@ -56,7 +62,10 @@ export class Player extends Combatant {
       this.indexTarget,
       this.health,
       this.actionsPerTurn,
-      this.tokens,
+      this.advTokens,
+      this.disadvTokens,
+      this.defTokens,
+      this.expTokens,
       this.actionsTaken,
       this.abilityScores,
       this.focus,
@@ -74,11 +83,9 @@ export class Player extends Combatant {
   takeDamage(incomingDamage: number) {
     let damage = Math.max(0, incomingDamage - this.damageResistance);
 
-    if (this.health > 10 && this.health - damage <= 10)
-      this.tokens[Token.Action][Boost.Negative] += 1;
+    if (this.health > 10 && this.health - damage <= 10) this.disadvTokens += 1;
 
-    if (this.health > 5 && this.health - damage <= 5)
-      this.tokens[Token.Action][Boost.Negative] += 1;
+    if (this.health > 5 && this.health - damage <= 5) this.disadvTokens += 1;
 
     this.health -= damage;
   }

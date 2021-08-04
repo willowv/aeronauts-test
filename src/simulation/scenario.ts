@@ -1,4 +1,4 @@
-import Combatant, { initialTokens } from "../simulation/combatants/combatant";
+import Combatant from "../simulation/combatants/combatant";
 import { Player } from "../simulation/combatants/player";
 import { CombatState } from "./state";
 import { Action } from "../simulation/combatants/actions/action";
@@ -106,7 +106,10 @@ export class Scenario {
           null,
           scenarioPlayer.health,
           1,
-          initialTokens(),
+          0,
+          0,
+          0,
+          0,
           0,
           scenarioPlayer.abilityScores,
           scenarioPlayer.focus,
@@ -150,10 +153,10 @@ export class ScenarioEnemyAirship {
     let health, numActions, partialDamage, fullDamage;
     switch (this.level) {
       case EnemyLevel.Normal:
-        health = 9;
+        health = 7;
         numActions = 2;
         partialDamage = 2;
-        fullDamage = 5;
+        fullDamage = 4;
         break;
       case EnemyLevel.Dangerous:
         health = 10;
@@ -169,9 +172,9 @@ export class ScenarioEnemyAirship {
         break;
       case EnemyLevel.Scary:
         health = 15;
-        numActions = 4;
+        numActions = 3;
         partialDamage = 2;
-        fullDamage = 4;
+        fullDamage = 5;
         break;
     }
     return new EnemyAirship(
@@ -307,7 +310,10 @@ export class ScenarioEnemySet {
           null,
           health,
           actionsPerTurn,
-          initialTokens(),
+          0,
+          0,
+          0,
+          0,
           0,
           true,
           actions,
@@ -327,5 +333,3 @@ export class ScenarioEnemySet {
     return enemies;
   }
 }
-
-export const EmptyEnemySet = () => new ScenarioEnemySet([0, 0, 0, 0]);

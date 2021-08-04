@@ -1,5 +1,5 @@
 import { Action } from "./actions/action";
-import { Boost, CombatantType, Faction, Token } from "../../enum";
+import { CombatantType, Faction } from "../../enum";
 import { AI } from "./ai/ai";
 
 export const initialTokens = () => [
@@ -13,7 +13,10 @@ export class Combatant {
   health: number;
   actions: Action[];
   actionsPerTurn: number;
-  tokens: number[][];
+  advTokens: number;
+  disadvTokens: number;
+  defTokens: number;
+  expTokens: number;
   actionsTaken: number;
   isCritical: boolean;
   faction: Faction;
@@ -29,7 +32,10 @@ export class Combatant {
     indexTarget: number | null,
     health: number,
     actionsPerTurn: number,
-    tokens: number[][],
+    advTokens: number,
+    disadvTokens: number,
+    defTokens: number,
+    expTokens: number,
     actionsTaken: number,
     isCritical: boolean,
     actions: Action[],
@@ -45,7 +51,10 @@ export class Combatant {
     this.indexTarget = indexTarget;
     this.health = health;
     this.actionsPerTurn = actionsPerTurn;
-    this.tokens = tokens;
+    this.advTokens = advTokens;
+    this.disadvTokens = disadvTokens;
+    this.defTokens = defTokens;
+    this.expTokens = expTokens;
     this.actionsTaken = actionsTaken;
     this.isCritical = isCritical;
     this.actions = actions;
@@ -64,7 +73,10 @@ export class Combatant {
       this.indexTarget,
       this.health,
       this.actionsPerTurn,
-      this.tokens,
+      this.advTokens,
+      this.disadvTokens,
+      this.defTokens,
+      this.expTokens,
       this.actionsTaken,
       this.isCritical,
       this.actions,
@@ -79,11 +91,7 @@ export class Combatant {
   }
 
   effectiveHealth(): number {
-    return (
-      this.health -
-      this.tokens[Token.Defense][Boost.Negative] -
-      this.tokens[Token.Action][Boost.Negative]
-    );
+    return this.health - this.disadvTokens - this.expTokens;
   }
 
   isDead(): boolean {
@@ -100,19 +108,19 @@ export class Combatant {
   }
 
   getBoostForAttackOnMe(): number {
-    let defense = Math.min(1, this.tokens[Token.Defense][Boost.Positive]);
-    let exposure = Math.min(1, this.tokens[Token.Defense][Boost.Negative]);
-    this.tokens[Token.Defense][Boost.Positive] -= defense;
-    this.tokens[Token.Defense][Boost.Negative] -= exposure;
+    let defense = Math.min(1, this.defTokens);
+    let exposure = Math.min(1, this.expTokens);
+    this.defTokens -= defense;
+    this.expTokens -= exposure;
 
     return exposure - defense;
   }
 
   getBoostForAttackFromMe(): number {
-    let advantage = Math.min(1, this.tokens[Token.Action][Boost.Positive]);
-    let disadvantage = Math.min(1, this.tokens[Token.Action][Boost.Negative]);
-    this.tokens[Token.Action][Boost.Positive] -= advantage;
-    this.tokens[Token.Action][Boost.Negative] -= disadvantage;
+    let advantage = Math.min(1, this.advTokens);
+    let disadvantage = Math.min(1, this.disadvTokens);
+    this.advTokens -= advantage;
+    this.disadvTokens -= disadvantage;
 
     return advantage - disadvantage;
   }

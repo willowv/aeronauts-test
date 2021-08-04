@@ -1,6 +1,6 @@
 import { CombatState } from "./state";
 import { Player } from "./combatants/player";
-import { Token, Boost } from "../enum";
+import { Boost } from "../enum";
 import Combatant from "./combatants/combatant";
 
 export interface Statistic {
@@ -74,10 +74,10 @@ export function CombatReportFromFinalState(
     lowestPlayerFocus = Math.min(lowestPlayerFocus, player.focus);
     totalPlayerHealth += player.health;
     totalPlayerFocus += player.focus;
-    unspentAdv += player.tokens[Token.Action][Boost.Positive];
-    unspentDisadv += player.tokens[Token.Action][Boost.Negative];
-    unspentDef += player.tokens[Token.Defense][Boost.Positive];
-    unspentExp += player.tokens[Token.Defense][Boost.Negative];
+    unspentAdv += player.advTokens;
+    unspentDisadv += player.disadvTokens;
+    unspentDef += player.defTokens;
+    unspentExp += player.expTokens;
     actionsTotal += player.actionsTaken;
     if (player.isDead()) numberOfPlayerKOs++;
     else if (player.health <= 5) numberOfPlayerInjuries++;
@@ -120,10 +120,10 @@ export function CombatReportFromFinalState(
   }
 
   finalState.enemies.forEach((enemy: Combatant) => {
-    unspentAdv += enemy.tokens[Token.Action][Boost.Positive];
-    unspentDisadv += enemy.tokens[Token.Action][Boost.Negative];
-    unspentDef += enemy.tokens[Token.Defense][Boost.Positive];
-    unspentExp += enemy.tokens[Token.Defense][Boost.Negative];
+    unspentAdv += enemy.advTokens;
+    unspentDisadv += enemy.disadvTokens;
+    unspentDef += enemy.defTokens;
+    unspentExp += enemy.expTokens;
     actionsTotal += enemy.actionsTaken;
     actionsEnemy += enemy.actionsTaken;
   });

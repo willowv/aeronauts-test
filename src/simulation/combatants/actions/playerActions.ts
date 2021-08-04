@@ -1,4 +1,4 @@
-import { Ability, Boost, CombatantType, Faction, Token } from "../../../enum";
+import { Ability, Boost, CombatantType, Faction } from "../../../enum";
 import { Airship, Quadrant, WeaponType } from "../../airships/airship";
 import Combatant from "../combatant";
 import { Action, ActionType, SourceType } from "./action";
@@ -38,10 +38,10 @@ export const Defend = new Action(
     let state = initialState.clone();
     let newTarget = state.GetCombatantFromSelf(target as Combatant);
     if (checkResult >= 15) {
-      newTarget.tokens[Token.Defense][Boost.Positive] += 3;
+      newTarget.defTokens += 3;
       newTarget.health += 2;
     } else if (checkResult >= 10) {
-      newTarget.tokens[Token.Defense][Boost.Positive] += 3;
+      newTarget.defTokens += 3;
     }
     return state;
   }
@@ -132,10 +132,10 @@ export const AntiAir = new Action(
     let newTarget = state.GetCombatantFromSelf(target as Combatant);
     if (checkResult < 10) {
       newTarget.takeDamage(4);
-      newTarget.tokens[Token.Action][Boost.Negative] += 1;
+      newTarget.disadvTokens += 1;
     } else if (checkResult < 15) {
       newTarget.takeDamage(2);
-      newTarget.tokens[Token.Action][Boost.Negative] += 1;
+      newTarget.disadvTokens += 1;
     }
     return state;
   }

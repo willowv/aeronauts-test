@@ -1,6 +1,6 @@
 import { AI } from "./ai";
 import Combatant from "../combatant";
-import { Token, Boost, Ability } from "../../../enum";
+import { Boost, Ability } from "../../../enum";
 import { Action } from "../actions/action";
 import {
   AntiAir,
@@ -30,7 +30,7 @@ export class PlayerAI implements AI {
       .filter(
         (ally) =>
           ally !== self &&
-          ally.tokens[Token.Defense][Boost.Positive] === 0 &&
+          ally.defTokens === 0 &&
           ally.health < 10 &&
           !ally.isDead()
       )

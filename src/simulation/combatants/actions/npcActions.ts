@@ -1,4 +1,4 @@
-import { Ability, Boost, CombatantType, Faction, Token } from "../../../enum";
+import { Ability, CombatantType, Faction } from "../../../enum";
 import { Quadrant, WeaponType } from "../../airships/airship";
 import Combatant from "../combatant";
 import { Action, ActionType, SourceType } from "./action";
@@ -122,7 +122,7 @@ export const EnemyAA = new Action(
     let newTarget = state.GetCombatantFromSelf(target as Combatant);
     if (checkResult < 10) {
       newTarget.takeDamage(state.enemyAirship.fullDamage - 1);
-      newTarget.tokens[Token.Action][Boost.Negative] += 1;
+      newTarget.disadvTokens += 1;
     } else if (checkResult < 15) {
       newTarget.takeDamage(state.enemyAirship.partialDamage);
     }
@@ -147,7 +147,7 @@ export const EnemyFighterGuns = new Action(
     let newActor = state.GetCombatantFromSelf(actor as Combatant);
     if (checkResult < 10) {
       newTarget.takeDamage(newActor.fullDamage - 1);
-      newTarget.tokens[Token.Action][Boost.Negative] += 1;
+      newTarget.disadvTokens += 1;
     } else if (checkResult < 15) {
       newTarget.takeDamage(newActor.partialDamage);
     }
