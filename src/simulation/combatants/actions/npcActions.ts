@@ -92,9 +92,8 @@ export const EnemyTorps = new Action(
     } else if (checkResult < 15) {
       state.playerAirship.takeDamage(
         targetQuadrant,
-        state.enemyAirship.partialDamage - 1
+        state.enemyAirship.partialDamage
       );
-      state.playerAirship.exposureTokensByQuadrant[targetQuadrant] += 1;
     }
     state.playerAirship.suppressionByQuadrant[targetQuadrant] = true;
     return state;
