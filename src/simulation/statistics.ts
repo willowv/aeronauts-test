@@ -85,23 +85,27 @@ export function CombatReportFromFinalState(
   if (finalState.playerAirship !== null) {
     lowestPlayerHealth = Math.min(
       lowestPlayerHealth,
-      Math.min(...finalState.playerAirship.healthByQuadrant)
+      ...finalState.playerAirship.healthByQuadrant
     );
     totalPlayerHealth += finalState.playerAirship.healthByQuadrant.reduce(
-      (totalHealth, health) => totalHealth + health
+      (totalHealth, health) => totalHealth + health,
+      0
     );
     unspentAdv += finalState.playerAirship.advantageTokensByQuadrant.reduce(
-      (totalAdv, advantage) => totalAdv + advantage
+      (totalAdv, advantage) => totalAdv + advantage,
+      0
     );
     unspentDisadv +=
       finalState.playerAirship.disadvantageTokensByQuadrant.reduce(
-        (totalDisadv, disadvantage) => totalDisadv + disadvantage
+        (totalDisadv, disadvantage) => totalDisadv + disadvantage,
+        0
       );
     unspentDef += finalState.playerAirship.speedTokens[Boost.Positive];
     unspentExp +=
       finalState.playerAirship.speedTokens[Boost.Negative] +
       finalState.playerAirship.exposureTokensByQuadrant.reduce(
-        (totalExp, exposure) => totalExp + exposure
+        (totalExp, exposure) => totalExp + exposure,
+        0
       );
     if (finalState.playerAirship.isDead()) numberOfPlayerKOs += 2;
     else
@@ -110,7 +114,8 @@ export function CombatReportFromFinalState(
           (totalInjuries, health) => {
             if (health <= 5) return totalInjuries + 1;
             else return totalInjuries;
-          }
+          },
+          0
         );
   }
 
@@ -124,17 +129,20 @@ export function CombatReportFromFinalState(
   });
   if (finalState.enemyAirship !== null) {
     unspentAdv += finalState.enemyAirship.advantageTokensByQuadrant.reduce(
-      (totalAdv, adv) => totalAdv + adv
+      (totalAdv, adv) => totalAdv + adv,
+      0
     );
     unspentDisadv +=
       finalState.enemyAirship.disadvantageTokensByQuadrant.reduce(
-        (totalDisadv, disadv) => totalDisadv + disadv
+        (totalDisadv, disadv) => totalDisadv + disadv,
+        0
       );
     unspentDef += finalState.enemyAirship.speedTokens[Boost.Positive];
     unspentExp +=
       finalState.enemyAirship.speedTokens[Boost.Negative] +
       finalState.enemyAirship.exposureTokensByQuadrant.reduce(
-        (totalExp, exp) => totalExp + exp
+        (totalExp, exp) => totalExp + exp,
+        0
       );
     actionsTotal += finalState.enemyAirship.actionsTaken;
     actionsEnemy += finalState.enemyAirship.actionsTaken;
