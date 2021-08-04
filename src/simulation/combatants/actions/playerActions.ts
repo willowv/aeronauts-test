@@ -130,10 +130,10 @@ export const AntiAir = new Action(
       return state;
 
     let newTarget = state.GetCombatantFromSelf(target as Combatant);
-    if (checkResult < 10) {
+    if (checkResult >= 15) {
       newTarget.takeDamage(4);
       newTarget.disadvTokens += 1;
-    } else if (checkResult < 15) {
+    } else if (checkResult >= 10) {
       newTarget.takeDamage(2);
       newTarget.disadvTokens += 1;
     }
@@ -199,9 +199,9 @@ export const FighterGuns = new Action(
     if (!state.isAirCombat) return state;
 
     let newTarget = state.GetCombatantFromSelf(target as Combatant);
-    if (checkResult < 10) {
+    if (checkResult >= 15) {
       newTarget.takeDamage(5);
-    } else if (checkResult < 15) {
+    } else if (checkResult >= 10) {
       newTarget.takeDamage(3);
     }
     return state;

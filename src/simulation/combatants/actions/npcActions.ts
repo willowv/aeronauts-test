@@ -193,9 +193,9 @@ export const EnemyBombs = new Action(
       if (newActor.isDead()) return state;
     }
 
-    if (checkResult >= 15) {
+    if (checkResult < 10) {
       state.playerAirship.takeDamage(targetQuadrant, newActor.fullDamage);
-    } else if (checkResult >= 10) {
+    } else if (checkResult < 15) {
       state.playerAirship.takeDamage(targetQuadrant, newActor.partialDamage);
     }
     state.playerAirship.suppressionByQuadrant[targetQuadrant] = true;
