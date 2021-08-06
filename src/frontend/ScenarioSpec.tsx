@@ -8,7 +8,6 @@ import {
   ScenarioPlayerAirship,
   ScenarioEnemyAirship,
 } from "../simulation/scenario";
-import { Attack } from "../simulation/combatants/actions/playerActions";
 import { PlayerSpec } from "./PlayerSpec";
 import { StatsVis } from "./StatsVis";
 import { SimulateScenario } from "../simulation/simulator";
@@ -40,6 +39,10 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
   }
 
   ensureCaptainAndEngineer(players: ScenarioPlayer[]): ScenarioPlayer[] {
+    if (this.state.playerAirship === null) {
+      return players;
+    }
+
     let indexCurCaptain = players.findIndex(
       (player) => player.role === Role.Captain
     );
@@ -92,7 +95,6 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
             newPlayers.push(
               new ScenarioPlayer(
                 [0, 0, 0, 0, 0],
-                Attack,
                 "Player",
                 maxPlayerFocus,
                 maxPlayerHealth,
@@ -118,7 +120,7 @@ export class ScenarioSpec extends React.Component<any, ScenarioSpecState> {
         </Button>
       );
     }
-    if (this.state.isAirCombat) {
+    if (this.state.isAirCombat && this.state.playerAirship !== null) {
       playerSpecs.unshift(
         <PlayerAirshipSpec
           key="airship-spec"
