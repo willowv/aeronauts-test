@@ -1,4 +1,3 @@
-import { Action } from "./actions/action";
 import { CombatantType, Faction } from "../../enum";
 import { AI } from "./ai/ai";
 
@@ -11,7 +10,6 @@ export class Combatant {
   index: number;
   indexTarget: number | null;
   health: number;
-  actions: Action[];
   actionsPerTurn: number;
   advTokens: number;
   disadvTokens: number;
@@ -38,7 +36,6 @@ export class Combatant {
     expTokens: number,
     actionsTaken: number,
     isCritical: boolean,
-    actions: Action[],
     faction: Faction,
     maxHealth: number,
     ai: AI,
@@ -57,7 +54,6 @@ export class Combatant {
     this.expTokens = expTokens;
     this.actionsTaken = actionsTaken;
     this.isCritical = isCritical;
-    this.actions = actions;
     this.faction = faction;
     this.maxHealth = maxHealth;
     this.ai = ai;
@@ -79,7 +75,6 @@ export class Combatant {
       this.expTokens,
       this.actionsTaken,
       this.isCritical,
-      this.actions,
       this.faction,
       this.maxHealth,
       this.ai,

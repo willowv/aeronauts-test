@@ -1,12 +1,6 @@
 import Combatant from "../simulation/combatants/combatant";
 import { Player } from "../simulation/combatants/player";
 import { CombatState } from "./state";
-import { Action } from "../simulation/combatants/actions/action";
-import {
-  EnemyBombs,
-  EnemyFighterGuns,
-  EnemyAttack,
-} from "../simulation/combatants/actions/npcActions";
 import { CombatantType, Faction } from "../enum";
 import {
   PlayerAI,
@@ -19,16 +13,6 @@ import { EnemyAI, EnemyFighterAI } from "./combatants/ai/enemyAi";
 import { PlayerAirship } from "./airships/playerAirship";
 import { Quadrant } from "./airships/airship";
 import { EnemyAirship } from "./airships/enemyAirship";
-import {
-  AntiAir,
-  Attack,
-  AugmentSystems,
-  Bombs,
-  Cannons,
-  Defend,
-  FighterGuns,
-  Torpedoes,
-} from "./combatants/actions/playerActions";
 
 export enum EnemyLevel {
   Normal = 0,
@@ -79,27 +63,30 @@ export class Scenario {
   generatePlayers(): Player[] {
     let outputPlayers: Player[] = this.players.map(
       (scenarioPlayer: ScenarioPlayer, index: number) => {
-        let actions = [Attack, Defend];
+        let combatantType, ai;
         let damageResistance = 0;
-        let combatantType = CombatantType.Ground;
-        let ai = new PlayerAI();
-        if (this.isAirCombat && this.playerAirship !== null) {
-          if (this.playerAirship.indexPlayerCaptain === index) {
-            actions = [Cannons, Torpedoes, AntiAir];
+        switch (scenarioPlayer.role) {
+          case Role.Captain:
             combatantType = CombatantType.Crew;
             ai = new PlayerCaptainAI();
-          } else if (this.playerAirship.indexPlayerEngineer === index) {
-            actions = [AugmentSystems];
+            break;
+          case Role.Engineer:
             combatantType = CombatantType.Crew;
             ai = new PlayerEngineerAI();
-          } else {
-            actions = [FighterGuns, Bombs];
+            break;
+          case Role.Interceptor:
             combatantType = CombatantType.Fighter;
-            if (scenarioPlayer.role === Role.Bomber) {
-              damageResistance = 1;
-              ai = new PlayerBomberAI();
-            } else ai = new PlayerInterceptorAI();
-          }
+            ai = new PlayerInterceptorAI();
+            break;
+          case Role.Bomber:
+            combatantType = CombatantType.Fighter;
+            ai = new PlayerBomberAI();
+            damageResistance = 1;
+            break;
+          case Role.Ground:
+            combatantType = CombatantType.Ground;
+            ai = new PlayerAI();
+            break;
         }
         return new Player(
           index,
@@ -113,7 +100,6 @@ export class Scenario {
           0,
           scenarioPlayer.abilityScores,
           scenarioPlayer.focus,
-          actions,
           scenarioPlayer.name,
           ai,
           combatantType,
@@ -222,7 +208,6 @@ export class ScenarioPlayerAirship {
 
 export class ScenarioPlayer {
   abilityScores: number[];
-  weapon: Action;
   name: string;
   focus: number;
   health: number;
@@ -230,14 +215,12 @@ export class ScenarioPlayer {
 
   constructor(
     abilityScores: number[],
-    weapon: Action,
     name: string,
     focus: number,
     health: number,
     role: Role
   ) {
     this.abilityScores = abilityScores;
-    this.weapon = weapon;
     this.name = name;
     this.focus = focus;
     this.health = health;
@@ -247,7 +230,6 @@ export class ScenarioPlayer {
   clone() {
     return new ScenarioPlayer(
       this.abilityScores,
-      this.weapon,
       this.name,
       this.focus,
       this.health,
@@ -275,9 +257,6 @@ export class ScenarioEnemySet {
         let health, actionsPerTurn, partialDamage, fullDamage;
         let ai = isAirCombat ? new EnemyFighterAI() : new EnemyAI();
         let type = isAirCombat ? CombatantType.Fighter : CombatantType.Ground;
-        let actions = isAirCombat
-          ? [EnemyFighterGuns, EnemyBombs]
-          : [EnemyAttack];
         switch (combatantType as EnemyLevel) {
           case EnemyLevel.Normal:
           default:
@@ -316,7 +295,6 @@ export class ScenarioEnemySet {
           0,
           0,
           true,
-          actions,
           Faction.Enemies,
           health,
           ai,

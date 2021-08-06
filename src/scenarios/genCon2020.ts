@@ -2,21 +2,19 @@ import {
   ScenarioPlayer,
   ScenarioEnemySet,
   Role,
-  ScenarioPlayerAirship,
   ScenarioEnemyAirship,
   EnemyLevel,
+  ScenarioPlayerAirship,
 } from "../simulation/scenario";
-import { Attack } from "../simulation/combatants/actions/playerActions";
 import { maxPlayerHealth } from "../simulation/combatants/player";
 
-let scenarioFocus = 6;
+let scenarioFocus = 12;
 
 export const scenarioGenCon2020 = () => {
   return {
     players: [
       new ScenarioPlayer(
         [1, 1, 0, 0, 2],
-        Attack,
         "Captain",
         scenarioFocus,
         maxPlayerHealth,
@@ -24,7 +22,6 @@ export const scenarioGenCon2020 = () => {
       ),
       new ScenarioPlayer(
         [1, 2, 1, 0, 0],
-        Attack,
         "Tinkerer",
         scenarioFocus,
         maxPlayerHealth,
@@ -32,7 +29,6 @@ export const scenarioGenCon2020 = () => {
       ),
       new ScenarioPlayer(
         [0, 0, 1, 2, 1],
-        Attack,
         "Gunslinger",
         scenarioFocus,
         maxPlayerHealth,
@@ -40,11 +36,17 @@ export const scenarioGenCon2020 = () => {
       ),
       new ScenarioPlayer(
         [1, 0, 2, 0, 1],
-        Attack,
         "Muscle",
         scenarioFocus,
         maxPlayerHealth,
         Role.Bomber
+      ),
+      new ScenarioPlayer(
+        [2, 0, 1, 1, 0],
+        "Thief",
+        scenarioFocus,
+        maxPlayerHealth,
+        Role.Interceptor
       ),
     ],
     isAirCombat: true,
